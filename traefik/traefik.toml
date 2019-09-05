@@ -1,0 +1,56 @@
+[global]
+  sendAnonymousUsage = false
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+  [entryPoints.https]
+    address = ":443"
+
+[api]
+
+# Enable ACME (Let's Encrypt): automatic SSL.
+[certificatesResolvers.mydnschallenge.acme]
+  # Email address used for registration.
+  email = "CLOUDFLARE_EMAIL"
+  # File or key used for certificates storage.
+  storage = "/etc/traefik/acme/acme.json"
+
+  # CA server to use. Uncomment the line to use Let's Encrypt's staging server, leave commented to go to prod. (Optional)
+  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+  # Use a DNS-01 ACME challenge rather than HTTP-01 challenge.
+  # Note: mandatory for wildcard certificate generation.
+  [certificatesResolvers.mydnschallenge.acme.dnsChallenge]
+    # DNS provider used.
+    provider = "cloudflare"
+    # By default, the provider will verify the TXT DNS challenge record before letting ACME verify.
+    # If delayBeforeCheck is greater than zero, this check is delayed for the configured duration in seconds.
+    # Useful if internal networks block external DNS queries.
+    #
+    # Optional
+    # Default: 0
+    #
+    # delayBeforeCheck = 0
+
+## Dynamic configuration ##
+#[tcp]
+#  [tcp.routers]
+#    [tcp.routers.to-database]
+#      entryPoints = ["mysql-default"]
+#      # Catch every request (only available rule for non-tls routers. See below.)
+#      rule = "HostSNI(`*`)"
+#      service = "database"
+
+[providers]
+  [providers.docker]
+    endpoint = "unix:///var/run/docker.sock"
+    watch = true
+    exposedByDefault = false
+    network = "traefik_proxy"
+
+#  [providers.file]
+#  ## Provide a dedicated file, or a directory of several dedicated files
+##    filename = "dynamic_conf.toml"
+#    directory = "/path/to/config"
+#    watch = true
