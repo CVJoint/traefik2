@@ -16,15 +16,17 @@ or whichever directory you'd like. Reload your .bashrc or .bash_aliases file usi
 
 You can include the following in your .bash_aliases file in order to bring up containers, e.g. `dup traefik`:
 
-  `dup() {`
-  `  docker-compose -f /home/$USER/traefik2/ymlfiles/$1.yml -p $1 up -d`
-  `}`
+  ```dup() {
+    docker-compose -f /home/$USER/traefik2/ymlfiles/$1.yml -p $1 up -d
+  }
+  ```
 
 and to bring down containers, e.g. `ddown traefik`:
 
-  `ddown() {`
-  `  docker-compose -f /home/$USER/traefik2/ymlfiles/$1.yml -p $1 down`
-  `}`
+  ```ddown() {
+    docker-compose -f /home/$USER/traefik2/ymlfiles/$1.yml -p $1 down
+  }
+  ```
 
 Other environment variables you will need:
 
