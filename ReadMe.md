@@ -50,12 +50,12 @@ or specify the subnet that you want to use (as long as it's in the private IP sp
 
 or create a macvlan network with:
 
-  `docker network create -d macvlan --subnet=192.168.1.0/24 --ip-range=192.168.1.128/25 --gateway=192.168.1.1 -o parent=enp4s0f0 traefik_proxy`
+  `docker network create -d macvlan --subnet=192.168.1.0/24 --ip-range=192.168.1.128/25 --gateway=192.168.1.1 -o parent=eth0 traefik_proxy`
 
   If you create a macvlan network make sure your DHCP server doesn't assign
   addresses above .127  **Note:** services won't be availabe by the host. This
   hasn't been an issue for me since I run my services on a server, and access
-  them using apps on my phone or using my laptop, with the exception of pihole.
+  them on other devices, with the exception of pihole.
   Pihole runs in a docker container on a raspberry pi as a separate piece of
   networking equipment.
 
