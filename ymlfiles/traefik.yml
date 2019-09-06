@@ -3,7 +3,7 @@
   # docker network create traefik_proxy
 # Trail logs using (docker logs -tf --tail="50" traefik). Change traefik to container you want to trail
 
-version: "3.7"
+version: "3.3"
 services:
 
 
@@ -12,11 +12,16 @@ services:
     container_name: traefik
     image: traefik:v2.0.0-rc1
     restart: always
-    command: #These are used for fail2ban
-      - "--loglevel=INFO"
-      - "--accesslog=true"
-      - "--accessLog.filePath=/var/log/traefik.log"
-      - "--accessLog.filters.statusCodes=400-499"
+#    command: #These are used for fail2ban
+#      - "--log.level=DEBUG" # INFO, DEBUG
+#      - "--accesslog=true"
+#      - "--accessLog.filePath=/var/log/traefik.log"
+#      - "--accessLog.filters.statusCodes=400-499"
+#      - "--certificatesresolvers.mydnschallenge.acme.tlschallenge=true"
+##      - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
+#      - "--certificatesresolvers.mydnschallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+#      - "--certificatesresolvers.mydnschallenge.acme.email=$CLOUDFLARE_EMAIL"
+#      - "--certificatesresolvers.mydnschallenge.acme.storage=/etc/traefik/acme/acme.json"
     networks:
 #      traefik_proxy:
 #        ipv4_address: 192.168.1.252
@@ -36,27 +41,27 @@ services:
 #      - "secret"
     labels:
       - "traefik.enable=true"
-#      - "traefik.docker.network=traefik_proxy"
+      - "traefik.docker.network=traefik_proxy"
       - "traefik.http.routers.traefik-web.rule=Host(`traefik.$DOMAINNAME`)"
-      - "traefik.http.routers.traefik-web.entrypoints=https"
+      - "traefik.http.routers.traefik-web.entrypoints=http"
 #      - "traefik.http.routers.traefik-web.tls.certresolver=mydnschallenge"
-      - "traefik.http.routers.traefik-web.service=traefik-web-svc"
-      - "traefik.http.services.traefik-web-svc.loadbalancer.server.port=8080"
+#      - "traefik.http.routers.traefik-web.service=traefik-web-svc"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 #      - "traefik.tcp.routers.gitea-ssh.rule=HostSNI(`*`)"  ## From a Gitea example: https://community.containo.us/t/routing-ssh-traffic-with-traefik-v2/717/7
 #      - "traefik.tcp.routers.gitea-ssh.entrypoints=ssh"
 #      - "traefik.tcp.routers.gitea-ssh.service=gitea-ssh-svc"
 #      - "traefik.tcp.services.gitea-ssh-svc.loadbalancer.server.port=22"
-      - "traefik.http.middlewares.testHeader.headers.sslredirect=true"
-      - "traefik.http.middlewares.testHeader.headers.stsSeconds=315360000"
-      - "traefik.http.middlewares.testHeader.headers.browserXssFilter=true"
-      - "traefik.http.middlewares.testHeader.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.testHeader.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.testHeader.headers.sslHost=traefik.$DOMAINNAME"
-      - "traefik.http.middlewares.testHeader.headers.sslForceHost=true"
-      - "traefik.http.middlewares.testHeader.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.testHeader.headers.stsPreload=true"
-      - "traefik.http.middlewares.testHeader.headers.customresponseheaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-      - "traefik.http.middlewares.testHeader.headers.framedeny=true"
+##      - "traefik.http.middlewares.testHeader.headers.sslredirect=true"
+#      - "traefik.http.middlewares.testHeader.headers.stsSeconds=315360000"
+#      - "traefik.http.middlewares.testHeader.headers.browserXssFilter=true"
+#      - "traefik.http.middlewares.testHeader.headers.contentTypeNosniff=true"
+#      - "traefik.http.middlewares.testHeader.headers.forceSTSHeader=true"
+#      - "traefik.http.middlewares.testHeader.headers.sslHost=traefik.$DOMAINNAME"
+#      - "traefik.http.middlewares.testHeader.headers.sslForceHost=true"
+#      - "traefik.http.middlewares.testHeader.headers.stsIncludeSubdomains=true"
+#      - "traefik.http.middlewares.testHeader.headers.stsPreload=true"
+#      - "traefik.http.middlewares.testHeader.headers.customresponseheaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+##      - "traefik.http.middlewares.testHeader.headers.framedeny=true"
 #      - "traefik.http.middlewares.test-auth.forwardauth.address=http://oauth:4181"
 #      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
 #      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true"
@@ -67,6 +72,10 @@ services:
 #      - "traefik.http.middlewares.testHeader.headers.allowedHosts=$DOMAINNAME"
 #      - "traefik.http.middlewares.testHeader.headers.customFrameOptionsValue="
 #      - "traefik.http.middlewares.testHeader.headers.customBrowserXSSValue="
+      - traefik.http.routers.traefik.middlewares=redirect@file
+      - traefik.http.routers.traefik_secure.entrypoints=https
+      - traefik.http.routers.traefik_secure.rule=Host(`traefik.$DOMAINNAME`)
+      - traefik.http.routers.traefik_secure.tls.certresolver=letsencrypt
 
 ## Google OAuth - Limits access to only your Google account
   # https://hub.docker.com/r/thomseddon/traefik-forward-auth
