@@ -1,0 +1,48 @@
+version: "3.3"
+services:
+
+## Emby Media Server
+  emby:
+    container_name: emby
+    image: emby/embyserver
+    restart: always
+    devices:
+     - /dev/dri:/dev/dri
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.1.249
+#      - traefik_proxy
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+    volumes:
+      - /mnt/storage/movies:/MOVIES:ro
+      - /mnt/storage/tv:/TVSHOWS:ro
+      - /mnt/storage/concerts:/CONCERTS:ro
+      - /mnt/storage/music/music:/music:ro
+      - $USERDIR/docker/emby:/config
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - GIDLIST=44
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      - traefik.http.routers.emby.entrypoints=http
+      - traefik.http.routers.emby.rule=Host(`emby.$DOMAINNAME`)
+
+      - traefik.http.routers.emby-secure.entrypoints=https
+      - traefik.http.routers.emby-secure.rule=Host(`emby.$DOMAINNAME`)
+      - traefik.http.routers.emby-secure.tls.certresolver=cloudflare
+
+      - "traefik.http.routers.emby-secure.service=emby-secure"
+      - traefik.http.services.emby-secure.loadbalancer.server.port=8096
+
+      - "traefik.http.routers.emby-secure.middlewares=emby-secured"
+      - "traefik.http.middlewares.emby-secured.chain.middlewares=emby-https-only"
+      - "traefik.http.middlewares.emby-https-only.redirectscheme.scheme=https"
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

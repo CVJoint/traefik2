@@ -17,7 +17,7 @@
 
 [log]
   ##Log level (Default: "ERROR")
-  level = "DEBUG" ## DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+  level = "INFO" ## DEBUG, INFO, WARN, ERROR, FATAL, PANIC
 
   ##Sets the filepath for the traefik log. If not specified, stdout will be used. (Default: os.Stdout)
 #  filePath = "log/traefik.log"
@@ -25,7 +25,7 @@
   ##Format is either "json" or "common". (Default: "common")
 #  format = "json"
 
-[accessLog]
+#[accessLog]
   ##Sets the filepath for the access log. If not specified, stdout will be used. (Default: os.Stdout)
 #  filePath = "/path/to/log/log.txt"
 
@@ -58,17 +58,17 @@
     swarmMode = false
     network = "traefik_proxy"
 
-  [providers.file]
+#  [providers.file]
     ##Provide a dedicated file, or a directory of several dedicated files
-    filename = "/etc/traefik/middlewares.toml"
+#    filename = "/etc/traefik/middlewares.toml"
     #directory = "/path/to/config"
-    watch = true
+#    watch = true
 
 
 # Enable ACME (Let's Encrypt): automatic SSL.
-[certificatesResolvers.letsencrypt.acme]
+[certificatesResolvers.cloudflare.acme]
   # Email address used for registration.
-  email = "your e-mail"
+  email = "your email"
   # File or key used for certificates storage.
   storage = "/etc/traefik/acme/acme.json"
 
@@ -77,9 +77,10 @@
 
   # Use a DNS-01 ACME challenge rather than HTTP-01 challenge.
   # Note: mandatory for wildcard certificate generation.
-  [certificatesResolvers.letsencrypt.acme.dnsChallenge]
+  [certificatesResolvers.cloudflare.acme.dnsChallenge]
     # DNS provider used.
     provider = "cloudflare"
+    resolvers = ["1.1.1.1:53", "1.0.0.1:53"]
     # By default, the provider will verify the TXT DNS challenge record before letting ACME verify.
     # If delayBeforeCheck is greater than zero, this check is delayed for the configured duration in seconds.
     # Useful if internal networks block external DNS queries.

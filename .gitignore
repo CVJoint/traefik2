@@ -1,5 +1,5 @@
 rules.toml
 old_t.toml
 /dynamic
-/traefik/acme/acme.json
+traefik/acme/acme.json
 

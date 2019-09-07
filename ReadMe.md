@@ -1,4 +1,4 @@
-# Traefik v2.0
+# Traefik v2.0 -- Under Development...
 
 -------
 
@@ -60,7 +60,7 @@ or create a macvlan network with:
   networking equipment.
 
 
-Change **CLOUDFLARE_EMAIL** in the traefik.toml (I don't know if you can use variables in the toml file.) and run 
+Change **<your email>** in the traefik.toml, and run: 
 
 `dup traefik`
 
