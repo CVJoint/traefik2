@@ -27,17 +27,15 @@ services:
       - traefik.http.routers.heimdall-secure.rule=Host(`heimdall.$DOMAINNAME`)
       - traefik.http.routers.heimdall-secure.tls.certresolver=cloudflare
 
-      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181"
-      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User"
+      - traefik.http.routers.heimdall-secure.middlewares=heimdall-secured
+      - traefik.http.middlewares.heimdall-secured.chain.middlewares=https-only,test-auth
+      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
+      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
+      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
 
-      - "traefik.http.routers.heimdall-secure.service=heimdall-secure"
+      - traefik.http.routers.heimdall-secure.service=heimdall-secure
       - traefik.http.services.heimdall-secure.loadbalancer.server.port=80
-
-      - "traefik.http.routers.heimdall-secure.middlewares=heimdall-secured"
-      - "traefik.http.middlewares.heimdall-secured.chain.middlewares=https-only,test-auth"
-      - "traefik.http.middlewares.https-only.redirectscheme.scheme=https"
-
 
 networks:
   traefik_proxy:

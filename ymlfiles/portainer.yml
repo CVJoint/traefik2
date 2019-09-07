@@ -28,17 +28,15 @@ services:
       - traefik.http.routers.portainer-secure.rule=Host(`portainer.$DOMAINNAME`)
       - traefik.http.routers.portainer-secure.tls.certresolver=cloudflare
 
-      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181"
-      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User"
+      - traefik.http.routers.portainer-secure.middlewares=secured
+      - traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth
+      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
+      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
+      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
 
-      - "traefik.http.routers.portainer-secure.service=portainer-secure"
+      - traefik.http.routers.portainer-secure.service=portainer-secure
       - traefik.http.services.portainer-secure.loadbalancer.server.port=9000
-
-      - "traefik.http.routers.portainer-secure.middlewares=secured"
-      - "traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth"
-      - "traefik.http.middlewares.https-only.redirectscheme.scheme=https"
-
 
 volumes:
   portainer_data:

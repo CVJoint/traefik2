@@ -35,12 +35,12 @@ services:
       - traefik.http.routers.emby-secure.rule=Host(`emby.$DOMAINNAME`)
       - traefik.http.routers.emby-secure.tls.certresolver=cloudflare
 
-      - "traefik.http.routers.emby-secure.service=emby-secure"
-      - traefik.http.services.emby-secure.loadbalancer.server.port=8096
-
       - "traefik.http.routers.emby-secure.middlewares=emby-secured"
       - "traefik.http.middlewares.emby-secured.chain.middlewares=emby-https-only"
       - "traefik.http.middlewares.emby-https-only.redirectscheme.scheme=https"
+
+      - "traefik.http.routers.emby-secure.service=emby-secure"
+      - traefik.http.services.emby-secure.loadbalancer.server.port=8096
 
 networks:
   traefik_proxy:

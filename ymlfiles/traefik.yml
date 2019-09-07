@@ -9,7 +9,7 @@ services:
 ## Traefik - Reverse Proxy
   traefik:
     container_name: traefik
-    image: traefik:v2.0.0-rc1
+    image: traefik:v2.0.0-rc2
     restart: always
     networks:
       traefik_proxy:
@@ -22,7 +22,6 @@ services:
     volumes:
       - $TRAEFIK2DIR/traefik:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log/docker:/var/log # Used for fail2ban
     environment:
       - CF_API_EMAIL=$CLOUDFLARE_EMAIL
       - CF_API_KEY=$CLOUDFLARE_API_KEY
@@ -36,16 +35,16 @@ services:
       - traefik.http.routers.traefik-secure.rule=Host(`traefik.$DOMAINNAME`)
       - traefik.http.routers.traefik-secure.tls.certresolver=cloudflare
 
-      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181"
-      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User"
+      - traefik.http.routers.traefik-secure.middlewares=secured
+      - traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth
+      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
+      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
+      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
 
-      - "traefik.http.routers.traefik-secure.service=traefik-secure"
+      - traefik.http.routers.traefik-secure.service=traefik-secure
       - traefik.http.services.traefik-secure.loadbalancer.server.port=8080
 
-      - "traefik.http.routers.traefik-secure.middlewares=secured"
-      - "traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth"
-      - "traefik.http.middlewares.https-only.redirectscheme.scheme=https"
 
 
 
@@ -124,75 +123,20 @@ services:
       - traefik.docker.network=traefik_proxy
       - traefik.http.routers.oauth.entrypoints=http
       - traefik.http.routers.oauth.rule=Host(`oauth.$DOMAINNAME`)
-#      - traefik.http.routers.oauth.middlewares=redirect@file,test-auth
 
       - traefik.http.routers.oauth-secure.entrypoints=https
       - traefik.http.routers.oauth-secure.rule=Host(`oauth.$DOMAINNAME`)
       - traefik.http.routers.oauth-secure.tls.certresolver=cloudflare
 
-      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181"
-      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User"
+      - traefik.http.routers.oauth-secure.middlewares=secured
+      - traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth
+      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
+      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
+      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
 
-      - "traefik.http.routers.oauth-secure.service=oauth-secure"
+      - traefik.http.routers.oauth-secure.service=oauth-secure
       - traefik.http.services.oauth-secure.loadbalancer.server.port=4181
-
-      - "traefik.http.routers.oauth-secure.middlewares=secured"
-      - "traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth"
-      - "traefik.http.middlewares.https-only.redirectscheme.scheme=https"
-
-
-
-#      - traefik.http.routers.oauth-secure.service=oauth-secure
-#      - traefik.http.routers.traefik-secure.middlewares=secured
-
-#      - traefik.http.middlewares.secured.chain.middlewares=https-only,known-ips,auth-users
-#      - traefik.http.middlewares.auth-users.basicauth.users=test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
-#      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
-#      - traefik.http.middlewares.known-ips.ipwhitelist.sourceRange=192.168.1.7,127.0.0.1/32
-#      - http.services.service1.loadbalancer.server.port=80
-
-#      - "traefik.http.middlewares.traefik-secure.headers.sslredirect=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.stsSeconds=315360000"
-#      - "traefik.http.middlewares.traefik-secure.headers.browserXssFilter=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.contentTypeNosniff=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.forceSTSHeader=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.sslHost=traefik.$DOMAINNAME"
-#      - "traefik.http.middlewares.traefik-secure.headers.sslForceHost=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.stsIncludeSubdomains=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.stsPreload=true"
-#      - "traefik.http.middlewares.traefik-secure.headers.customresponseheaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-#      - "traefik.http.middlewares.traefik-secure.headers.framedeny=true"
-
-#      - "traefik.http.routers.oauth.middlewares=test-auth"
-#      - "traefik.http.middlewares.test-auth.ForwardAuth.Address=http://oauth:4181"
-#      - "traefik.http.middlewares.test-auth.ForwardAuth.authResponseHeaders=X-Forwarded-User"
-#      - "traefik.http.middlewares.test-auth.ForwardAuth.trustForwardHeader=true"
-#      - "traefik.enable=true"
-##      - "traefik.docker.network=traefik_proxy"
-#      - "traefik.http.routers.traefik-web.rule=Host(`oauth.$DOMAINNAME`)"
-#      - "traefik.http.routers.traefik-web.entrypoints=http"
-#      - "traefik.http.routers.traefik-web.service=traefik-web-svc"
-#      - "traefik.http.services.traefik-web-svc.loadbalancer.server.port=4181"
-##      - "traefik.tcp.routers.gitea-ssh.rule=HostSNI(`*`)"  ## From a Gitea example: https://community.containo.us/t/routing-ssh-traffic-with-traefik-v2/717/7
-##      - "traefik.tcp.routers.gitea-ssh.entrypoints=ssh"
-##      - "traefik.tcp.routers.gitea-ssh.service=gitea-ssh-svc"
-##      - "traefik.tcp.services.gitea-ssh-svc.loadbalancer.server.port=22"
-#      - "traefik.http.middlewares.testHeader.headers.sslredirect=true"
-#      - "traefik.http.middlewares.testHeader.headers.stsSeconds=315360000"
-#      - "traefik.http.middlewares.testHeader.headers.browserXssFilter=true"
-#      - "traefik.http.middlewares.testHeader.headers.contentTypeNosniff=true"
-#      - "traefik.http.middlewares.testHeader.headers.forceSTSHeader=true"
-#      - "traefik.http.middlewares.testHeader.headers.sslHost=oauth.$DOMAINNAME"
-#      - "traefik.http.middlewares.testHeader.headers.sslForceHost=true"
-#      - "traefik.http.middlewares.testHeader.headers.stsIncludeSubdomains=true"
-#      - "traefik.http.middlewares.testHeader.headers.stsPreload=true"
-#      - "traefik.http.middlewares.testHeader.headers.customresponseheaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
-#      - "traefik.http.middlewares.testHeader.headers.framedeny=true"
-#      - "traefik.http.middlewares.test-auth.forwardauth.address=http://oauth:4181" # add this to any containers you want to protect (if possible, sometimes mobile apps dont work)
-#      - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User" # add this to any containers you want to protect (if possible, sometimes mobile apps dont work)
-#      - "traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true" # add this to any containers you want to protect (if possible, sometimes mobile apps dont work)
-##      - "traefik.http.middlewares.testHeader.headers.sslProxyHeaders="X-Forwarded-Proto,https"
 
 networks:
   traefik_proxy:
