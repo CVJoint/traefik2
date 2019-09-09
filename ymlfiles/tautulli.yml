@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+
+## Tautulli – Monitoring Plex Usage
+  tautulli:
+    container_name: tautulli
+    image: linuxserver/tautulli
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8181:8181"
+    volumes:
+      - $USERDIR/docker/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro # Plex Log Directory
+      - $USERDIR/docker/tautulli/config:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.tautulli.entrypoints=https
+      - traefik.http.routers.tautulli.rule=Host(`tautulli.$DOMAINNAME`)
+      - traefik.http.routers.tautulli.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.tautulli.middlewares=tautulli-headers
+      - traefik.http.middlewares.tautulli-headers.headers.SSLHost=tautulli.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.tautulli.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.tautulli.service=tautulli
+      - traefik.http.services.tautulli.loadbalancer.server.port=8181
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

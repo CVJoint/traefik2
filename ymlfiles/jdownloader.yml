@@ -1,0 +1,49 @@
+version: "3.7"
+services:
+
+## JDownloader – Download Manager
+  jdownloader:
+    container_name: jdownloader
+    image: jlesage/jdownloader-2
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.1.247
+#      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+#      - "5900:5900"
+#      - "3129:3129"
+    volumes:
+      - $USERDIR/dwnloads/jdown:/output
+      - /mnt/storage/music/music:/music
+      - $USERDIR/docker/jdownloader:/config
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=002
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+      - KEEP_APP_RUNNING=1
+#      - VNC_PASSWORD=<a password> # Optional
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.jdownloader.entrypoints=https
+      - traefik.http.routers.jdownloader.rule=Host(`jdownloader.$DOMAINNAME`)
+      - traefik.http.routers.jdownloader.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.jdownloader.middlewares=jdownloader-headers
+      - traefik.http.middlewares.jdownloader-headers.headers.SSLHost=jdownloader.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.jdownloader.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.jdownloader.service=jdownloader
+      - traefik.http.services.jdownloader.loadbalancer.server.port=5800
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

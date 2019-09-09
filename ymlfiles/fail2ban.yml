@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+
+## Fail2ban - Network security against attacks
+  # iptables -L <jail> --line-numbers
+  # fail2ban-client set <jail> unbanip <ip to unban>
+  # fail2ban-regex '<log output>' 'regex'
+  # Other commands: https://www.fail2ban.org/wiki/index.php/Commands
+  fail2ban:
+    container_name: fail2ban
+    image: crazymax/fail2ban
+    restart: always
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - /var/log:/var/log
+      - $USERDIR/docker/hass/home-assistant.log:/var/log/home-assistant.log:ro
+      - $USERDIR/docker/fail2ban:/data
+      - $USERDIR/docker/fail2ban/fail2ban.d:/etc/fail2ban/fail2ban.d
+    environment:
+      - TZ=$TZ
+      - F2B_LOG_LEVEL=INFO
+      - F2B_DB_PURGE_AGE=1d # Age at which bans should be purged from the database
+      - F2B_MAX_RETRY=1 # Number of failures before a host get banned
+      - F2B_IPTABLES_CHAIN=FORWARD # Specifies the iptables chain to which the Fail2Ban rules should be added
+      - SSMTP_HOST=smtp.gmail.com
+      - SSMTP_PORT=587
+      - SSMTP_USER=$SMTP_EMAIL
+      - SSMTP_PASSWORD=$SMTP_PASS # Create an "app password" if you use 2FA
+      - SSMTP_TLS=TLS
+      - F2B_ACTION=%(action_mw)s

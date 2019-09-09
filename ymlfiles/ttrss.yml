@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+## Tiny Tiny RSS
+  # Need to set up a database first
+  # Login: admin / password
+  ttrss:
+    container_name: ttrss
+    image: linuxserver/tt-rss
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "780:80"
+#      - "7443:443"
+    volumes:
+      - $USERDIR/docker/ttrss:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.ttrss.entrypoints=https
+      - traefik.http.routers.ttrss.rule=Host(`ttrss.$DOMAINNAME`)
+      - traefik.http.routers.ttrss.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.ttrss.middlewares=ttrss-headers
+      - traefik.http.middlewares.ttrss-headers.headers.SSLHost=ttrss.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.ttrss.middlewares=noauth-chain@file
+      ## Services
+      - traefik.http.routers.ttrss.service=ttrss
+      - traefik.http.services.ttrss.loadbalancer.server.port=80
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

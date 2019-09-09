@@ -1,0 +1,44 @@
+version: "3.7"
+services:
+
+## mkvtoolnix – Video Editor
+  mkvtoolnix:
+    container_name: mkvtoolnix
+    image: jlesage/mkvtoolnix
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+    volumes:
+      - $USERDIR/docker/mkvtoolnix:/config:rw
+      - $USERDIR:/home:rw # Data folder - can be anything
+      - /mnt/storage:/storage:rw # Data folder - can be anything
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK=002
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.mkvtoolnix.entrypoints=https
+      - traefik.http.routers.mkvtoolnix.rule=Host(`mkvtoolnix.$DOMAINNAME`)
+      - traefik.http.routers.mkvtoolnix.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.mkvtoolnix.middlewares=mkvtoolnix-headers
+      - traefik.http.middlewares.mkvtoolnix-headers.headers.SSLHost=mkvtoolnix.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.mkvtoolnix.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.mkvtoolnix.service=mkvtoolnix
+      - traefik.http.services.mkvtoolnix.loadbalancer.server.port=5800
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

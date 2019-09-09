@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 services:
 
 ## Portainer - WebUI for Containers
@@ -9,8 +9,6 @@ services:
     command: -H unix:///var/run/docker.sock
     networks:
       - traefik_proxy
-#    expose:
-#      - "9000"
 #    ports:
 #      - "9000:9000"
     volumes:
@@ -21,22 +19,18 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.portainer.entrypoints=http
+      ## HTTPS entrypoint
+      - traefik.http.routers.portainer.entrypoints=https
       - traefik.http.routers.portainer.rule=Host(`portainer.$DOMAINNAME`)
-
-      - traefik.http.routers.portainer-secure.entrypoints=https
-      - traefik.http.routers.portainer-secure.rule=Host(`portainer.$DOMAINNAME`)
-      - traefik.http.routers.portainer-secure.tls.certresolver=cloudflare
-
-      - traefik.http.routers.portainer-secure.middlewares=secured
-      - traefik.http.middlewares.secured.chain.middlewares=https-only,test-auth
-      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
-      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
-      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
-      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
-
-      - traefik.http.routers.portainer-secure.service=portainer-secure
-      - traefik.http.services.portainer-secure.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.portainer.middlewares=portainer-headers
+      - traefik.http.middlewares.portainer-headers.headers.SSLHost=portainer.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.portainer.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.portainer.service=portainer
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
 volumes:
   portainer_data:

@@ -12,8 +12,12 @@
     address = ":80"
   [entryPoints.https]
     address = ":443"
-#  [entryPoints.ssh]
-#    address = ":2222"
+  [entryPoints.mariadb-port]
+    address = ":3306"
+  [entryPoints.mongo-port]
+    address = ":27017"
+  [entryPoints.redis-port]
+    address = ":6379"
 
 [log]
   ##Log level (Default: "ERROR")
@@ -34,10 +38,22 @@
 
 [api]
   ##Name of the related entry point (Default: "traefik")
-#  entryPoint = "traefik"
+  #  entryPoint = "traefik"
 
   ##Enabled Dashboard (Default: true)
-#  dashboard = false
+  dashboard = true
+
+  ##Enable Debug (Default: false)
+  #  debug = true
+
+#[http]
+
+#  [http.routers]
+
+#    [http.routers.api]
+#        rule = "PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+#        service = "api@internal"
+#        insecure = true
 
 #[ping]
   ##Name of the related entry point (Default: "traefik")
@@ -58,11 +74,11 @@
     swarmMode = false
     network = "traefik_proxy"
 
-#  [providers.file]
+  [providers.file]
     ##Provide a dedicated file, or a directory of several dedicated files
-#    filename = "/etc/traefik/middlewares.toml"
-    #directory = "/path/to/config"
-#    watch = true
+#    filename = "/etc/traefik/rules/middlewares.toml"
+    directory = "/etc/traefik/rules"
+    watch = true
 
 
 # Enable ACME (Let's Encrypt): automatic SSL.
@@ -73,7 +89,7 @@
   storage = "/etc/traefik/acme/acme.json"
 
   # CA server to use. Uncomment the line to use Let's Encrypt's staging server, leave commented to go to prod. (Optional)
-  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+#  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
   # Use a DNS-01 ACME challenge rather than HTTP-01 challenge.
   # Note: mandatory for wildcard certificate generation.
@@ -89,12 +105,3 @@
     # Default: 0
     #
     # delayBeforeCheck = 0
-
-## Dynamic configuration ##
-#[tcp]
-#  [tcp.routers]
-#    [tcp.routers.to-database]
-#      entryPoints = ["mysql-default"]
-#      # Catch every request (only available rule for non-tls routers. See below.)
-#      rule = "HostSNI(`*`)"
-#      service = "database"

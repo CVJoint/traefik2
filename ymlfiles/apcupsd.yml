@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+
+## APCUPSD
+  # Check status with: docker exec -it apcupsd apcaccess
+  apcupsd:
+    container_name: apcupsd
+    image: gersilex/apcupsd
+    restart: always
+#    network_mode: host
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.1.239
+#    ports:
+#      - "3551:3551"
+    privileged: true
+    tty: true
+    volumes:
+      - /tmp/apcupsd-docker:/tmp/apcupsd-docker
+      - $USERDIR/docker/apcupsd/apcupsd.conf:/etc/apcupsd/apcupsd.conf
+      - $USERDIR/docker/apcupsd/doshutdown:/etc/apcupsd/doshutdown
+      - $USERDIR/docker/apcupsd/apcupsd.events/var/log/apcupsd.events
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

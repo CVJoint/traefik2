@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 services:
 
 ## Heimdall - Homepage
@@ -10,7 +10,6 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
-#      - "443:443"
     volumes:
       - $USERDIR/docker/heimdall:/config
     environment:
@@ -20,22 +19,18 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.heimdall.entrypoints=http
+      ## HTTPS entrypoint
+      - traefik.http.routers.heimdall.entrypoints=https
       - traefik.http.routers.heimdall.rule=Host(`heimdall.$DOMAINNAME`)
-
-      - traefik.http.routers.heimdall-secure.entrypoints=https
-      - traefik.http.routers.heimdall-secure.rule=Host(`heimdall.$DOMAINNAME`)
-      - traefik.http.routers.heimdall-secure.tls.certresolver=cloudflare
-
-      - traefik.http.routers.heimdall-secure.middlewares=heimdall-secured
-      - traefik.http.middlewares.heimdall-secured.chain.middlewares=https-only,test-auth
-      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
-      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
-      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
-      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
-
-      - traefik.http.routers.heimdall-secure.service=heimdall-secure
-      - traefik.http.services.heimdall-secure.loadbalancer.server.port=80
+      - traefik.http.routers.heimdall.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.heimdall.middlewares=heimdall-headers
+      - traefik.http.middlewares.heimdall-headers.headers.SSLHost=heimdall.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.heimdall.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.heimdall.service=heimdall
+      - traefik.http.services.heimdall.loadbalancer.server.port=80
 
 networks:
   traefik_proxy:

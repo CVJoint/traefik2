@@ -1,0 +1,23 @@
+# Available Header Options: https://github.com/unrolled/secure#available-options
+# A great resource for these headers is your preferred browser's docs. Firefox: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
+# https://developers.google.com/search/reference/robots_meta_tag
+# https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Clickjacking_Defense_Cheat_Sheet.md
+# Check headers here, don't include oauth when checking headers: https://securityheaders.com
+
+[http.middlewares]
+  [http.middlewares.secure-headers-nocookie.headers]
+    SSLRedirect = true
+    SSLForceHost = true
+    STSSeconds = 315360000
+    STSIncludeSubdomains = true
+    STSPreload = true
+    ForceSTSHeader = true
+    FrameDeny = true
+    CustomFrameOptionsValue = "SAMEORIGIN"
+    ContentTypeNosniff = true
+    BrowserXssFilter = true
+    ContentSecurityPolicy = "default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'"
+    ReferrerPolicy = "same-origin"
+    FeaturePolicy = "camera 'none'; display-capture 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none'"
+    [http.middlewares.secure-headers-nocookie.headers.customResponseHeaders]
+      X-Robots-Tag = "none,noarchive,nosnippet,notranslate,noimageindex"

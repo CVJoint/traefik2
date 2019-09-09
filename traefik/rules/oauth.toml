@@ -1,0 +1,5 @@
+[http.middlewares]
+  [http.middlewares.oauth.forwardAuth]
+    address = "http://oauth:4181"
+    trustForwardHeader = true
+    authResponseHeaders = ["X-Forwarded-User", "X-WebAuth-User"]

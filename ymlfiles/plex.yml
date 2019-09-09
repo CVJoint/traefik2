@@ -1,0 +1,52 @@
+version: "3.7"
+services:
+
+## Plex Media Server
+   #Navigate to (127.0.0.1:32400/web) to reset your server
+  plex:
+    container_name: plex
+    image: linuxserver/plex
+    restart: always
+    devices:
+      - /dev/dri:/dev/dri
+    privileged: true
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.1.250
+#    ports:
+#      - "32400:32400"
+#      - "32400:32400/udp"
+#      - "32469:32469"
+#      - "32469:32469/udp"
+#      - "5353:5353/udp"
+#      - "1900:1900/udp"
+    volumes:
+      - /mnt/storage/movies:/MOVIES:ro
+      - /mnt/storage/tv:/TV:ro
+      - /mnt/storage/concerts:/CONCERTS:ro
+      - $USERDIR/docker/plex:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - VERSION=docker
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.plex.entrypoints=https
+      - traefik.http.routers.plex.rule=Host(`plex.$DOMAINNAME`)
+      - traefik.http.routers.plex.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.plex.middlewares=plex-headers
+      - traefik.http.middlewares.plex-headers.headers.SSLHost=plex.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.plex.middlewares=noauth-chain@file
+      ## Services
+      - traefik.http.routers.plex.service=plex
+      - traefik.http.services.plex.loadbalancer.server.port=32400
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

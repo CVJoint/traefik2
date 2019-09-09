@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+
+## Ouroboros
+  # https://hub.docker.com/r/pyouroboros/ouroboros/
+  # https://github.com/pyouroboros/ouroboros/wiki
+  ouroboros:
+    container_name: ouroboros
+    image: pyouroboros/ouroboros
+    restart: always
+    networks:
+      - traefik_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CLEANUP=true
+#      - INTERVAL=3600
+      - CRON="0 4 * * *"
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      - LATEST=true
+      - IGNORE=mongo influxdb postgres mariadb
+      - TZ=$TZ
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

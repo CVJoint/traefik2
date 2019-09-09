@@ -1,0 +1,3 @@
+[http.middlewares]
+  [http.middlewares.noauth-chain.chain]
+    middlewares = ["https-only", "secure-headers"]

@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 services:
 
 ## Emby Media Server
@@ -12,9 +12,9 @@ services:
       traefik_proxy:
         ipv4_address: 192.168.1.249
 #      - traefik_proxy
-    ports:
-      - "8096:8096"
-      - "8920:8920"
+#    ports:
+#      - "8096:8096"
+#      - "8920:8920"
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro
@@ -28,19 +28,18 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.emby.entrypoints=http
+      ## HTTPS entrypoint
+      - traefik.http.routers.emby.entrypoints=https
       - traefik.http.routers.emby.rule=Host(`emby.$DOMAINNAME`)
-
-      - traefik.http.routers.emby-secure.entrypoints=https
-      - traefik.http.routers.emby-secure.rule=Host(`emby.$DOMAINNAME`)
-      - traefik.http.routers.emby-secure.tls.certresolver=cloudflare
-
-      - "traefik.http.routers.emby-secure.middlewares=emby-secured"
-      - "traefik.http.middlewares.emby-secured.chain.middlewares=emby-https-only"
-      - "traefik.http.middlewares.emby-https-only.redirectscheme.scheme=https"
-
-      - "traefik.http.routers.emby-secure.service=emby-secure"
-      - traefik.http.services.emby-secure.loadbalancer.server.port=8096
+      - traefik.http.routers.emby.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.emby.middlewares=emby-headers
+      - traefik.http.middlewares.emby-headers.headers.SSLHost=emby.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.emby.middlewares=noauth-chain@file
+      ## Services
+      - traefik.http.routers.emby.service=emby
+      - traefik.http.services.emby.loadbalancer.server.port=8096
 
 networks:
   traefik_proxy:
