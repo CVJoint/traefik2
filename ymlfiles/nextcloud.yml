@@ -6,7 +6,7 @@ services:
   ## Suggested to create NextCloud database using MariaDB
     # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
     # CREATE DATABASE nextcloud CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-    # GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'nextcloud.traefik_proxy'IDENTIFIED BY 'Hippi99((';
+    # GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'nextcloud.traefik_proxy'IDENTIFIED BY '<password>';
     # FLUSH PRIVILEGES;
     # exit
   ## When signing in under Storage & database select MySQL/MariaDB and enter:
