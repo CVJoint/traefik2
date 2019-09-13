@@ -38,7 +38,7 @@ services:
       - traefik.http.routers.jdownloader.middlewares=jdownloader-headers
       - traefik.http.middlewares.jdownloader-headers.headers.SSLHost=jdownloader.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.jdownloader.middlewares=secure-chain@file
+      - traefik.http.routers.jdownloader.middlewares=vnc-chain@file
       ## Services
       - traefik.http.routers.jdownloader.service=jdownloader
       - traefik.http.services.jdownloader.loadbalancer.server.port=5800

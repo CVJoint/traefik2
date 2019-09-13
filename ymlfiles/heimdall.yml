@@ -27,7 +27,7 @@ services:
       - traefik.http.routers.heimdall.middlewares=heimdall-headers
       - traefik.http.middlewares.heimdall-headers.headers.SSLHost=heimdall.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.heimdall.middlewares=secure-chain@file
+      - traefik.http.routers.heimdall.middlewares=secure-headers@file
       ## Services
       - traefik.http.routers.heimdall.service=heimdall
       - traefik.http.services.heimdall.loadbalancer.server.port=80

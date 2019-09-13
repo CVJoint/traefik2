@@ -8,7 +8,7 @@ services:
 ## Traefik - Reverse Proxy
   traefik:
     container_name: traefik
-    image: traefik:v2.0.0-rc2
+    image: traefik:v2.0.0-rc3
     restart: always
     networks:
       traefik_proxy:
@@ -27,8 +27,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy
-#      - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
-#      - "traefik.http.routers.api.service=api@internal"
       ## HTTPS entrypoint
       - traefik.http.routers.traefik.entrypoints=https
       - traefik.http.routers.traefik.rule=Host(`traefik.$DOMAINNAME`)
@@ -37,10 +35,16 @@ services:
       - traefik.http.routers.traefik.middlewares=traefik-headers
       - traefik.http.middlewares.traefik-headers.headers.SSLHost=traefik.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.traefik.middlewares=secure.headers@file
+      - traefik.http.routers.traefik.middlewares=secure-headers@file
       ## Services
       - traefik.http.routers.traefik.service=traefik
+      - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+#      - traefik.http.routers.api.entrypoints=https
+#      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+#      - traefik.http.routers.api.service=api@internal
+#      - traefik.http.services.api.loadbalancer.server.port=8080
 
 #      - traefik.tcp.routers.1traefik.entrypoints=https
 #      - traefik.tcp.routers.1traefik.tls=true
@@ -49,6 +53,72 @@ services:
 #      - traefik.tcp.routers.1traefik.service=1traefik
 #      - traefik.tcp.services.1traefik.loadbalancer.server.port=8080
 
+#      - traefik.http.middlewares.https-only.redirectscheme.scheme=https
+#      - traefik.http.middlewares.test-auth.forwardauth.trustForwardHeader=true
+#      - traefik.http.middlewares.test-auth.forwardauth.Address=http://oauth:4181
+#      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-WebAuth-User
+#      - traefik.http.middlewares.secure-headers.headers.SSLRedirect=true
+#      - traefik.http.middlewares.secure-headers.headers.SSLForceHost=true
+#      - traefik.http.middlewares.secure-headers.headers.STSSeconds=315360000
+#      - traefik.http.middlewares.secure-headers.headers.STSIncludeSubDomains=true
+#      - traefik.http.middlewares.secure-headers.headers.STSPreload=true
+#      - traefik.http.middlewares.secure-headers.headers.ForceSTSHeader=true
+#      - traefik.http.middlewares.secure-headers.headers.FrameDeny=true
+#      - traefik.http.middlewares.secure-headers.headers.CustomFrameOptionsValue=SAMEORIGIN
+#      - traefik.http.middlewares.secure-headers.headers.ContentTypeNosniff=true
+#      - traefik.http.middlewares.secure-headers.headers.BrowserXssFilter=true
+#      - traefik.http.middlewares.secure-headers.headers.ContentSecurityPolicy=default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none';
+#      - traefik.http.middlewares.secure-headers.headers.ReferrerPolicy=same-origin
+#      - traefik.http.middlewares.secure-headers.headers.FeaturePolicy=camera 'none'; display-capture 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';
+#      - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,
+#      - traefik.http.middlewares.secure-headers.headers.customResponseHeaders.Set-Cookie=__Secure-sess=123; path=/; HttpOnly; Secure; SameSite=Lax;
+#      - "traefik.http.middlewares.testHeader.headers.allowedHosts=$DOMAINNAME"
+#      customFrameOptionsValue: 'allow-from https://${DOMAINNAME}'
+
+
+## Google OAuth - Limits access to only your Google account
+  # https://hub.docker.com/r/thomseddon/traefik-forward-auth
+  # https://console.developers.google.com/
+  # Follow directions at above link. My Google settings under the Credentials tab are:
+  # Credentials: Name can be anything (mine is Traefik) and Authorized redirect URLs:  	https://oauth.$DOMAINNAME/_oauth
+  # OAuth Concent Screen: Application Name is Traefik (think it can be anything). I entered my e-mail for support e-mail. Authorized Domains is $DOMAINNAME
+  # Domain Verification: $DOMAINNAME
+
+  oauth:
+    container_name: oauth
+    image: thomseddon/traefik-forward-auth
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.1.251
+##      - traefik_proxy
+    environment:
+      - PROVIDERS_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+      - PROVIDERS_GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      - SECRET=$OAUTH_SECRET
+      - COOKIE_DOMAIN=$DOMAINNAME
+      - INSECURE_COOKIE=1
+      - AUTH_HOST=oauth.$DOMAINNAME
+      - URL_PATH=/_ooauth
+      - WHITELIST=$MY_EMAIL
+      - LOG_LEVEL=info
+      - LOG_FORMAT=text
+##      - LIFETIME=43200
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.oauth.entrypoints=https
+      - traefik.http.routers.oauth.rule=Host(`oauth.$DOMAINNAME`)
+      - traefik.http.routers.oauth.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.oauth.middlewares=oauth-headers
+      - traefik.http.middlewares.oauth-headers.headers.SSLHost=oauth.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.oauth.middlewares=secure-chain@file
+      ## Services
+      - traefik.http.routers.oauth.service=oauth
+      - traefik.http.services.oauth.loadbalancer.server.port=4181
 
 networks:
   traefik_proxy:

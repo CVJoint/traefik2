@@ -3,21 +3,7 @@ services:
 
 ## Airsonic - Music Server
   # Login: admin / admin
-  ## If you want to use a MySQL database:
-  # Create a database:
-  # docker exec -it mariadb mysql -uroot -p
-  # CREATE DATABASE airsonic CHARACTER SET = utf8 COLLATE = utf8_general_ci;
-  # GRANT ALL PRIVILEGES ON airsonic.* TO 'airsonic'@'airsonic.traefik_proxy'IDENTIFIED BY '<CHANGEME>';
-  # FLUSH PRIVILEGES;
-  # exit
-  # Create an "airsonic.properties" file in your config folder and paste the following (change password):
-  # DatabaseMysqlMaxlength=512
-  # DatabaseConfigType=EMBED
-  # DatabaseConfigEmbedDriver=com.mysql.jdbc.Driver
-  # DatabaseConfigEmbedPassword=<CHANGEME>
-  # DatabaseConfigEmbedUrl=jdbc:mysql://mariadb:3306/airsonic?sessionVariables=sql_mode=ANSI_QUOTES
-  # DatabaseConfigEmbedUsername=airsonic
-  # DatabaseUsertableQuote=
+
   airsonic:
     container_name: airsonic
     image: linuxserver/airsonic
@@ -50,7 +36,7 @@ services:
       - traefik.http.routers.airsonic.middlewares=airsonic-headers
       - traefik.http.middlewares.airsonic-headers.headers.SSLHost=airsonic.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.airsonic.middlewares=noauth-chain@file
+      - traefik.http.routers.airsonic.middlewares=noauth-chain-nocookie@file
       ## Services
       - traefik.http.routers.airsonic.service=airsonic
       - traefik.http.services.airsonic.loadbalancer.server.port=4040

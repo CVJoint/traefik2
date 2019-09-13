@@ -37,14 +37,15 @@
 #  format = "json"
 
 [api]
+  dashboard = true
+#  insecure = true
   ##Name of the related entry point (Default: "traefik")
-  #  entryPoint = "traefik"
+  #entryPoint = "traefik"
 
   ##Enabled Dashboard (Default: true)
-  dashboard = true
-
+  
   ##Enable Debug (Default: false)
-  #  debug = true
+  #debug = true
 
 #[http]
 

@@ -12,19 +12,19 @@ services:
 #      - "5800:5800"
     volumes:
       - $USERDIR/docker/handbrake/config:/config:rw
-      - /mnt/storage:/storage:ro # Data folder - can be anything
-      - $USERDIR/dwnloads:/downloads:ro # Data folder - can be anything
       - $USERDIR/docker/handbrake/watch:/watch:rw # Watch folder
       - $USERDIR/docker/handbrake/output:/output:rw # Output folder
+      - /mnt/storage:/storage:ro # Data folder - can be anything
+      - $USERDIR/dwnloads:/downloads:ro # Data folder - can be anything
     environment:
       - USER_ID=$PUID
       - GROUP_ID=$PGID
-      - TZ=${TZ}
+      - TZ=$TZ
       - UMASK=002
       - DISPLAY_WIDTH=1280
       - DISPLAY_HEIGHT=768
-      - AUTOMATED_CONVERSION_PRESET=H.265 MKV 480p30
-#      - AUTOMATED_CONVERSION_PRESET=H.265 MKV 1080p30
+#      - AUTOMATED_CONVERSION_PRESET=H.265 MKV 480p30
+      - AUTOMATED_CONVERSION_PRESET=H.265 MKV 1080p30
       - AUTOMATED_CONVERSION_FORMAT=mkv
     labels:
       - traefik.enable=true
