@@ -10,9 +10,9 @@ services:
       - /dev/dri:/dev/dri
     networks:
       - traefik_proxy
-#    ports:
-#      - "8096:8096"
-#      - "8920:8920"
+    ports:
+      - "8096:8096"
+      - "8920:8920"
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro

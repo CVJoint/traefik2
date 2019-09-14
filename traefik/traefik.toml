@@ -8,10 +8,21 @@
   sendAnonymousUsage = true
 
 [entryPoints]
+  ## HTTP
   [entryPoints.http]
     address = ":80"
+    [entryPoints.http.proxyProtocol]
+      trustedIPs = ["192.168.50.1/32", "192.168.1.1/32", "127.0.0.1/32"] # "192.168.50.1/32" is my traefik_proxy gateway
+#      insecure = true
+    [entryPoints.http.forwardedHeaders]
+      trustedIPs = ["192.168.50.1/32", "192.168.1.1/32", "127.0.0.1/32"]
+#      insecure = true
+  ## HTTPS
   [entryPoints.https]
     address = ":443"
+  ## OTHERS
+  [entryPoints.ssh]
+    address = ":2222"
   [entryPoints.mariadb-port]
     address = ":3306"
   [entryPoints.mongo-port]
@@ -38,12 +49,12 @@
 
 [api]
   dashboard = true
-#  insecure = true
+  insecure = true
   ##Name of the related entry point (Default: "traefik")
   #entryPoint = "traefik"
 
   ##Enabled Dashboard (Default: true)
-  
+
   ##Enable Debug (Default: false)
   #debug = true
 
@@ -85,7 +96,7 @@
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesResolvers.cloudflare.acme]
   # Email address used for registration.
-  email = "cannondale8022@gmail.com"
+  email = "your email"
   # File or key used for certificates storage.
   storage = "/etc/traefik/acme/acme.json"
 

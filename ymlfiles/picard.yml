@@ -31,7 +31,7 @@ services:
       - traefik.http.routers.picard.middlewares=picard-headers
       - traefik.http.middlewares.picard-headers.headers.SSLHost=picard.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.picard.middlewares=secure-chain@file
+      - traefik.http.routers.picard.middlewares=vnc-chain@file
       ## Services
       - traefik.http.routers.picard.service=picard
       - traefik.http.services.picard.loadbalancer.server.port=5800

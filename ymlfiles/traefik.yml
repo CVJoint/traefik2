@@ -13,8 +13,15 @@ services:
     networks:
       - traefik_proxy
     ports:
-      - "80:80"
-      - "443:443"
+      # https://www.reddit.com/r/docker/comments/c1wrep/traefik_reverse_proxy_question_docker_overlay/
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
 #      - "8080:8080"
     volumes:
       - $TRAEFIK2DIR/traefik:/etc/traefik
@@ -33,11 +40,14 @@ services:
       - traefik.http.routers.traefik.middlewares=traefik-headers
       - traefik.http.middlewares.traefik-headers.headers.SSLHost=traefik.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.traefik.middlewares=secure-headers@file
+      - traefik.http.routers.traefik.middlewares=secure-chain-nocookie@file
       ## Services
       - traefik.http.routers.traefik.service=traefik
-      - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=8080
+      ## TRAEFIK API
+      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+      - traefik.http.routers.api.service=api@internal
+      - traefik.http.routers.api.middlewares=secure-chain-nocookie@file
 
 #      - traefik.http.routers.api.entrypoints=https
 #      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
@@ -73,6 +83,19 @@ services:
 #      - "traefik.http.middlewares.testHeader.headers.allowedHosts=$DOMAINNAME"
 #      customFrameOptionsValue: 'allow-from https://${DOMAINNAME}'
 
+## Who Am I?? - Show Headers
+  # curl -H Host:whoami.localhost http://{HOST_IP}:80
+
+  whoami:
+    container_name: whoami
+    image: containous/whoami
+    networks:
+      - traefik_proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      - traefik.http.routers.whoami.entrypoints=http
+      - traefik.http.routers.whoami.rule=Host(`whoami.localhost`) # keep as .localhost (see curl command above)
 
 ## Google OAuth - Limits access to only your Google account
   # https://hub.docker.com/r/thomseddon/traefik-forward-auth
@@ -111,7 +134,7 @@ services:
       - traefik.http.routers.oauth.middlewares=oauth-headers
       - traefik.http.middlewares.oauth-headers.headers.SSLHost=oauth.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.oauth.middlewares=secure-chain@file
+      - traefik.http.routers.oauth.middlewares=secure-chain-nocookie@file
       ## Services
       - traefik.http.routers.oauth.service=oauth
       - traefik.http.services.oauth.loadbalancer.server.port=4181

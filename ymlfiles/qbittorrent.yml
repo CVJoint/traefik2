@@ -47,7 +47,7 @@ services:
       - traefik.http.routers.qbittorrent.middlewares=qbittorrent-headers
       - traefik.http.middlewares.qbittorrent-headers.headers.SSLHost=qbittorrent.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.qbittorrent.middlewares=secure-chain-nocookie@file
+      - traefik.http.routers.qbittorrent.middlewares=vnc-chain-nocookie@file
       ## Services
       - traefik.http.routers.qbittorrent.service=qbittorrent
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
