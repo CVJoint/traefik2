@@ -7,11 +7,9 @@ services:
     image: emby/embyserver
     restart: always
     devices:
-     - /dev/dri:/dev/dri
+      - /dev/dri:/dev/dri
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.249
-#      - traefik_proxy
+      - traefik_proxy
 #    ports:
 #      - "8096:8096"
 #      - "8920:8920"

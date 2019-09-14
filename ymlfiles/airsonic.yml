@@ -9,9 +9,7 @@ services:
     image: linuxserver/airsonic
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.248
-#      - traefik_proxy
+      - traefik_proxy
 #    ports:
 #      - "4040:4040"
     volumes:

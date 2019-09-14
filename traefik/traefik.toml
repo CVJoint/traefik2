@@ -85,7 +85,7 @@
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesResolvers.cloudflare.acme]
   # Email address used for registration.
-  email = "your email"
+  email = "cannondale8022@gmail.com"
   # File or key used for certificates storage.
   storage = "/etc/traefik/acme/acme.json"
 

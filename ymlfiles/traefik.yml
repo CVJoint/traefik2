@@ -8,15 +8,13 @@ services:
 ## Traefik - Reverse Proxy
   traefik:
     container_name: traefik
-    image: traefik:v2.0.0-rc3
+    image: traefik:v2.0.0-rc4
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.252
-#      - traefik_proxy
-#    ports:
-#      - "80:80"
-#      - "443:443"
+      - traefik_proxy
+    ports:
+      - "80:80"
+      - "443:443"
 #      - "8080:8080"
     volumes:
       - $TRAEFIK2DIR/traefik:/etc/traefik
@@ -89,9 +87,7 @@ services:
     image: thomseddon/traefik-forward-auth
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.251
-##      - traefik_proxy
+      - traefik_proxy
     environment:
       - PROVIDERS_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
       - PROVIDERS_GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
@@ -103,7 +99,7 @@ services:
       - WHITELIST=$MY_EMAIL
       - LOG_LEVEL=info
       - LOG_FORMAT=text
-##      - LIFETIME=43200
+#      - LIFETIME=43200
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy

@@ -7,12 +7,7 @@ services:
     container_name: apcupsd
     image: gersilex/apcupsd
     restart: always
-#    network_mode: host
-    networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.239
-#    ports:
-#      - "3551:3551"
+    network_mode: host
     privileged: true
     tty: true
     volumes:
@@ -20,8 +15,3 @@ services:
       - $USERDIR/docker/apcupsd/apcupsd.conf:/etc/apcupsd/apcupsd.conf
       - $USERDIR/docker/apcupsd/doshutdown:/etc/apcupsd/doshutdown
       - $USERDIR/docker/apcupsd/apcupsd.events/var/log/apcupsd.events
-
-networks:
-  traefik_proxy:
-    external:
-      name: traefik_proxy

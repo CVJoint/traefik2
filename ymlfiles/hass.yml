@@ -8,8 +8,7 @@ services:
     restart: always
     privileged: true
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.238
+      - traefik_proxy
 #    ports:
 #      - "8123:8123"
     volumes:

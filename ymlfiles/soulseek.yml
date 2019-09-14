@@ -18,7 +18,7 @@ services:
       - resolution=1280x720
     labels:
       - traefik.enable=true
-      - traefik.docker.network=traefik_proxy
+#      - traefik.docker.network=traefik_proxy
       ## HTTPS entrypoint
       - traefik.http.routers.soulseek.entrypoints=https
       - traefik.http.routers.soulseek.rule=Host(`soulseek.$DOMAINNAME`)

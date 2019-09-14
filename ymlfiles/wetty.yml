@@ -7,9 +7,7 @@ services:
     image: svenihoney/wetty
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.242
-#      - traefik_proxy
+      - traefik_proxy
 #    ports:
 #     - "3000:3000"
     environment:

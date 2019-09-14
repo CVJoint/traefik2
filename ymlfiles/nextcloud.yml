@@ -41,8 +41,7 @@ services:
     image: linuxserver/nextcloud
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.237
+      - traefik_proxy
 #    ports:
 #      - "7443:443"
     volumes:

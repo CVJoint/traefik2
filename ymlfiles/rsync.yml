@@ -9,12 +9,10 @@ services:
     image: axiom/rsync-server
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.244
-#      - traefik_proxy
+      - traefik_proxy
 #    ports:
 #      - "873:873"
-#      - "9000:22"
+#      - "22:22"
     volumes:
       - $USERDIR/.ssh/authorized_keys:/root/.ssh/authorized_keys
       - /mnt/storage:/data:ro

@@ -7,9 +7,7 @@ services:
     image: jlesage/jdownloader-2
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.247
-#      - traefik_proxy
+      - traefik_proxy
 #    ports:
 #      - "5800:5800"
 #      - "5900:5900"
