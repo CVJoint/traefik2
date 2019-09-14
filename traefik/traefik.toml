@@ -20,6 +20,9 @@
   ## HTTPS
   [entryPoints.https]
     address = ":443"
+  ## TRAEFIK
+  [entryPoints.traefik]
+    address = ":8080"
   ## OTHERS
   [entryPoints.ssh]
     address = ":2222"

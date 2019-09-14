@@ -45,6 +45,7 @@ services:
       - traefik.http.routers.traefik.service=traefik
       - traefik.http.services.traefik.loadbalancer.server.port=8080
       ## TRAEFIK API
+#      - traefik.http.routers.api.entrypoints=traefik
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal
       - traefik.http.routers.api.middlewares=secure-chain-nocookie@file

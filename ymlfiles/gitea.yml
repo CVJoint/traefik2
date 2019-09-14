@@ -4,7 +4,7 @@ services:
 #https://docs.gitea.io/en-us/fail2ban-setup/
 
   ## Suggested procedure to create your Gitea Database:
-  ## Replace <these values>
+  ## Change the <password>
     # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
     # CREATE DATABASE keycloak CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
     # GRANT ALL PRIVILEGES ON keycloak.* TO 'keycloak'@'keycloak.traefik_proxy' IDENTIFIED BY '<password>';

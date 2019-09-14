@@ -2,7 +2,15 @@ version: "3.7"
 services:
 
 ## Tiny Tiny RSS
-  # Need to set up a database first
+
+  ## Suggested procedure to create your TTRSS Database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE ttrss CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
+    # GRANT ALL PRIVILEGES ON ttrss.* TO 'ttrss'@'ttrss.traefik_proxy' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
   # Login: admin / password
   ttrss:
     container_name: ttrss
