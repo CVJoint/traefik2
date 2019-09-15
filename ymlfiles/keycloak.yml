@@ -1,0 +1,74 @@
+# https://www.keycloak.org/documentation.html
+# https://www.keycloak.org/docs/latest/getting_started/index.html
+# https://hub.docker.com/_/postgres
+# https://hub.docker.com/r/jboss/keycloak/
+version: "3.7"
+services:
+
+  ## To fix net.core.*mem issues add these to the bottom of /etc/sysctl.conf
+  ## https://forums.docker.com/t/how-to-tune-kernel-properties-in-docker-images/25291
+    # ## Allow a 25MB UDP receive buffer for JGroups
+    # net.core.rmem_max = 26214400
+    # ## Allow a 1MB UDP send buffer for JGroups
+    # net.core.wmem_max = 1048576
+
+    # or
+
+    # sudo sysctl -w net.core.rmem_max=26214400
+    # sudo sysctl -w net.core.wmem_max=1048576
+    ## https://www.cyberciti.biz/faq/reload-sysctl-conf-on-linux-using-sysctl/
+
+  ## Suggested procedure to create your KeyCloak Database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE keycloak CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
+    # GRANT ALL PRIVILEGES ON keycloak.* TO 'keycloak'@'keycloak.traefik_proxy' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  ## Initialize admin account:
+    # docker exec keycloak keycloak/bin/add-user-keycloak.sh -u <username> -p <password>
+
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8080:8080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - KEYCLOAK_USER=cvjoint
+      - KEYCLOAK_PASSWORD=Plunki88**
+      - DB_VENDOR=mariadb
+      - DB_ADDR=mariadb
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=$MYSQL_PASSWORD
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_HOSTNAME=keycloak.$DOMAINNAME
+#      - JDBC_PARAMS=connectTimeout=30000
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.keycloak-rtr.entrypoints=https
+      - traefik.http.routers.keycloak-rtr.rule=Host(`keycloak.$DOMAINNAME`)
+      - traefik.http.routers.keycloak-rtr.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.keycloak-rtr.middlewares=keycloak-headers
+      - traefik.http.middlewares.keycloak-headers.headers.SSLHost=keycloak.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.keycloak-rtr.middlewares=noauth-chain-nocookie@file
+      ## Services
+      - traefik.http.routers.keycloak-rtr.service=keycloak-svc
+      - traefik.http.services.keycloak-svc.loadbalancer.server.port=8080
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

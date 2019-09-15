@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+## grocy - Web-based Groceries & Household Management
+
+  # Give it a minute to start...
+  # Login: admin / admin
+  # Create new user and delete admin
+
+  grocy:
+    container_name: grocy
+    image: linuxserver/grocy
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "80:80"
+    environment:
+      - PGID=$PGID
+      - PUID=$PUID
+      - TZ=$TZ
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_proxy
+      ## HTTPS entrypoint
+      - traefik.http.routers.grocy-rtr.entrypoints=https
+      - traefik.http.routers.grocy-rtr.rule=Host(`grocy.$DOMAINNAME`)
+      - traefik.http.routers.grocy-rtr.tls.certresolver=cloudflare
+      ## Middlewares - Unique
+      - traefik.http.routers.wetty-rtr.middlewares=grocy-headers
+      - traefik.http.middlewares.grocy-headers.headers.SSLHost=grocy.$DOMAINNAME
+      ## Middlewares - Chain
+      - traefik.http.routers.grocy-rtr.middlewares=secure-chain-nocookie@file
+      ## Services
+      - traefik.http.routers.grocy-rtr.service=grocy-svc
+      - traefik.http.services.grocy-svc.loadbalancer.server.port=80
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

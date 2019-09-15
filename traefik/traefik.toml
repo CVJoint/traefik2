@@ -28,6 +28,8 @@
     address = ":2222"
   [entryPoints.mariadb-port]
     address = ":3306"
+  [entryPoints.postgres-port]
+    address = ":5432"
   [entryPoints.mongo-port]
     address = ":27017"
   [entryPoints.redis-port]
@@ -51,12 +53,12 @@
 #  format = "json"
 
 [api]
-  dashboard = true
-  insecure = true
   ##Name of the related entry point (Default: "traefik")
   #entryPoint = "traefik"
 
   ##Enabled Dashboard (Default: true)
+  dashboard = true
+  insecure = true
 
   ##Enable Debug (Default: false)
   #debug = true

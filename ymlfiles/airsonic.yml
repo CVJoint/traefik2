@@ -22,7 +22,7 @@ services:
     environment:
       - PUID=$PUID
       - PGID=$PGID
-      - JAVA_OPTS=-Dserver.use-forward-headers=true
+      - JAVA_OPTS="-Dserver.use-forward-headers=true -Dserver.tomcat.protocol-header=X-Forwarded-Proto"
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy

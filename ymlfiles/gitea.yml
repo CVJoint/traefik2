@@ -34,7 +34,7 @@ services:
       - DB_HOST=mariadb:3306
       - DB_NAME=gitea
       - DB_USER=gitea
-      - DB_PASSWD=${MYSQL_ROOT_PASSWORD}
+      - DB_PASSWD=$MYSQL_ROOT_PASSWORD
       - RUN_MODE=prod
 #      - INSTALL_LOCK=true # Disallow access to the install page. Enable after first sign in
 #      - SECRET_KEY=”” # Global secret key. This should be changed. If this has a value and INSTALL_LOCK is empty, INSTALL_LOCK will automatically set to true.
@@ -50,7 +50,7 @@ services:
       - traefik.http.routers.gitea.middlewares=gitea-headers
       - traefik.http.middlewares.gitea-headers.headers.SSLHost=gitea.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.gitea.middlewares=noauth-chain@file
+      - traefik.http.routers.gitea.middlewares=noauth-chain-nocookie@file
       ## Services
       - traefik.http.routers.gitea.service=gitea-svc
       - traefik.http.services.gitea-svc.loadbalancer.server.port=3000

@@ -42,11 +42,11 @@ services:
     restart: always
     networks:
       - traefik_proxy
-#    ports:
-#      - "7443:443"
+    ports:
+      - "7443:443"
     volumes:
       - /mnt/storage/files/nextcloud:/data
-      - $USERDIR/docker/nextcloud:/config
+      - $USERDIR/docker/nextcloud3:/config
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -80,8 +80,7 @@ services:
     tty: "true"
     restart: always
     networks:
-      traefik_proxy:
-        ipv4_address: 192.168.1.236
+      - traefik_proxy
 #    ports:
 #      - "80:80"
 #      - "443:443"
