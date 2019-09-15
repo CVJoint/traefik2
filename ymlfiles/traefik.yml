@@ -47,7 +47,7 @@ services:
       ## TRAEFIK API
 #      - traefik.http.routers.api.entrypoints=traefik
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
-      - traefik.http.routers.api.service=api@internal
+      - traefik.http.routers.api.service=api@internal # API must be secured with auth
       - traefik.http.routers.api.middlewares=secure-chain-nocookie@file
 
 
@@ -119,13 +119,13 @@ services:
       - PROVIDERS_GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
       - SECRET=$OAUTH_SECRET
       - COOKIE_DOMAIN=$DOMAINNAME
-      - INSECURE_COOKIE=1
+      - INSECURE_COOKIE=false
       - AUTH_HOST=oauth.$DOMAINNAME
-      - URL_PATH=/_ooauth
+      - URL_PATH=/_oauth
       - WHITELIST=$MY_EMAIL
       - LOG_LEVEL=info
       - LOG_FORMAT=text
-#      - LIFETIME=43200
+      - LIFETIME=2592000 # 30 days
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik_proxy

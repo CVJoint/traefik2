@@ -60,7 +60,7 @@ or create a macvlan network with:
   networking equipment.
 
 
-Change **<your email>** in the traefik.toml, and run: 
+Change **your email** in the traefik.toml, and run: 
 
 `dup traefik`
 
