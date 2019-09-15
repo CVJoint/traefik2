@@ -51,7 +51,7 @@ services:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal # API must be secured with auth
       - traefik.http.routers.api.middlewares=basic_auth@file # auth needed to access api without insecure flag. Not working..
-#      - traefik.http.middlewares.basic_auth.basicauth.users=cvjoint:$$apr1$$X0WPEgtI$$XXTxEW5o7CXWbPRUOJiq60
+#      - traefik.http.middlewares.basic_auth.basicauth.users=
 #      - traefik.http.middlewares.basic_auth.basicauth.usersfile=/etc/traefik/.htpasswd
 
 
