@@ -34,7 +34,7 @@ services:
       - traefik.http.routers.emby.middlewares=emby-headers
       - traefik.http.middlewares.emby-headers.headers.SSLHost=emby.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.emby.middlewares=noauth-chain@file
+      - traefik.http.routers.emby.middlewares=test-headers@file
       ## Services
       - traefik.http.routers.emby.service=emby
       - traefik.http.services.emby.loadbalancer.server.port=8096

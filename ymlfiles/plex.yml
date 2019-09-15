@@ -40,7 +40,7 @@ services:
       - traefik.http.routers.plex.middlewares=plex-headers
       - traefik.http.middlewares.plex-headers.headers.SSLHost=plex.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.plex.middlewares=noauth-chain@file
+      - traefik.http.routers.plex.middlewares=test-headers@file
       ## Services
       - traefik.http.routers.plex.service=plex
       - traefik.http.services.plex.loadbalancer.server.port=32400

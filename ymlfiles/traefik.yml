@@ -40,16 +40,19 @@ services:
       - traefik.http.routers.traefik.middlewares=traefik-headers
       - traefik.http.middlewares.traefik-headers.headers.SSLHost=traefik.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.traefik.middlewares=secure-chain-nocookie@file
+      - traefik.http.routers.traefik.middlewares=test-headers@file
       ## Services
       - traefik.http.routers.traefik.service=traefik
       - traefik.http.services.traefik.loadbalancer.server.port=8080
       ## TRAEFIK API
-#      - traefik.http.routers.api.entrypoints=traefik
+        ### API Login: test/test ###
+        # https://docs.traefik.io/v2.0/operations/api/#endpoints
+      - traefik.http.routers.api.entrypoints=traefik
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal # API must be secured with auth
-      - traefik.http.routers.api.middlewares=secure-chain-nocookie@file
-
+      - traefik.http.routers.api.middlewares=basic_auth@file # auth needed to access api without insecure flag. Not working..
+#      - traefik.http.middlewares.basic_auth.basicauth.users=cvjoint:$$apr1$$X0WPEgtI$$XXTxEW5o7CXWbPRUOJiq60
+#      - traefik.http.middlewares.basic_auth.basicauth.usersfile=/etc/traefik/.htpasswd
 
 
 #      - traefik.http.routers.api.entrypoints=https

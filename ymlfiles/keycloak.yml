@@ -105,7 +105,7 @@ services:
       - traefik.http.routers.whoami.entrypoints=http
       - traefik.http.routers.whoami.rule=Host(`whoami.localhost`) # keep as .localhost (see curl command above)
 
-## Google OAuth -
+## Traefik Forward Auth - Auth Gate for SSO
 
   oauth:
     container_name: oauth
@@ -114,19 +114,21 @@ services:
     restart: always
     networks:
       - traefik_proxy
+    depends_on:
+      - keycloak
     environment:
       - CLIENT_ID=$AUTH_CLIENT_ID
       - CLIENT_SECRET=$AUTH_CLIENT_SECRET
       ## This is based on using the Master realm. Create a new client, this will go into your CLIENT_ID, CLIENT_SECRET details.
-      - OIDC_ISSUER=https://keycloak.${DOMAINNAME}/auth/realms/master
+      - OIDC_ISSUER=https://keycloak.$DOMAINNAME/auth/realms/master
       - SECRET=$AUTH_SECRET
       - AUTH_HOST=oauth.$DOMAINNAME
       - COOKIE_DOMAIN=$DOMAINNAME
       - COOKIE_SECURE=true
-      - URL_PATH=/_oauth
+#      - URL_PATH=_oauth
 #      - WHITELIST=$MY_EMAIL
-      - LOG_LEVEL=info
-      - LOG_FORMAT=text
+#      - LOG_LEVEL=info
+#      - LOG_FORMAT=text
       - LIFETIME=2592000 # 30 days
     labels:
       - traefik.enable=true
@@ -139,7 +141,7 @@ services:
       - traefik.http.routers.oauth.middlewares=oauth-headers
       - traefik.http.middlewares.oauth-headers.headers.SSLHost=oauth.$DOMAINNAME
       ## Middlewares - Chain
-      - traefik.http.routers.oauth.middlewares=secure-chain-nocookie@file
+      - traefik.http.routers.oauth.middlewares=secure-chain@file
       ## Services
       - traefik.http.routers.oauth.service=oauth
       - traefik.http.services.oauth.loadbalancer.server.port=4181
@@ -172,6 +174,8 @@ services:
     container_name: keycloak
     image: jboss/keycloak
     restart: always
+    depends_on:
+      - traefik
     networks:
       - traefik_proxy
 #    ports:
@@ -179,8 +183,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=$PUID
+      - PGID=$PGID
       - KEYCLOAK_USER=$MY_USERNAME
       - KEYCLOAK_PASSWORD=$MY_PASSWORD
       - DB_VENDOR=mariadb

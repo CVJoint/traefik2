@@ -12,9 +12,9 @@
     CustomFrameOptionsValue = "SAMEORIGIN"
     ContentTypeNosniff = true
     BrowserXssFilter = true
-    ContentSecurityPolicy = "default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'"
-    ReferrerPolicy = "same-origin"
-    FeaturePolicy = "camera 'none'; display-capture 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none'"
+#    ContentSecurityPolicy = "default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'"
+#    ReferrerPolicy = "same-origin"
+#    FeaturePolicy = "camera 'none'; display-capture 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none'"
     [http.middlewares.test-headers.headers.customResponseHeaders]
       X-Robots-Tag = "none,noarchive,nosnippet,notranslate,noimageindex"
 #      Set-Cookie = "__Secure-sess=123; path=/; HttpOnly; Secure; SameSite=Lax"
