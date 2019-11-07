@@ -1,3 +1,0 @@
-[http.middlewares]
-  [http.middlewares.noauth-chain-nocookie.chain]
-    middlewares = ["https-only", "secure-headers-nocookie"]

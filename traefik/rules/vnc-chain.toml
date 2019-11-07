@@ -1,3 +1,0 @@
-[http.middlewares]
-  [http.middlewares.vnc-chain.chain]
-    middlewares = ["https-only", "vnc-headers", "oauth"]
