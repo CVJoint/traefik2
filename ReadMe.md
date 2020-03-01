@@ -5,7 +5,7 @@
 Clone the repo using:
 
 ```
-$ git clone https://github.com/sseifert/docker-compose.git $HOME/docker/traefik2
+$ git clone https://github.com/CVJoint/traefik2.git $HOME/docker/traefik2
 ```
 
 Then create the environment variable, **\$TRAEFIK2DIR** which points to this directory. I've been using a **.bash_aliases** file to identify my environment variables with:
