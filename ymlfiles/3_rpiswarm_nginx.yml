@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+## Nginx
+
+  nginx:
+    image: edwinluijten/hypriot-nginx:1.13.1
+    networks:
+      - overlay_net
+    ports:
+      - "80:80"
+    volumes:
+      - nfs_swarmdata:/usr/share/nginx/html
+      - /opt/swarmdata/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - /opt/swarmdata/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+#          - node.platform.arch == armv6l
+
+volumes:
+  nfs_swarmdata:
+    driver: local
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.50,nfsvers=4,nolock,soft,rw"
+      device: ":/opt/swarmdata/"
+
+networks:
+  overlay_net:
+    external: true

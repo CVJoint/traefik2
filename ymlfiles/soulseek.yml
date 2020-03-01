@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+## Soulseek - P2P Media Service
+  soulseek:
+    container_name: soulseek
+    image: realies/soulseek:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    network_mode: "container:qbittorrent"
+#    ports:
+#      - "6080:6080"
+    volumes:
+      - soulseek_data:/root/.SoulseekQt
+      - soulseek_logs:/root/Soulseek Chat Logs
+      - $USERDIR/dwnloads/completed:/root/Soulseek Downloads/complete
+      - $USERDIR/dwnloads/temp:/root/Soulseek Downloads/downloading
+      - /mnt/storage/music/music:/Music
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - resolution=1600x720
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.soulseek-rtr.entrypoints=https"
+      - "traefik.http.routers.soulseek-rtr.rule=Host(`soulseek.$DOMAINNAME`)"
+      - "traefik.http.routers.soulseek-rtr.tls=true"
+      - "traefik.http.routers.soulseek-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.soulseek-rtr.middlewares=soulseek-headers,oauth@file"
+      - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.soulseek-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.allowedhosts=soulseek.$DOMAINNAME"
+      - "traefik.http.middlewares.soulseek-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.soulseek-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.sslhost=soulseek.$DOMAINNAME"
+      - "traefik.http.middlewares.soulseek-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.soulseek-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.soulseek-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.soulseek-headers.headers.framedeny=true"
+    #  - "traefik.http.middlewares.soulseek-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.soulseek-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.soulseek-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.soulseek-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.soulseek-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.soulseek-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.soulseek-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.soulseek-rtr.service=soulseek-svc"
+      - "traefik.http.services.soulseek-svc.loadbalancer.server.port=6080"
+
+volumes:
+  soulseek_data:
+  soulseek_logs:
+
+networks:
+  traefik_proxy:
+    external: true

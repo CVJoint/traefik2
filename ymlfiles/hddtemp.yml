@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+
+## Hddtemp
+  hddtemp:
+    container_name: hddtemp
+    image: emilgil/hddtemp:latest
+    restart: always
+    privileged: true
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "7634:7634"
+    volumes:
+      - /dev:/dev:ro
+    environment:
+      - TZ=$TZ
+      - DRIVES=sd* # [abcdefghijk]
+#      - HDDTEMP_ARGS="-q -d -F /dev/sd*"
+
+networks:
+  traefik_proxy:
+    external: true

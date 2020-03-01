@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+
+## Node-RED
+
+  nodered:
+    image: nodered/node-red:1.0.3-2-12-minimal-arm32v6
+    networks:
+      - overlay_net
+    ports:
+      - "1880:1880"
+    volumes:
+      - /opt/swarmdata/docker/nodered:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=$TZ
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+#          - node.platform.arch == armv6l
+
+networks:
+  overlay_net:
+    external: true

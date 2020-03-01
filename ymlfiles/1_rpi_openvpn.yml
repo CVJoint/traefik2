@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+
+## OpenVPN - VPN Service
+  openvpn:
+    container_name: openvpn
+    image: darathor/openvpn:latest
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    networks:
+      pi_net:
+        ipv4_address: 172.20.200.40
+    ports:
+      - "1194:1194"
+    volumes:
+      - ~/docker/openvpn:/etc/openvpn
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+networks:
+  pi_net:
+    external: true

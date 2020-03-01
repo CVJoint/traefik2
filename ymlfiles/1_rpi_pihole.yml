@@ -1,0 +1,108 @@
+
+### Before starting the containers, create an external network to assign IP addresses:
+  # docker network create --gateway 172.20.200.1 --subnet 172.20.200.0/24 pi_net
+
+## Pihole - Ad-blocker
+
+  ## The resolv.conf file was giving me trouble in the pihole container. My workaround was:
+    # mkdir -p $USERDIR/docker/pihole/resolv.conf
+    # vim $USERDIR/docker/pihole/resolv.conf/resolv.conf
+    ## Enter both lines below and save:
+    # nameserver 127.0.0.1
+    # nameserver 172.20.200.102
+
+  ## To store logs use:
+    # touch $USERDIR/docker/pihole/pihole.log
+
+  ## I've added the following blocklist in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
+    # https://dbl.oisd.nl/
+    ## More info here: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
+  ## These regex's:
+    # https://github.com/mmotti/pihole-regex
+  ## And I've added the following whitelist entry:
+    # https://github.com/anudeepND/whitelist/blob/master/domains/whitelist.txt
+
+version: "3.7"
+services:
+
+## Pihole - Ad-blocker
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    depends_on:
+      - unbound
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BIND_SERVICE
+    network_mode: "host"
+#    networks:
+#      pi_net:
+#        ipv4_address: 172.20.200.101
+#    ports:
+#      - '53:53/tcp'
+#      - '53:53/udp'
+#      - '67:67/udp'
+#      - '80:80/tcp'
+#      - '443:443/tcp'
+    volumes:
+      - ~/docker/pihole/pihole:/etc/pihole
+#      ## Add dark skin to pihole: https://github.com/thomasbnt/Night_PiHole
+#      - ~/docker/pihole/theme/skin-blue.min.css:/var/www/html/admin/style/vendor/skin-blue.min.css
+#      - ~/docker/pihole/theme/AdminLTE.min.css:/var/www/html/admin/style/vendor/AdminLTE.min.css
+      - ~/docker/pihole/resolv.conf/resolv.conf:/etc/resolv.conf:ro
+      - ~/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+      ## Run `touch ~/docker/pihole/pihole.log` before starting pihole
+      - ~/docker/pihole/pihole.log:/var/log/pihole.log
+    environment:
+      - TZ=$TZ
+      - ServerIP=192.168.1.3 # My Docker Host IP
+      - IPv6=False
+      - WEBPASSWORD=$PIHOLE_PASSWORD
+      - DNS1=127.0.0.1
+      - DNS2=172.20.200.102 # Unbound IP
+
+## Unbound - DNS Server
+
+  ## Setup folders and files
+    # mkdir $USERDIR/docker/pihole/unbound
+    # docker run --rm --entrypoint cat mvance/unbound-rpi /opt/unbound/etc/unbound/a-records.conf > ${USERDIR}/docker/pihole/unbound/a-records.conf
+  ## Start container
+    # docker exec -it unbound unbound-anchor
+  ## Stop container
+    # sudo rm $USERDIR/docker/pihole/unbound/var/root.key
+    # sudo mv $USERDIR/docker/pihole/unbound/root.key $USERDIR/docker/pihole/unbound/var
+    # sudo wget https://www.internic.net/domain/named.root -O ~/docker/pihole/unbound/var/root.hints
+
+  ## Edit the unbound.conf file, add to the bottom of BASIC SETTINGS:
+    ## For a recursive resolver (querying the root domains):
+      # root-hints: "/opt/unbound/etc/unbound/var/root.hints"
+      ## Commnt out everything in the DNS forwarding section at the bottom since we will recursively query the root servers instead
+    ## To fix Plex DNS rebinding:
+      # private-domain: plex.direct
+
+  ## Test that it's working (pihole must be running)
+    # docker exec -it pihole dig pi-hole.net @127.0.0.1 -p 53
+
+  ## Test DNSSEC
+  ## This command should result in: "status: SERVFAIL"
+    # docker exec -it pihole dig sigfail.verteiltesysteme.net @127.0.0.1 -p 53
+  ## This command should result in: "status: NOERROR"
+    # docker exec -it pihole dig sigok.verteiltesysteme.net @127.0.0.1 -p 53
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound-rpi:latest
+    restart: always
+    networks:
+      pi_net:
+        ipv4_address: 172.20.200.102
+#    ports:
+#      - '5353:5353'
+    volumes:
+      - ~/docker/pihole/unbound:/opt/unbound/etc/unbound
+
+networks:
+  pi_net:
+    external: true

@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+
+## Docker Garbage Collector
+
+  ## Create excludes file:
+    # mkdir -p $USERDIR/docker/dockergc
+    # cd $!
+    # wget https://raw.githubusercontent.com/clockworksoul/docker-gc-cron/master/compose/docker-gc-exclude
+
+  dockergc:
+    container_name: dockergc
+    image: clockworksoul/docker-gc-cron:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - $USERDIR/docker/dockergc/docker-gc-exclude:/etc/docker-gc-exclude
+    environment:
+      - CRON=0 1 * * *
+      - FORCE_IMAGE_REMOVAL=1
+      - FORCE_CONTAINER_REMOVAL=1
+      - MINIMUM_IMAGES_TO_SAVE=1
+      - GRACE_PERIOD_SECONDS=3600
+      - DRY_RUN=0
+      - CLEAN_UP_VOLUMES=1
+      - TZ=$TZ

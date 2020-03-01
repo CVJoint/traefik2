@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+
+## OpenVPN - VPN Access Server
+  openvpn-as:
+    container_name: openvpn-as
+    image: linuxserver/openvpn-as:latest
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.240
+    ports:
+      - "943:943" # Admin GUI
+      - "9443:9443" # TCP port
+      - "1194:1194/udp" # UDP port
+    volumes:
+      - $USERDIR/docker/openvpn-as:/config
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#      - INTERFACE=eth0 #Optional - With bridge networking, leave it as eth0 (or don't include at all), if host or macvlan, set it to your host's network interface, found by running ifconfig
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.openvpnAS-rtr.entrypoints=https"
+      - "traefik.http.routers.openvpnAS-rtr.rule=Host(`openvpn.$DOMAINNAME`)"
+      - "traefik.http.routers.openvpnAS-rtr.tls=true"
+      - "traefik.http.routers.openvpnAS-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.openvpnAS-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.openvpnAS-rtr.service=openvpnAS-svc"
+      - "traefik.http.services.openvpnAS-svc.loadbalancer.server.port=943"
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

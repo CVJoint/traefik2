@@ -1,0 +1,50 @@
+version: "3.7"
+services:
+
+## Chevereto - Image Hosting
+
+  ## Suggested procedure to create your Chevereto Database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE chevereto CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON chevereto.* TO 'chevereto'@'%' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  # Fix permissions:
+  # sudo chmod -R 766 ${USERDIR}/Pictures
+    # or
+  # create user or group with id 33 and assign permissions to that folder
+
+  chevereto:
+    container_name: chevereto
+    image: nmtan/chevereto:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "80:80"
+    volumes:
+      - ${USERDIR}/Pictures:/var/www/html/images
+    environment:
+      - CHEVERETO_DB_HOST=mariadb
+      - CHEVERETO_DB_USERNAME=chevereto
+      - CHEVERETO_DB_PASSWORD=$MYSQL_PASSWORD
+      - CHEVERETO_DB_NAME=chevereto
+      - CHEVERETO_DB_PREFIX=chv_
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photos-rtr.entrypoints=https"
+      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      - "traefik.http.routers.photos-rtr.tls=true"
+      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.photos-rtr.service=photos-svc"
+      - "traefik.http.services.photos-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

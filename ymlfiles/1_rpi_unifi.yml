@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Unifi Controller Software
+  ## Adopt new device
+    # ssh ubnt@DEVICE_IP
+    # login with ubnt/ubnt
+    # mca-cli
+    # set-inform http://$address:8080/inform
+
+  unifi:
+    container_name: unifi
+    image: linuxserver/unifi-controller:arm32v7-latest
+    restart: unless-stopped
+    network_mode: host
+#    networks:
+#      - pi_net
+#    ports:
+#      - "3478:3478/udp"
+#      - "10001:10001/udp"
+#      - "8080:8080" # insecure dashboard
+#      - "8081:8081"
+#      - "8443:8443" # secure dashboard
+#      - "8843:8843"
+#      - "8880:8880"
+#      - "6789:6789"
+    volumes:
+      - ~/docker/unifi:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+
+#networks:
+#  pi_net:
+#    external: true

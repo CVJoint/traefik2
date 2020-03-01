@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+
+## MongoDB - Database
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "27017:27017"
+    volumes:
+      - $USERDIR/docker/mongo:/data/db
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+## Mongo-Express - Database Manager
+  mongoexpress:
+    container_name: mongoexpress
+    image: mongo-express:latest
+    restart: always
+    depends_on:
+      - mongo
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      - ME_CONFIG_BASICAUTH_USERNAME=$MY_USERNAME
+#      - ME_CONFIG_BASICAUTH_PASSWORD=$MY_PASSWORD
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.mongoexpress-rtr.entrypoints=https"
+      - "traefik.http.routers.mongoexpress-rtr.rule=Host(`mongoexpress.$DOMAINNAME`)"
+      - "traefik.http.routers.mongoexpress-rtr.tls=true"
+      - "traefik.http.routers.mongoexpress-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.mongoexpress-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.mongoexpress-rtr.service=mongoexpress-svc"
+      - "traefik.http.services.mongoexpress-svc.loadbalancer.server.port=8081"
+
+networks:
+  traefik_proxy:
+    external: true

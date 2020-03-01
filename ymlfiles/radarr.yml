@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Radarr – Movie Download and Management
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.245
+#    ports:
+#      - "7878:7878"
+    volumes:
+      - $USERDIR/docker/radarr:/config
+      - $USERDIR/dwnloads:/downloads
+      - /mnt/storage/movies:/movies
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.radarr-rtr.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAINNAME`)"
+      - "traefik.http.routers.radarr-rtr.tls=true"
+      - "traefik.http.routers.radarr-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.radarr-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.radarr-rtr.service=radarr-svc"
+      - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+
+networks:
+  traefik_proxy:
+    external: true

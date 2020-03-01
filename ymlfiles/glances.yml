@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+
+## Glances - Container and System Monitor
+  glances:
+    container_name: glances
+    image: nicolargo/glances:latest
+    pid: host
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "61208:61208"
+    volumes:
+      - $USERDIR/docker/glances:/glances/conf # Use this if you want to add a glances.conf file
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - GLANCES_OPT=-w
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glances-rtr.entrypoints=https"
+      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      - "traefik.http.routers.glances-rtr.tls=true"
+      - "traefik.http.routers.glances-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.glances-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.glances-rtr.service=glances-svc"
+      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+
+networks:
+  traefik_proxy:
+    external: true

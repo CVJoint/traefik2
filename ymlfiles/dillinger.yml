@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+
+## Dillinger - Markdown Editor
+
+  ## Create $USERDIR/docker/dillinger/configs/googledrive/googledrive-config.json
+    # {
+    #   "client_id": "<client_id>",
+    #   "client_secret": "<client_secret>",
+    #   "redirect_uri": "https://dillinger.$DOMAINNAME/oauth/googledrive"
+    # }
+
+    # I created a Google Web application, with Authorized JavaScript origin = https://dillinger.$DOMAINNAME and Authorized redirect URIs = https://dillinger.$DOMAINNAME/oauth/googledrive
+
+  dillinger:
+    container_name: dillinger
+    image: linuxserver/dillinger:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "8080:8080"
+    volumes:
+      - $USERDIR/docker/dillinger:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dillinger-rtr.entrypoints=https"
+      - "traefik.http.routers.dillinger-rtr.rule=Host(`dillinger.$DOMAINNAME`)"
+      - "traefik.http.routers.dillinger-rtr.tls=true"
+      - "traefik.http.routers.dillinger-rtr.tls.certresolver=dns-cloudflare"
+#      - "traefik.http.routers.dillinger-rtr.tls.options=tls-opts@file"
+      ## Middlewares
+      - "traefik.http.routers.dillinger-rtr.middlewares=secure-headers@file,dillinger-auth" # Doesn't work with OAuth for some reason
+      - "traefik.http.middlewares.dillinger-auth.basicauth.users=$HTPASSWD" # htpasswd should have single $'s escaped w backslash: \$
+      ## HTTP Services
+      - "traefik.http.routers.dillinger-rtr.service=dillinger-svc"
+      - "traefik.http.services.dillinger-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+
+## sabnzbd - Usenet Downloader
+
+  ## Enable external access:
+    # Navigate to Config > Special using Host IP. e.g.: http://<host ip>:8082/config/special/
+    # Scroll to the bottom and add to host_whitelist ( )
+    # Enter sabnzbd.$DOMAINNAME separated by a comma ,
+
+  sabnzbd:
+    container_name: sabnzbd
+    image: linuxserver/sabnzbd:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8082:8080"
+#      - "9090:9090"
+    volumes:
+      - $USERDIR/docker/sabnzbd:/config
+      - $USERDIR/dwnloads/sabnzbd:/downloads
+      - $USERDIR/dwnloads/temp:/incomplete-downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sabnzbd-rtr.entrypoints=https"
+      - "traefik.http.routers.sabnzbd-rtr.rule=Host(`sabnzbd.$DOMAINNAME`)"
+      - "traefik.http.routers.sabnzbd-rtr.tls=true"
+      - "traefik.http.routers.sabnzbd-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.sabnzbd-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.sabnzbd-rtr.service=sabnzbd-svc"
+      - "traefik.http.services.sabnzbd-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

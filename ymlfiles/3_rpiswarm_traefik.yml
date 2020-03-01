@@ -1,0 +1,56 @@
+version: "3.7"
+services:
+
+## Traefik
+# runs but not set up
+  traefik:
+    image: gilir/rpi-traefik:latest
+    command:
+      - --logLevel=INFO
+      - --api
+      - --docker
+      - --docker.swarmmode
+      - --docker.watch
+      - --docker.domain=<domain>
+      - --checkNewVersion=false
+      - --acme
+      - --acme.email=<e-mail>
+      - --acme.storage=/etc/traefik/acme/acme.json
+      - --acme.entrypoint=https
+      - --acme.ondemand=true
+      - --acme.domains='<domains>
+      - --entryPoints=Name:https Address::443 TLS
+      - --entryPoints=Name:http Address::80 Redirect.EntryPoint:https
+      - --defaultentrypoints=https,https
+    networks:
+      - overlay_net
+    ports:
+      - "2080:80"
+      - "2280:8080"
+      - "443:443"
+    volumes:
+      - /opt/swarmdata/docker/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+#    environment:
+#      - CLOUDFLARE_EMAIL=$CLOUDFLARE_EMAIL
+#      - CLOUDFLARE_API_KEY=$CLOUDFLARE_API_KEY
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+#          - node.platform.arch == armv7l
+#        preferences:
+#          - spread: node.labels.zone
+
+networks:
+  overlay_net:
+    external: true

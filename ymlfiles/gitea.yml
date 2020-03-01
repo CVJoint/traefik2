@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+
+## Gitea - Selfhosted Git Service
+  #https://docs.gitea.io/en-us/fail2ban-setup/
+
+  ## Suggested procedure to create your database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE gitea CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON gitea.* TO 'gitea'@'gitea.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  ## Disable self registration during install, or with the DISABLE_REGISTRATION flag in gitea>conf>app.ini
+
+  gitea:
+    container_name: gitea
+    image: gitea/gitea:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#      - "3000:3000"
+#      - "127.0.0.1:2222:22"
+    volumes:
+      - $USERDIR/docker/gitea:/data
+      - /var/log/docker/gitea.log:/var/log/docker/gitea.log # make sure to touch this file with user permissions before starting, and change the log path on install
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+#      - SSH_PORT=2222
+      - DB_TYPE=mysql
+      - DB_HOST=mariadb:3306
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=$MYSQL_PASSWORD
+      - RUN_MODE=prod
+      - ROOT_URL=https://gitea.$DOMAINNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.gitea-rtr.entrypoints=https"
+      - "traefik.http.routers.gitea-rtr.rule=Host(`gitea.$DOMAINNAME`)"
+      - "traefik.http.routers.gitea-rtr.tls=true"
+      - "traefik.http.routers.gitea-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.gitea-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.gitea-rtr.service=gitea-svc"
+      - "traefik.http.services.gitea-svc.loadbalancer.server.port=3000"
+      ## TCP
+#      - "traefik.tcp.routers.gitea-tcp.entrypoints=ssh"
+#      - "traefik.tcp.routers.gitea-tcp.tls=true"
+#      - "traefik.tcp.routers.gitea-tcp.rule=HostSNI(`*`)"
+#      - "traefik.tcp.routers.gitea-tcp.service=gitea-tcp-svc"
+#      - "traefik.tcp.services.gitea-tcp-svc.loadbalancer.server.port=22"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

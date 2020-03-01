@@ -1,0 +1,24 @@
+# This file is for testing. Enable this middleware and tweak the headers
+
+[http.middlewares]
+  [http.middlewares.test-headers.headers]
+    AccessControlAllowMethods= ["GET", "OPTIONS", "PUT"]
+    AccessControlMaxAge = 100
+    AddVaryHeader = true
+    HostsProxyHeaders = ["X-Forwarded-Host"]
+    SSLRedirect = true
+#    SSLForceHost = true
+    STSSeconds = 63072000
+    STSIncludeSubdomains = true
+    STSPreload = true
+    ForceSTSHeader = true
+    FrameDeny = true
+    ContentTypeNosniff = true
+    BrowserXssFilter = true
+#    ContentSecurityPolicy = "default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+#    ContentSecurityPolicy = "default-src 'self' 'unsafe-inline' data:;"
+    ReferrerPolicy = "same-origin"
+    FeaturePolicy = "camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+    [http.middlewares.test-headers.headers.customResponseHeaders]
+      X-Robots-Tag = "none,noarchive,nosnippet,notranslate,noimageindex,"
+      Set-Cookie = "__Secure-sess=123; path=/; HttpOnly; Secure; SameSite=Lax;"

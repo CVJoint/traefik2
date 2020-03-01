@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## Hydra2 - Usenet Search Application
+
+  hydra:
+    container_name: hydra
+    image: linuxserver/hydra2:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5076:5076"
+    volumes:
+      - $USERDIR/docker/hydra:/config
+      - $USERDIR/dwnloads:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.hydra-rtr.entrypoints=https"
+      - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
+      - "traefik.http.routers.hydra-rtr.tls=true"
+      - "traefik.http.routers.hydra-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.hydra-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.hydra-rtr.service=hydra-svc"
+      - "traefik.http.services.hydra-svc.loadbalancer.server.port=5076"
+
+networks:
+  traefik_proxy:
+    external: true

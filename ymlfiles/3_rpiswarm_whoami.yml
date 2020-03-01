@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+
+## Who Am I
+
+  whoami:
+    image: containous/whoami:latest
+    networks:
+      - overlay_net
+    ports:
+      - "8000:80"
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+#          - node.role == manager
+          - node.platform.arch == armv7l
+
+networks:
+  overlay_net:
+    external: true

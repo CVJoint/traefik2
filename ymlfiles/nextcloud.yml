@@ -1,0 +1,159 @@
+version: "3.7"
+services:
+
+## NextCloud – Your Own Cloud Storage
+
+  ## Suggested way to create NextCloud database using MariaDB
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE nextcloud CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'nextcloud.mariadb'IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+  ## When signing in under Storage & database select MySQL/MariaDB and enter:
+    # Database user: your db user (nextcloud)
+    # Database password: your db password (<password>)
+    # Database name: your db name (nextcloud)
+    # localhost: mariadb:3306
+
+  ## If you have a Redis server you can connect to it in $USERDIR/docker/nextcloud/www/nextcloud/config/config.php: (Optional)
+    ## Add the following lines after " 'memcache.local' => '\\OC\\Memcache\\APCu', "
+    # 'memcache.distributed' => '\\OC\\Memcache\\Redis',
+    # 'memcache.locking' => '\\OC\\Memcache\\Redis',
+    # 'redis' => array(
+    #     'host' => 'redis',
+    #     'port' => 6379,
+    # ),
+
+  nextcloud:
+    container_name: nextcloud
+    image: linuxserver/nextcloud:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#      - "7443:443"
+    volumes:
+      - $USERDIR/docker/nextcloud:/config
+      - /mnt/storage/files/nextcloud:/data
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik_proxy"
+      ## HTTP Routers
+      - "traefik.http.routers.nextcloud-rtr.entrypoints=https"
+      - "traefik.http.routers.nextcloud-rtr.rule=Host(`nextcloud.$DOMAINNAME`)"
+      - "traefik.http.routers.nextcloud-rtr.tls=true"
+      - "traefik.http.routers.nextcloud-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.nextcloud-rtr.middlewares=nextcloud-redirect,nextcloud-headers"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=https://$$1/remote.php/dav/"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true"
+
+      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.nextcloud-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.allowedhosts=nextcloud.$DOMAINNAME"
+      - "traefik.http.middlewares.nextcloud-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.nextcloud-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.sslhost=nextcloud.$DOMAINNAME"
+      - "traefik.http.middlewares.nextcloud-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.nextcloud-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.nextcloud-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.nextcloud-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.nextcloud-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.nextcloud-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.nextcloud-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.nextcloud-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.nextcloud-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.nextcloud-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.nextcloud-rtr.service=nextcloud-svc"
+      - "traefik.http.services.nextcloud-svc.loadbalancer.server.port=443"
+      - "traefik.http.services.nextcloud-svc.loadbalancer.passhostheader=true"
+      ## TCP Routers
+      - "traefik.tcp.routers.nextcloud-tcp.entrypoints=https"
+      - "traefik.tcp.routers.nextcloud-tcp.rule=HostSNI(`nextcloud.$DOMAINNAME`)"
+      - "traefik.tcp.routers.nextcloud-tcp.tls=true"
+      - "traefik.tcp.routers.nextcloud-tcp.tls.certresolver=dns-cloudflare"
+      - "traefik.tcp.routers.nextcloud-tcp.tls.passthrough=true"
+      ## TCP Services
+      - "traefik.tcp.routers.nextcloud-tcp.service=nextcloud-tcp-svc"
+      - "traefik.tcp.services.nextcloud-tcp-svc.loadbalancer.server.port=443"
+
+
+## OnlyOffice - Document Server for NextCloud
+  # Add ONLYOFFICE to NextCloud and enter server address in settings
+
+### ... still working on this ... ###
+
+  onlyoffice:
+    container_name: onlyoffice
+    image: onlyoffice/documentserver:latest
+    stdin_open: true
+    tty: true
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    volumes:
+#      - onlyoffice_logs:/var/log/onlyoffice
+#      - onlyoffice_fonts:/usr/share/fonts/truetype/custom
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik_proxy"
+      ## HTTPS entrypoint
+      - "traefik.http.routers.onlyoffice-rtr.entrypoints=https"
+      - "traefik.http.routers.onlyoffice-rtr.rule=Host(`onlyoffice.$DOMAINNAME`)"
+      - "traefik.http.routers.onlyoffice-rtr.tls=true"
+      - "traefik.http.routers.onlyoffice-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.onlyoffice-rtr.middlewares=onlyoffice-headers"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolmaxage=100"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.addvaryheader=true"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.allowedhosts=onlyoffice.$DOMAINNAME"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.sslhost=onlyoffice.$DOMAINNAME"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.sslforcehost=true"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.framedeny=true"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.onlyoffice-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.referrerpolicy=same-origin"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.onlyoffice-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.onlyoffice-rtr.service=onlyoffice-svc"
+      - "traefik.http.services.onlyoffice-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.onlyoffice-svc.loadbalancer.passhostheader=true"
+
+#volumes:
+#  onlyoffice_logs:
+#  onlyoffice_fonts:
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

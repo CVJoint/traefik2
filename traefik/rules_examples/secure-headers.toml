@@ -1,0 +1,28 @@
+# Available Header Options: https://github.com/unrolled/secure#available-options
+# A great resource for these headers is your preferred browser's docs. Firefox: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
+# https://developers.google.com/search/reference/robots_meta_tag
+# https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Clickjacking_Defense_Cheat_Sheet.md
+# CSP for VNC: https://github.com/cockpit-project/cockpit/pull/5932
+# Check headers here, don't include OAuth when checking headers, otherwise you are checking google's headers: https://securityheaders.com
+# or check them here: https://observatory.mozilla.org/
+
+[http.middlewares]
+  [http.middlewares.secure-headers.headers]
+    accessControlAllowMethods= ["GET", "OPTIONS", "PUT"]
+    accessControlMaxAge = 100
+    hostsProxyHeaders = ["X-Forwarded-Host"]
+    sslRedirect = true
+    stsSeconds = 63072000
+    stsIncludeSubdomains = true
+    stsPreload = true
+    forceSTSHeader = true
+#    frameDeny = true
+    customFrameOptionsValue = "allow-from https:<your domain>" # This option overrides frameDeny
+    contentTypeNosniff = true
+    browserXssFilter = true
+#    contentSecurityPolicy = "default-src 'self'; frame-ancestors 'none'; script-src 'none'; object-src 'none'; base-uri 'none';"
+    referrerPolicy = "same-origin"
+    featurePolicy = "camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+    [http.middlewares.secure-headers.headers.customResponseHeaders]
+      X-Robots-Tag = "none,noarchive,nosnippet,notranslate,noimageindex,"
+#      Set-Cookie = "__Secure-sess=123; path=/; HttpOnly; Secure; SameSite=Lax;"

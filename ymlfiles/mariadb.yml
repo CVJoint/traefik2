@@ -1,0 +1,138 @@
+version: "3.7"
+services:
+
+## Mariadb – Database Server
+
+  ## Create external mariadb network:
+    # docker network create --gateway 192.168.250.1 --subnet 192.168.250.0/24 mariadb
+
+  ## Suggested procedure to create new databases:
+  ## Replace <these values>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE <database name> CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON <database name>.* TO '<user>'@'<container>.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  ## Create a custom.cnf:
+    # Start the container to create the initial files, then stop the container and remove all but the custom.cnf.
+      # rm -R $USERDIR/docker/mariadb/databases
+      # rm -R $USERDIR/docker/mariadb/log
+    # Add the following to $USERDIR/docker/mariadb/custom.cnf under the [mysqld] section:
+      # character_set_server=utf8mb4
+      # collation_server=utf8mb4_unicode_ci
+      # innodb_file_format=Barracuda
+      # innodb_large_prefix=ON
+      # innodb_default_row_format=DYNAMIC
+    # Start container
+  ## Some resources for why these commands are chosen:
+  ## utf8mb4 is the most universal and up to date character set allowing for emojis among other benefits
+  ## utf8mb4_unicode_ci is the "standard" database type while general_ci is a simplified version which tried to improve speed before modern computing. I believe there is little to no benefit to use the simpler version.
+  ## https://docs.nextcloud.com/server/16/admin_manual/configuration_database/mysql_4byte_support.html
+  ## For a complete list of available options: docker run -it --rm mariadb --verbose --help
+  ## Check your database variables, for example:
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # SHOW VARIABLES LIKE 'character_set_server';
+    # SHOW VARIABLES LIKE '%server%';
+    # SHOW VARIABLES LIKE 'innodb%';
+    # exit
+
+  ## Delete the initial default databases and secure MySQL:
+  ## NOTE: Accept all options except for 'Disallow root login remotely'. Answer "no" due to docker networking.
+    # docker exec -it mariadb /usr/bin/mysql_secure_installation
+
+  mariadb:
+    container_name: mariadb
+    image: linuxserver/mariadb:latest
+    restart: always
+    networks:
+#      traefik_proxy:
+#        ipv4_address: 192.168.50.250
+      mariadb:
+        ipv4_address: 192.168.250.250
+    ports:
+      - "3306:3306"
+    volumes:
+      - $USERDIR/docker/mariadb/data:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+## Database Backup
+
+  ## Modify script to add subdirs by date
+    ## Create the script file
+      # docker run --rm --entrypoint cat dsteinkopf script/backup-all-mysql /backup-all-mysql.sh  > $USERDIR/docker/mariadb/backup-all-mysql.sh
+      # chmod 755 $USERDIR/docker/mariadb/backup-all-mysql.sh
+    ## Edit the file:
+      ## Add subdirs by date and time:
+        # DBDUMPSDIR=/var/dbdumps/`date +"%Y-%m-%d_%H%M%S"`
+        # ERRORFILELASTRUN=$DBDUMPSDIR/../errorslastrun.log
+
+    ## Decompress before restore: backupfile.sql.gz.
+      # sudo bunzip2 <filename>.sql.bz2
+
+    ## Restore a backup:
+      # docker exec -it mariadb
+      # mysql -u root -p -e "create database database_name";
+      # mysql -u root -p database_name < /dbbackups/path/to/your_database_backup.sql
+      # exit
+
+  dbbackup:
+    container_name: dbbackup
+    image: dsteinkopf/backup-all-mysql:latest
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - mariadb
+    volumes:
+      - /mnt/storage/misc/backup/backup_databases/mariadb:/var/dbdumps
+      - $USERDIR/docker/mariadb/backup-all-mysql.sh:/backup-all-mysql.sh
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - BACKUP_INTERVAL=604800 #1week 86400 #1day
+      - BACKUP_FIRSTDELAY=30 #1h
+      - MYSQL_HOST=mariadb
+      - MYSQL_ENV_MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+## phpMyAdmin - WebUI for MariaDB
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    depends_on:
+      - mariadb
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#      - "80:80"
+    environment:
+#      - PMA_ARBITRARY=1 # Allows you to enter a database server hostname on login form
+      - PMA_HOST=mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - PMA_ABSOLUTE_URI=https://phpmyadmin.$DOMAINNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
+      - "traefik.http.routers.phpmyadmin-rtr.rule=Host(`phpmyadmin.$DOMAINNAME`)"
+#      - "traefik.http.routers.phpmyadmin-rtr.tls=true"
+      - "traefik.http.routers.phpmyadmin-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.phpmyadmin-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
+      - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

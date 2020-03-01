@@ -1,0 +1,68 @@
+version: "3.7"
+services:
+
+## BOINC Client - Berkeley Open Infrastructure for Network Computing
+  # https://boinc.berkeley.edu/projects.php
+
+  ## Use Docker or install on host: sudo apt install boinc-client
+
+  ## Use a Terminal UI (very useful!)
+    # sudo apt install boinctui
+    # boinctui
+
+  ## Enter boinccmd commands via shell:
+    # docker exec -it boinc bash
+    # boinccmd --help
+    # exit
+
+  ## Attach to BOINCStats Account Manager (BAM):
+    # Create an account at https://bam.boincstats.com/
+    # docker exec -it boinc boinccmd --acct_mgr attach https://bam.boincstats.com <username> <password>
+  ## Check if account is connected:
+    # docker exec -it boinc boinccmd --acct_mgr info
+
+  ## Join a project:
+    # Create an account at https://www.worldcommunitygrid.org/ or using my recruitment link: https://join.worldcommunitygrid.org?recruiterId=1093972
+    # docker exec -it boinc boinccmd --lookup_account http://www.worldcommunitygrid.org <your_email> <your_password>
+    # docker exec -it boinc boinccmd --project_attach http://www.worldcommunitygrid.org <account key>
+  ## Or atach directly to project:
+    # docker exec -it boinc boinccmd --project_attach <project URL> <account key>
+
+  ## Check task status using command line:
+    # docker exec -it boinc boinccmd --get_tasks
+  ## I only like to see this info:
+    # docker exec -it boinc boinccmd --get_tasks | egrep '\-\-\-|WU name|project URL|task_state|fraction'
+
+  ## My Project URLs:
+    # World Community Grid - http://www.worldcommunitygrid.org
+    # Climate Prediction - https://climateprediction.net  ## never had any tasks :-(
+    # Rosetta@Home - http://boinc.bakerlab.org/rosetta/
+    # SETI@Home - http://setiathome.berkeley.edu
+    # Cosmology@Home - http://www.cosmologyathome.org
+
+  ## Pi Pojects:
+    # Einstein@Home - http://einstein.phys.uwm.edu/
+    # SETI@Home - http://setiathome.berkeley.edu
+    # Universe@Home - https://universeathome.pl/universe/
+
+  ## Detach from projcet:
+    # docker exec -it boinc boinccmd --project <project URL> detach_when_done
+
+  boinc:
+    container_name: boinc
+    image: boinc/client:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "31416:31416"
+    volumes:
+      - $USERDIR/docker/boinc/client:/var/lib/boinc
+    environment:
+      - TZ=$TZ
+      - BOINC_GUI_RPC_PASSWORD=$MY_PASSWORD
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+
+networks:
+  traefik_proxy:
+    external: true

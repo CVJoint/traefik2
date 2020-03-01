@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## Firefox - Web Browser
+  firefox:
+    container_name: firefox
+    image: jlesage/firefox:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+    ports:
+      - "5800:5800"
+    volumes:
+      - ${USERDIR}/docker/firefox:/config
+      - /dev/shm:/dev/shm
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK=002
+      - KEEP_APP_RUNNING=1
+      - CLEAN_TMP_DIR=1
+      - DISPLAY_WIDTH=1800
+      - DISPLAY_HEIGHT=800
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.firefox-rtr.entrypoints=https"
+      - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
+      - "traefik.http.routers.firefox-rtr.tls=true"
+      - "traefik.http.routers.firefox-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.firefox-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.firefox-rtr.service=firefox-svc"
+      - "traefik.http.services.firefox-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## MakeMKV - Video Converter
+  makemkv:
+    container_name: makemkv
+    image: jlesage/makemkv:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+    volumes:
+      - $USERDIR/docker/makemkv/config:/config:rw
+      - $USERDIR/docker/makemkv/output:/output:rw # Output folder
+      - /mnt/storage:/storage:ro # Data folder - can be anything
+      - $USERDIR/dwnloads:/downloads:ro # Data folder - can be anything
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK=002
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=768
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.makemkv-rtr.entrypoints=https"
+      - "traefik.http.routers.makemkv-rtr.rule=Host(`makemkv.$DOMAINNAME`)"
+      - "traefik.http.routers.makemkv-rtr.tls=true"
+      - "traefik.http.routers.makemkv-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.makemkv-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.makemkv-rtr.service=makemkv-svc"
+      - "traefik.http.services.makemkv-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

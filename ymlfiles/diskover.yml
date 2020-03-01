@@ -1,0 +1,75 @@
+version: "2.2"
+services:
+
+## Add Redis
+
+## Diskover - Disk Space Usage Manager / Search Tool
+  diskover:
+    container_name: diskover
+    image: linuxserver/diskover:latest
+    restart: always
+    mem_limit: 4096m
+    depends_on:
+      - elasticsearch
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+#      - "9181:9181"
+#      - "9999:9999"
+    volumes:
+      - $USERDIR/docker/diskover/config:/config
+      - /mnt/storage:/data:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USER=elastic
+      - ES_PASS=changeme # keep as "changeme" ... not sure how to actually change
+      - INDEX_NAME=diskover-
+      - RUN_ON_START=true
+      - USE_CRON=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.diskover-rtr.entrypoints=https"
+      - "traefik.http.routers.diskover-rtr.rule=Host(`diskover.$DOMAINNAME`)"
+      - "traefik.http.routers.diskover-rtr.tls=true"
+      - "traefik.http.routers.diskover-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.diskover-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.diskover-rtr.service=diskover-svc"
+      - "traefik.http.services.diskover-svc.loadbalancer.server.port=80"
+
+## Elasticsearch - Search and Analytics Engine
+# On linux machine you need to enter (sudo sysctl -w vm.max_map_count=262144) because the standard value of 65530 is too low (error in logs)
+# If you get the warning "Failed to create node environment" you need to make sure permissions are set to 1000:1000 on the data folder
+# sudo chown -R 1000:1000 ${USERDIR}/docker/elasticsearch/
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.9
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: '-1'
+        hard: '-1'
+    volumes:
+      - $USERDIR/docker/diskover/elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - bootstrap.memory_lock=true
+      - cluster.name=docker-cluster
+      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+
+networks:
+  traefik_proxy:
+    external: true

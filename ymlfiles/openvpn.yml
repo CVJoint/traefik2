@@ -1,0 +1,70 @@
+version: "3.7"
+services:
+
+## OpenVPN - VPN Service
+
+  ## Create config file:
+    ## I'm using the following cipher with my iphone: AES-256-CBC-SHA256
+    ## This is considered OVPN Hardening and is optional. I've added it to the example below as reference. More info here:
+    # https://github.com/kylemanna/docker-openvpn/blob/master/docs/paranoid.md
+    # https://community.openvpn.net/openvpn/wiki/Hardening
+  # docker-compose -f <path to docker-compose file> run --rm openvpn ovpn_genconfig -u udp://<WAN IP> <optional encryption>
+  # Example:
+  # docker-compose -f ~/docker/ymlfiles/openvpn.yml run --rm openvpn ovpn_genconfig -u udp://<WAN IP> -C 'AES-256-CBC' -a 'SHA256'
+  # Find your server/WAN IP here: https://whatismyipaddress.com/
+
+  ## Change these in openvpn.conf:
+  ## Comment out or delete these lines:
+    # route 192.168.254.0 255.255.255.0
+    # push "dhcp-option DNS 8.8.8.8"
+    # push "dhcp-option DNS 8.8.4.4"
+  ## Add these lines under the Push Configurations:
+    # push "route 172.20.200.0 255.255.255.0"
+    # push "dhcp-option DNS 172.20.200.101"
+
+  ## Change the same values in ovpn_env.sh so that they look like the following:
+  # OVPN_DNS_SERVERS=([0]="172.20.200.101")
+  # OVPN_ROUTES=([0]="172.20.200.0/24")
+
+  ## Create Certificates:
+  # docker-compose -f ~/docker/ymlfiles/openvpn.yml run --rm openvpn ovpn_initpki
+
+  ## Fix ownership
+  # sudo chown -R ${USER}:docker ~/docker/openvpn
+
+  ## Start OpenVPN container
+
+  ## Create client certificate (change client name if you want e.g. to iphone)
+  # docker exec -it openvpn easyrsa build-client-full iphone
+
+  ## Export client ovpn file (use same client name as above):
+  # docker exec -it openvpn ovpn_getclient iphone > iphone.ovpn
+
+  ## Transfer client.ovpn to your client (e.g. your phone) and open with OpenVPN Connect
+
+  ## To revoke client certificate:
+  # docker exec -it openvpn ovpn_revokeclient iphone remove
+
+  openvpn:
+    container_name: openvpn
+    image: kylemanna/openvpn:latest
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.242
+    ports:
+#      - "943:943"
+#      - "9443:9443"
+      - "1194:1194/udp"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - $USERDIR/docker/openvpn:/etc/openvpn
+#    environment:
+#      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy

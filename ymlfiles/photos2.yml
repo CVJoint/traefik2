@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## Photo/Image Server
+
+  ## You must copy the file from the link below into the /config folder:
+    # https://github.com/trebonius0/Photato/blob/master/photato.ini
+
+  photos:
+    container_name: photos
+    image: trebonius0/photato:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#    - "8186:8186"
+    volumes:
+      - ${USERDIR}/Pictures:/pictures
+      - ${USERDIR}/docker/photos/config:/config
+      - ${USERDIR}/docker/photos/cache:/cache
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photos-rtr.entrypoints=https"
+      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAIN`)"
+      - "traefik.http.routers.photos-rtr.tls=true"
+      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.photos-rtr.service=photos-svc"
+      - "traefik.http.services.photos-svc.loadbalancer.server.port=8186"
+
+networks:
+  traefik_proxy:
+    external: true

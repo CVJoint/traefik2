@@ -1,0 +1,3 @@
+[http.middlewares]
+  [http.middlewares.test-chain.chain]
+    middlewares = ["oauth", "test-headers"]

@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+
+## Piwigo - Photo Gallery Server
+
+  ## Suggested procedure to create your Piwigo Database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE piwigo CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON piwigo.* TO 'piwigo'@'piwigo.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  piwigo:
+    container_name: piwigo
+    image: linuxserver/piwigo:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#     - "80:80"
+    volumes:
+#      - ${USERDIR}/docker/piwigo:/config
+      - ${USERDIR}/Pictures:/pics
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photos-rtr.entrypoints=https"
+      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      - "traefik.http.routers.photos-rtr.tls=true"
+      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.photos-rtr.service=photos-svc"
+      - "traefik.http.services.photos-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

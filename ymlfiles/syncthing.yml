@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+
+## Syncthing – Continuous File Synchronization
+
+  ## Fix inotify limit error - Need to run on host
+    #https://docs.syncthing.net/users/faq.html#inotify-limits
+      # echo "fs.inotify.max_user_watches=204800" | sudo tee -a /etc/sysctl.d/90-override.conf
+    # This only takes effect after a reboot. To adjust the limit immediately, run:
+      # sudo sh -c 'echo 204800 > /proc/sys/fs/inotify/max_user_watches'
+
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+#      - "8384:8384" # Application WebUI
+      - "22000:22000" # Listening port
+      - "21027:21027/udp" # Protocol discovery
+    volumes:
+      - $USERDIR/transfer_sync:/data/default
+      - $USERDIR/.scripts:/data/scripts
+      - $TRAEFIK2DIR/ymlfiles:/data/ymlfiles
+      - $USERDIR/docker/syncthing:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
+      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
+      - "traefik.http.routers.syncthing-rtr.tls=true"
+      - "traefik.http.routers.syncthing-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.syncthing-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
+      - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
+
+networks:
+  traefik_proxy:
+    external: true

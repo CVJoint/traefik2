@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+
+## qBittorrent with VPN – Bittorrent Downloader
+  # mkdir $USERDIR/docker/qbittorrent
+  # mkdir $USERDIR/docker/qbittorrent/openvpn
+  # Place ovpn file in $USERDIR/docker/qbittorrent/openvpn
+  # If you can't see text in the WebUI go to your qbittorrent.conf file and add "en" to the Locale setting so it looks like this: General\Locale=en
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: markusmcnugen/qbittorrentvpn:latest
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.247
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+#    ports:
+#      - "8022:8080"
+#      - "8999:8999"
+#      - "8999:8999/udp"
+    volumes:
+      - $USERDIR/docker/qbittorrent:/config
+      - $USERDIR/dwnloads:/downloads
+      - /mnt/storage:/mnt/storage
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - VPN_ENABLED=yes
+      - VPN_USERNAME=$PIA_USER
+      - VPN_PASSWORD=$PIA_PASS
+      - LAN_NETWORK=192.168.1.0/24
+      - NAME_SERVERS=1.1.1.1,1.0.0.1
+      - UMASK=002
+      ## Add these to your .ovpn file:
+#      - VPN_OPTIONS=--inactive 3600 --ping 10 --ping-exit 60 --auth-nocache
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qbittorrent.$DOMAINNAME`)"
+      - "traefik.http.routers.qbittorrent-rtr.tls=true"
+      - "traefik.http.routers.qbittorrent-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.qbittorrent-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

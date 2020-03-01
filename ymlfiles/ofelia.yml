@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+
+## Ofelia - Modern Job Scheduler (cron)
+  ofelia:
+    container_name: ofelia
+    image: mcuadros/ofelia:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $USERDIR/docker/ofelia/config.ini:/etc/ofelia/config.ini
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

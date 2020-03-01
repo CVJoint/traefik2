@@ -1,0 +1,56 @@
+version: "3.7"
+services:
+
+## Odoo - Business Management Software
+  odoo:
+    container_name: odoo
+    image: odoo:12.0
+    restart: always
+    depends_on:
+      - odoo_db
+    networks:
+      - traefik_proxy
+    ports:
+      - "8069:8069"
+    volumes:
+      - odoo-web-data:/var/lib/odoo # folder needs correct folder perms to mount locally...
+#      - $USERDIR/docker/odoo/config:/etc/odoo # custom config
+#      - $USERDIR/docker/odoo/addons:/mnt/extra-addons
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - HOST=odoo_db
+      - USER=odoo
+      - PASSWORD=odoo
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.odoo-rtr.entrypoints=https"
+      - "traefik.http.routers.odoo-rtr.rule=Host(`odoo.$DOMAINNAME`)"
+      - "traefik.http.routers.odoo-rtr.tls=true"
+      - "traefik.http.routers.odoo-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.odoo-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.odoo-rtr.service=odoo-svc"
+      - "traefik.http.services.odoo-svc.loadbalancer.server.port=8069"
+
+  odoo_db:
+    container_name: odoo_db
+    image: postgres:10
+    networks:
+      - traefik_proxy
+    volumes:
+      - $USERDIR/docker/odoo/db:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+volumes:
+  odoo-web-data:
+
+networks:
+  traefik_proxy:
+    external: true

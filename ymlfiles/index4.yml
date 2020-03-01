@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+
+## Simple Directory Index / File Browser
+  index:
+    container_name: index
+    image: kitpages/nginx-explorer:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    volumes:
+      - $TESTDIR:/usr/share/nginx/html:ro # Location you want to index
+    environment:
+      - HTTP_USER=test
+      - HTTP_PASSWORD=test
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.index-rtr.entrypoints=https"
+      - "traefik.http.routers.index-rtr.rule=Host(`index.$DOMAINNAME`)"
+      - "traefik.http.routers.index-rtr.tls=true"
+      - "traefik.http.routers.index-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.index-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.index-rtr.service=index-svc"
+      - "traefik.http.services.index-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

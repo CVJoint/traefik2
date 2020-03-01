@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+
+## Ouroboros
+  ouroboros:
+    container_name: ouroboros
+    image: pyouroboros/ouroboros:latest
+    restart: always
+    networks:
+      - pi_net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=$TZ
+      - CLEANUP=true
+      - CRON="0 5 * * *"
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+#      - IGNORE=unbound
+#      - NOTIFIERS=$DISCORD_NOTIFY # Discord Webhook URL
+
+networks:
+  pi_net:
+    external: true

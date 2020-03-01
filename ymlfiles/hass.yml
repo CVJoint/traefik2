@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Home Assistant - Home Automation Hub
+
+  ## Check config with:
+    # docker exec -it hass hass --script check_config -c /config
+
+  hass:
+    container_name: hass
+    image: homeassistant/home-assistant:latest
+    restart: always
+    privileged: true
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8123:8123"
+    volumes:
+      - $USERDIR/docker/hass:/config
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.hass-rtr.entrypoints=https"
+      - "traefik.http.routers.hass-rtr.rule=Host(`hass.$DOMAINNAME`)"
+      - "traefik.http.routers.hass-rtr.tls=true"
+      - "traefik.http.routers.hass-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.hass-rtr.middlewares=secure-headers@file"
+      ## HTTP Services
+      - "traefik.http.routers.hass-rtr.service=hass-svc"
+      - "traefik.http.services.hass-svc.loadbalancer.server.port=8123"
+
+networks:
+  traefik_proxy:
+    external: true

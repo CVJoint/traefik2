@@ -1,0 +1,99 @@
+version: "3.7"
+services:
+
+## YOURLS - Your Own URL Shortener
+
+  ## Suggested procedure to create your YOURLS Database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE yourls CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON yourls.* TO 'yourls'@'yourls.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  ## You need to add a theme otherwise YOURLS will not work. I'm using ininity-squared. Extract the contents of the latest release zip folder into the yourls folder mounted below
+    # https://github.com/tomslominski/infinity-squared
+
+  ## I use these plugins:
+    ## https://github.com/YOURLS/awesome-yourls
+    # Admin NoReCAPTCHA
+    # Allow Hyphens in Short URLs
+    # Anti spam
+    # Every Click Counts
+    # Google Safe Browsing
+    # Login Timeout
+    # Popular Clicks Extended
+
+  yourls:
+    container_name: yourls
+    image: yourls:latest
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.248
+      mariadb:
+        ipv4_address: 192.168.250.248
+#    ports:
+#      - "80:80"
+    volumes:
+      - $USERDIR/docker/yourls/config:/var/www/html # Create folder, then extract latest release from this link or any other theme: https://github.com/tomslominski/infinity-squared/releases/latest
+#      - $USERDIR/docker/yourls/page:/page
+    environment:
+      - YOURLS_SITE=https://$DOMAINNAME
+      - YOURLS_DB_HOST=mariadb
+      - YOURLS_DB_USER=yourls
+      - YOURLS_DB_PASS=$MYSQL_PASSWORD
+      - YOURLS_DB_NAME=yourls
+      - YOURLS_USER=$MY_USERNAME
+      - YOURLS_PASS=$YOURLS_PASS
+      - YOURLS_COOKIEKEY=$YOURLS_COOKIEKEY # go to http://yourls.org/cookie
+      - YOURLS_URL_CONVERT=62
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.yourls-rtr.entrypoints=https"
+      - "traefik.http.routers.yourls-rtr.rule=Host(`$DOMAINNAME`)"
+      - "traefik.http.routers.yourls-rtr.priority=1"
+      - "traefik.http.routers.yourls-rtr.tls=true"
+      - "traefik.http.routers.yourls-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.yourls-rtr.middlewares=yourls-headers"
+      - "traefik.http.middlewares.yourls-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.yourls-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.yourls-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.yourls-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.yourls-headers.headers.allowedhosts=$DOMAINNAME"
+      - "traefik.http.middlewares.yourls-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.yourls-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.yourls-headers.headers.sslhost=$DOMAINNAME"
+      - "traefik.http.middlewares.yourls-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.yourls-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.yourls-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.yourls-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.yourls-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.yourls-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.yourls-headers.headers.framedeny=true"
+#      - "traefik.http.middlewares.yourls-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.yourls-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.yourls-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.yourls-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; script-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.yourls-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.yourls-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.yourls-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.yourls-rtr.service=yourls-svc"
+      - "traefik.http.services.yourls-svc.loadbalancer.server.port=80"
+      ## Admin Page
+      - "traefik.http.routers.yourlsAdmin-rtr.entrypoints=https"
+      - "traefik.http.routers.yourlsAdmin-rtr.rule=(Host(`$DOMAINNAME`) && Path(`/admin/`))"
+      - "traefik.http.routers.yourlsAdmin-rtr.priority=2"
+      - "traefik.http.routers.yourlsAdmin-rtr.tls=true"
+      - "traefik.http.routers.yourlsAdmin-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.yourlsAdmin-rtr.middlewares=secure-chain@file"
+      - "traefik.http.routers.yourlsAdmin-rtr.service=yourls-svc"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

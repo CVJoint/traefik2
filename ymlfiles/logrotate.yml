@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+
+## LogRotate - Log File Crawler
+  logrotate:
+    container_name: logrotate
+    image: blacklabelops/logrotate:latest
+    restart: always
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/log/docker:/var/log/docker
+      - $USERDIR/docker/logrotate:/logs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker
+#      - LOGROTATE_INTERVAL=weekly # hourly daily weekly monthly yearly
+      - LOG_FILE_ENDINGS=log json xml
+#      - LOGROTATE_COPIES=10
+      - LOGROTATE_SIZE=30M # 100k = 100 kilobytes; M = Megabytes; G = Gigabytes
+#      - LOGROTATE_COMPRESSION=compress # Default = nocompress
+      - LOGROTATE_OLDDIR=/logs
+#      - LOGROTATE_CRONSCHEDULE=* * * * * *
+      - LOGROTATE_LOGFILE=/logs/logrotatecron.log

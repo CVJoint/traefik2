@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Sonarr – TV Show Download and Management
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:preview #latest
+    restart: unless-stopped
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.246
+#    ports:
+#      - "8989:8989"
+    volumes:
+      - $USERDIR/docker/sonarr:/config
+      - $USERDIR/dwnloads:/downloads
+      - /mnt/storage/tv:/tv
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+      - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAINNAME`)"
+      - "traefik.http.routers.sonarr-rtr.tls=true"
+      - "traefik.http.routers.sonarr-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.sonarr-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
+      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+
+networks:
+  traefik_proxy:
+    external: true

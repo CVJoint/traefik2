@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+
+## Jellyfin - Media Server
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    restart: always
+    devices:
+     - /dev/dri:/dev/dri
+    networks:
+      - traefik_proxy
+    ports:
+      - "8097:8096"
+      - "8921:8920"
+    volumes:
+      - /mnt/storage/movies:/MOVIES:ro
+      - /mnt/storage/tv:/TVSHOWS:ro
+      - /mnt/storage/concerts:/CONCERTS:ro
+      - $USERDIR/docker/jellyfin:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
+      - "traefik.http.routers.jellyfin-rtr.tls=true"
+      - "traefik.http.routers.jellyfin-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-rtr.middlewares=jellyfin-headers"
+      - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.jellyfin-headers.headers.addvaryheader=true"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.allowedhosts=jellyfin.$DOMAINNAME"
+      - "traefik.http.middlewares.jellyfin-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.jellyfin-headers.headers.sslredirect=true"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.sslhost=jellyfin.$DOMAINNAME"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.sslforcehost=true"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.jellyfin-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.jellyfin-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.jellyfin-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.jellyfin-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.jellyfin-headers.headers.framedeny=true"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.jellyfin-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.jellyfin-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.jellyfin-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.jellyfin-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.jellyfin-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.jellyfin-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      - "traefik.http.middlewares.jellyfin-headers.headers.customframeoptionsvalue=allow-from https:$DOMAINNAME" # This option overrides FrameDeny
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+
+networks:
+  traefik_proxy:
+    external: true

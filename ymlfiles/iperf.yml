@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+
+## iperf3 - Network Latency Tool
+  iperf:
+    container_name: iperf
+    image: mlabbe/iperf3:latest
+    restart: unless-stopped
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.199
+    ports:
+      - "5201:5201/tcp"
+      - "5201:5201/udp"
+
+networks:
+  traefik_proxy:
+    external: true

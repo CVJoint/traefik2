@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Wetty - SSH over the web
+  wetty:
+    container_name: wetty
+    image: svenihoney/wetty:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "3000:3000"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VIRTUAL_HOST=wetty.$DOMAINNAME
+      - VIRTUAL_PORT=3000
+      - REMOTE_SSH_SERVER=192.168.1.12
+      - REMOTE_SSH_PORT=22
+      - REMOTE_SSH_USER=$USERNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.wetty-rtr.entrypoints=https"
+      - "traefik.http.routers.wetty-rtr.rule=Host(`wetty.$DOMAINNAME`)"
+      - "traefik.http.routers.wetty-rtr.tls=true"
+      - "traefik.http.routers.wetty-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.wetty-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.wetty-rtr.service=wetty-svc"
+      - "traefik.http.services.wetty-svc.loadbalancer.server.port=3000"
+
+networks:
+  traefik_proxy:
+    external: true

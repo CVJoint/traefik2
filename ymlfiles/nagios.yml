@@ -1,0 +1,67 @@
+version: "3.7"
+services:
+
+  # ... still working on this one ... 
+
+## Nagios - System, Network, and Infrastructure Monitor
+  # Login: nagiosadmin / nagios
+
+  ## Change default password:
+    # docker exec -it nagios htpasswd -bB /opt/nagios/etc/htpasswd.users nagiosadmin <password>
+
+  ## Install NRPE Server
+    # https://assets.nagios.com/downloads/nagioscore/docs/nrpe/NRPE.pdf
+
+  # https://hub.docker.com/r/binfalse/nrpe-server
+
+  ## Install NRPE Server
+    # sudo apt install nagios-nrpe-server
+  ## At a minimum, you’ll probably want to edit the “allowed_hosts” parameter, to include the IP of your Nagios Server.
+    # sudo vim /etc/nagios/nrpe.cfg
+  ## Create folder and change permissions (otherwise NRPE daemon wouldn't start)
+    # sudo mkdir /var/run/nagios
+    # sudo chown -R nagios:nagios /var/run/nagios
+  ## Restart NRPE Server
+    # sudo service nagios-nrpe-server restart
+  ## Check status
+    # sudo service nagios-nrpe-server status
+  ## Server runs on port 5666 by default
+
+  nagios:
+    container_name: nagios
+    image: jasonrivers/nagios:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    volumes:
+      - $USERDIR/docker/nagios/etc:/opt/nagios/etc
+      - $USERDIR/docker/nagios/var:/opt/nagios/var
+#      - $USERDIR/docker/nagios/custom-plugins:/opt/Custom-Nagios-Plugins
+#      - $USERDIR/docker/nagios/graph/var:/opt/nagiosgraph/var
+#      - $USERDIR/docker/nagios/graph/etc:/opt/nagiosgraph/etc
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+    environment:
+#      - MAIL_RELAY_HOST= # set Postfix relayhost
+#      - MAIL_INET_PROTOCOLS= # set the inet_protocols in postfix
+      - NAGIOS_FQDN=nagios.$DOMAINNAME # set the server Fully Qualified Domain Name in postfix
+      - NAGIOS_TIMEZONE=$TZ
+      - REMOTE_SSH_USER=$USERNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.nagios-rtr.entrypoints=https"
+      - "traefik.http.routers.nagios-rtr.rule=Host(`nagios.$DOMAINNAME`)"
+      - "traefik.http.routers.nagios-rtr.tls=true"
+      - "traefik.http.routers.nagios-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.nagios-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.nagios-rtr.service=nagios-svc"
+      - "traefik.http.services.nagios-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

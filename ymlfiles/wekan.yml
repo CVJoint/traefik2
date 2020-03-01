@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+# Need to run with MongoDB
+
+## Wekan - Open Source Kanban Board
+  wekan:
+    container_name: wekan
+    image: wekanteam/wekan:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8080:8080"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MONGO_URL=mongodb://mongo/wekan # //<mongo container name>:<mongo port>/<database name>
+      - ROOT_URL=https://wekan.$DOMAINNAME
+      - MAIL_URL=smtp://$SMTP_USER:$SMTP_PASS@$SMTP_EMAIL:465 # smtp://user:pass@mailserver.example.com:25/
+      - MAIL_FROM=Wekan Notifications <$SMTP_EMAIL>
+      - WITH_API=false
+      - BROWSER_POLICY_ENABLED=true
+      - TRUSTED_URL=https://wekan.$DOMAINNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.wekan-rtr.entrypoints=https"
+      - "traefik.http.routers.wekan-rtr.rule=Host(`wekan.$DOMAINNAME`)"
+      - "traefik.http.routers.wekan-rtr.tls=true"
+      - "traefik.http.routers.wekan-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.wekan-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.wekan-rtr.service=wekan-svc"
+      - "traefik.http.services.wekan-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

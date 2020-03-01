@@ -1,0 +1,102 @@
+version: "3.7"
+services:
+
+  ## Stop MariaDB container and start this one in order to initialize database (without creating external volume...)
+
+  ## Suggested procedure to create a MariaDB database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE guacamole CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON guacamole.* TO 'guacamole'@'guacamole.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  ## Populate database by entering MariaDB container:
+    # docker exec -it mariadb bash
+    # cat /opt/guacamole/mysql/schema/*.sql | mysql -u root -p guacamole
+
+  ## Stop containers, restart normal MariaDB container and comment out the one below, and the init volume
+
+  ## Navigate to guacamole.${DOMAINNAME}/guacamole
+    # Login: guacadmin / guacadmin
+    # Recommended to create a new user and disable/delete guacadmin
+
+## Guacd
+  guacd:
+    container_name: guacd
+    image: guacamole/guacd:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "4822:4822"
+#    environment:
+#      - GUACD_LOG_LEVEL=info
+    volumes:
+#      - /var/lib/guacamole/drive:/drive:rw
+#      - /var/lib/guacamole/record:/record:rw
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+## Guacamole
+  guacamole:
+    container_name: guacamole
+    image: guacamole/guacamole:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#      - "8080:8080"
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - GUACD_PORT=4822
+      - MYSQL_HOSTNAME=mariadb
+      - MYSQL_DATABASE=guacamole
+      - MYSQL_USER=guacamole
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+    volumes:
+#      - guacamole_db_init:/opt/guacamole/mysql/schema # Uncomment to initialize MariaDB. Need to use container below in the same compose file
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.guacamole-rtr.entrypoints=https"
+      - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
+      - "traefik.http.routers.guacamole-rtr.tls=true"
+      - "traefik.http.routers.guacamole-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.guacamole-rtr.middlewares=secure-chain@file,add-guacamole"
+      - "traefik.http.middlewares.add-guacamole.addPrefix.prefix=/guacamole"
+      ## HTTP Services
+      - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
+      - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
+
+#  mariadb:
+#    container_name: mariadb
+#    image: linuxserver/mariadb:latest
+#    restart: always
+#    networks:
+#      mariadb:
+#        ipv4_address: 192.168.250.250
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - $USERDIR/docker/mariadb/data:/config
+#      - guacamole_db_init:/opt/guacamole/mysql/schema
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+#    environment:
+#      - PUID=$PUID
+#      - PGID=$PGID
+#      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+volumes:
+  guacamole_db_init:
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

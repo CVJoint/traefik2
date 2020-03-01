@@ -1,0 +1,25 @@
+version: "2.0"
+services:
+
+## Portainer - WebUI for Containers
+  portainer:
+    container_name: portainer
+    image: portainer/portainer:latest
+    restart: always
+    command: -H unix:///var/run/docker.sock
+    networks:
+      - traefik_proxy
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data # Change to local directory if you want to save/transfer config locally
+    environment:
+      - TZ=$TZ
+
+volumes:
+  portainer_data:
+
+networks:
+  traefik_proxy:
+    external: true

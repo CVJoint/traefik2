@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+## Logio - UI for Docker Logs
+  logio:
+    container_name: logio
+    image: quay.io/blacklabelops/logio:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "28778:28778"
+    volumes:
+      - /opt/server
+#    environment:
+#      - LOGIO_ADMIN_USER=
+#      - LOGIO_ADMIN_PASSWORD=
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.logio-rtr.entrypoints=https"
+      - "traefik.http.routers.logio-rtr.rule=Host(`logs.$DOMAINNAME`)"
+      - "traefik.http.routers.logio-rtr.tls=true"
+      - "traefik.http.routers.logio-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.logio-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.logio-rtr.service=logio-svc"
+      - "traefik.http.services.logio-svc.loadbalancer.server.port=28778"
+
+## Harvester for Logio
+  harvester:
+    container_name: harvester
+    user: root
+    image: quay.io/blacklabelops/logio:latest
+    restart: always
+    command: harvester
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "28777:28777"
+    volumes:
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/log/docker:/var/log/docker:ro
+    environment:
+#      - DELAYED_START=10
+      - LOGIO_HARVESTER1STREAMNAME=DockerLogs
+      - LOGIO_HARVESTER1LOGSTREAMS=/var/lib/docker
+      - LOGIO_HARVESTER1FILEPATTERN=*.log
+      - LOGIO_HARVESTER2STREAMNAME=Traefik
+      - LOGIO_HARVESTER2LOGSTREAMS=/var/log/docker
+      - LOGIO_HARVESTER2FILEPATTERN=traefik.log
+      - LOGIO_HARVESTER3STREAMNAME=Bitwarden
+      - LOGIO_HARVESTER3LOGSTREAMS=/var/log/docker
+      - LOGIO_HARVESTER3FILEPATTERN=bitwarden.log
+      - LOGIO_HARVESTER4STREAMNAME=Pihole
+      - LOGIO_HARVESTER4LOGSTREAMS=/var/log/docker
+      - LOGIO_HARVESTER4FILEPATTERN=pihole.log
+
+#      - LOGS_DIRECTORIES=/var/lib/docker
+#      - LOG_FILE_PATTERN=*.log
+
+networks:
+  traefik_proxy:
+    external: true

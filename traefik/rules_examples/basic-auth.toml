@@ -1,0 +1,9 @@
+# Use this command and change the user and password:
+# echo $(htpasswd -nb user password)
+
+
+[http.middlewares]
+  [http.middlewares.basic-auth.basicAuth]
+    users = [
+      "user:$apr1$y.WvC/6.$E3FtsfTntPC0wVJ7IUVtX1",
+    ]

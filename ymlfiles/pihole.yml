@@ -1,0 +1,140 @@
+# Need to start the traefik network before running:
+  # docker network create --gateway 192.168.50.1 --subnet 192.168.50.0/24 traefik_proxy
+
+## Pihole - Ad-blocker
+
+  ## Modify Ubuntu Network Configuration:
+    ## Disable and stop Ubuntu’s DNS resolver:
+      # sudo systemctl disable systemd-resolved.service
+      # sudo systemctl stop systemd-resolved
+    ## Open Network Manager configuration:
+      # sudo vim /etc/NetworkManager/NetworkManager.conf
+    ## Add this new line under [main], under plugins:
+      # dns=default
+    ## Make a backup of resolv.conf file and delete original (optional)
+      # sudo cp /etc/resolv.conf /etc/resolv.conf.bak
+      # sudo rm /etc/resolv.conf
+    ## Restart Network Manager
+      # sudo service network-manager restart
+    ## Apparently sometimes it won't restart/connect, so restart a second time to be sure
+      # sudo service network-manager restart
+
+  ## The resolv.conf file was giving me trouble in the pihole container, so here is the workaround:
+    # mkdir -p $USERDIR/docker/pihole/resolv.conf
+    # vim $USERDIR/docker/pihole/resolv.conf/resolv.conf
+    ## Enter both lines below and save:
+    # nameserver 127.0.0.1
+    # nameserver 192.168.50.252
+
+  ## To store logs use:
+    # touch $USERDIR/docker/pihole/pihole.log
+
+  ## I've added the following blocklist in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
+    # https://dbl.oisd.nl/
+    ## More info here: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
+  ## These regex's: https://github.com/mmotti/pihole-regex
+    # docker exec -it pihole bash
+    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.sh | bash
+    # exit
+  ## And I've added the following whitelist entries (copy domains and paste all at once)
+    # https://github.com/anudeepND/whitelist/blob/master/domains/whitelist.txt
+
+version: "3.7"
+services:
+
+## Pihole - Ad-blocker
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: always
+    depends_on:
+      - unbound
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BIND_SERVICE
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.253
+    ports:
+      - '53:53/tcp'
+      - '53:53/udp'
+#      - '67:67/udp'
+      - '1180:80/tcp'
+      - '1443:443/tcp'
+    volumes:
+      - $USERDIR/docker/pihole/pihole:/etc/pihole
+#      ## Add dark skin to pihole: https://github.com/thomasbnt/Night_PiHole
+      - $USERDIR/docker/pihole/theme/skin-blue.min.css:/var/www/html/admin/style/vendor/skin-blue.min.css
+      - $USERDIR/docker/pihole/theme/AdminLTE.min.css:/var/www/html/admin/style/vendor/AdminLTE.min.css
+      - $USERDIR/docker/pihole/resolv.conf/resolv.conf:/etc/resolv.conf:ro
+      - $USERDIR/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
+      ## Run `touch ~/docker/pihole/pihole.log` before starting pihole
+      - $USERDIR/docker/pihole/pihole.log:/var/log/pihole.log
+      - ${USERDIR}/docker/pihole/scripts/whitelist/scripts/whitelist.sh:/usr/local/bin/whitelist.sh
+    environment:
+      - TZ=$TZ
+      - ServerIP=192.168.1.50 # (My Docker Host IP)
+      - IPv6=False
+      - WEBPASSWORD=$PIHOLE_PASSWORD
+      - DNS1=127.0.0.1
+      - DNS2=192.168.50.252 # Unbound IP
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pihole-rtr.entrypoints=https"
+      - "traefik.http.routers.pihole-rtr.rule=Host(`pihole.$DOMAINNAME`)"
+      - "traefik.http.routers.pihole-rtr.tls=true"
+      - "traefik.http.routers.pihole-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.pihole-rtr.middlewares=secure-chain@file,add-admin@file"
+      ## HTTP Services
+      - "traefik.http.routers.pihole-rtr.service=pihole-svc"
+      - "traefik.http.services.pihole-svc.loadbalancer.server.port=80"
+
+## Unbound - DNS Server
+
+  ## Setup folders and files
+    # mkdir $USERDIR/docker/pihole/unbound
+    # docker run --rm --entrypoint cat mvance/unbound /opt/unbound/etc/unbound/a-records.conf > ${USERDIR}/docker/pihole/unbound/a-records.conf
+
+  ## Refresh th root.key (OPTIONAL)
+    ## Start container
+      # docker exec -it unbound unbound-anchor
+    ## Stop container
+      # sudo rm $USERDIR/docker/pihole/unbound/var/root.key
+      # sudo mv $USERDIR/docker/pihole/unbound/root.key $USERDIR/docker/pihole/unbound/var
+
+  ## Pull new root.hints:
+    # sudo wget https://www.internic.net/domain/named.root -O ~/docker/pihole/unbound/var/root.hints
+
+  ## Additional settings for unbound.conf file:
+    ## Add to the bottom of BASIC SETTINGS:
+      # To fix the DNS rebinding problemfor Plex: private-domain: plex.direct
+      # To recursively query the root servers: root-hints: "/opt/unbound/etc/unbound/var/root.hints"
+        # Commnt out any DNS forwarders if you want to recursively query the root servers
+
+  ## Test that it's working (pihole must be running)
+    # docker exec -it pihole dig pi-hole.net @127.0.0.1 -p 53
+
+  ## Test DNSSEC
+  ## This command should result in: "status: SERVFAIL"
+    # docker exec -it pihole dig sigfail.verteiltesysteme.net @127.0.0.1 -p 53
+  ## This command should result in: "status: NOERROR"
+    # docker exec -it pihole dig sigok.verteiltesysteme.net @127.0.0.1 -p 53
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound:latest
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.252
+#    ports:
+#      - '5353:5353'
+    volumes:
+      - $USERDIR/docker/pihole/unbound:/opt/unbound/etc/unbound
+
+networks:
+  traefik_proxy:
+    external: true

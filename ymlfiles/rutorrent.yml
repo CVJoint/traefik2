@@ -1,0 +1,62 @@
+version: "3.7"
+services:
+
+## ruTorrent with VPN – Bittorrent Downloader
+  rutorrent:
+    container_name: rutorrent
+    image:  binhex/arch-rtorrentvpn:latest
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.237
+#    ports:
+#      - "9080:9080" # WebUI
+#      - "9443:9443" # HTTPS WebUI
+#      - "8118:8118" # privoxy
+    volumes:
+      - $USERDIR/docker/rutorrent:/config
+      - $USERDIR/dwnloads:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - VPN_ENABLED=yes
+      - VPN_USER=$PIA_USER
+      - VPN_PASS=$PIA_PASS
+      - VPN_PROV=pia
+      - STRICT_PORT_FORWARD=yes
+      - ENABLE_PRIVOXY=yes
+      - ENABLE_AUTODL_IRSSI=no
+      - ENABLE_RPC2=no
+#      - ENABLE_RPC2_AUTH=yes
+#      - RPC2_USER=admin
+#      - RPC2_PASS=rutorrent
+      - ENABLE_WEBUI_AUTH=no
+#      - WEBUI_USER=admin
+#      - WEBUI_PASS=rutorrent
+      - LAN_NETWORK=192.168.1.0/24
+      - NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1
+      - DEBUG=false
+      - PHP_TZ=$TZ
+      - UMASK=002
+      - PUID=$PUID
+      - PGID=$PGID
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.rutorrent-rtr.entrypoints=https"
+      - "traefik.http.routers.rutorrent-rtr.rule=Host(`rutorrent.$DOMAINNAME`)"
+      - "traefik.http.routers.rutorrent-rtr.tls=true"
+      - "traefik.http.routers.rutorrent-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.rutorrent-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.rutorrent-rtr.service=rutorrent-svc"
+      - "traefik.http.services.rutorrent-svc.loadbalancer.server.port=9080"
+
+networks:
+  traefik_proxy:
+    external: true

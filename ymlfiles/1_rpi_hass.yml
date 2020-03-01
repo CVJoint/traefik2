@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+
+## Home Assistant - Home Automation Hub
+  hass:
+    container_name: hass
+    image: homeassistant/raspberrypi3-homeassistant:latest
+    restart: always
+    network_mode: host
+    privileged: true
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+#    ports:
+#      - "8123:8123"
+    volumes:
+      - ~/docker/hass:/config
+    environment:
+      - TZ=$TZ

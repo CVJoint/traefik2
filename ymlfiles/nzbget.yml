@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## Nzbget - Usenet Downloader
+
+  # Login: nzbget
+  # Password: tegbzn6789
+
+  nzbget:
+    container_name: nzbget
+    image: linuxserver/nzbget:latest
+    restart: unless-stopped
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.241
+#    ports:
+#      - "6789:6789"
+    volumes:
+      - $USERDIR/docker/nzbget:/config
+      - $USERDIR/dwnloads:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.nzbget-rtr.entrypoints=https"
+      - "traefik.http.routers.nzbget-rtr.rule=Host(`nzbget.$DOMAINNAME`)"
+      - "traefik.http.routers.nzbget-rtr.tls=true"
+      - "traefik.http.routers.nzbget-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.nzbget-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.nzbget-rtr.service=nzbget-svc"
+      - "traefik.http.services.nzbget-svc.loadbalancer.server.port=6789"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+
+## Ombi – Media Request App
+  ombi:
+    container_name: ombi
+    image: linuxserver/ombi:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "3579:3579"
+    volumes:
+      - ${USERDIR}/docker/ombi:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.ombi-rtr.entrypoints=https"
+      - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
+      - "traefik.http.routers.ombi-rtr.tls=true"
+      - "traefik.http.routers.ombi-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.ombi-rtr.middlewares=secure-headers@file,rate-limit@file"
+      ## HTTP Services
+      - "traefik.http.routers.ombi-rtr.service=ombi-svc"
+      - "traefik.http.services.ombi-svc.loadbalancer.server.port=3579"
+
+networks:
+  traefik_proxy:
+    external: true

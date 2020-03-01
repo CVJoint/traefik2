@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+
+## Logarr - WebUI for Docker Logs
+  logarr:
+    container_name: logarr
+    image: monitorr/logarr-alpha:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    volumes:
+      - $USERDIR/docker/logarr:/config
+      - /var/log/docker:/var/log/docker:ro
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.logarr-rtr.entrypoints=https"
+      - "traefik.http.routers.logarr-rtr.rule=Host(`logs.$DOMAINNAME`)"
+      - "traefik.http.routers.logarr-rtr.tls=true"
+      - "traefik.http.routers.logarr-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.logarr-rtr.middlewares=logarr-headers"
+      - "traefik.http.middlewares.logarr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+#      - "traefik.http.middlewares.logarr-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.logarr-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.logarr-headers.headers.addvaryheader=true"
+#      - "traefik.http.middlewares.logarr-headers.headers.allowedhosts=logarr.$DOMAINNAME"
+      - "traefik.http.middlewares.logarr-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.logarr-headers.headers.sslredirect=true"
+#      - "traefik.http.middlewares.logarr-headers.headers.sslhost=logarr.$DOMAINNAME"
+#      - "traefik.http.middlewares.logarr-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.logarr-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.logarr-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.logarr-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.logarr-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.logarr-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.logarr-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.logarr-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.logarr-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.logarr-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.logarr-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.logarr-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.logarr-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.logarr-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.logarr-rtr.service=logarr-svc"
+      - "traefik.http.services.logarr-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

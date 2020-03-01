@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## Dozzle - Docker Real-Time Log Viewer
+  # Filter options: https://docs.docker.com/engine/reference/commandline/ps/#filtering
+
+  dozzle:
+    container_name: logs
+    image: amir20/dozzle:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running"
+#      DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
+    labels:
+#      - log_me
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dozzle-rtr.entrypoints=https"
+      - "traefik.http.routers.dozzle-rtr.rule=Host(`logs.$DOMAINNAME`)"
+      - "traefik.http.routers.dozzle-rtr.tls=true"
+      - "traefik.http.routers.dozzle-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.dozzle-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
+      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

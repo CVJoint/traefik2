@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## BOINC Client - Berkeley Open Infrastructure for Network Computing
+  # https://boinc.berkeley.edu/projects.php
+
+  ## Enter boinccmd commands via shell:
+    # docker exec -it boinc bash
+    # boinccmd --help
+    # exit
+
+  ## Link account to BOINCStats:
+    # Create an account at https://bam.boincstats.com/
+    # docker exec -it boinc boinccmd --join_acct_mgr https://bam.boincstats.com <username> <password>
+  ## Check if account is connected:
+    # docker exec -it boinc boinccmd --acct_mgr info
+
+  ## Join a project:
+    # Create an account at https://www.worldcommunitygrid.org/
+    # docker exec -it boinc boinccmd --lookup_account http://www.worldcommunitygrid.org <your_email> <your_password>
+    # docker exec -it boinc boinccmd --project_attach http://www.worldcommunitygrid.org <authenticator key>
+  ## Or atach directly to project:
+    # docker exec -it boinc boinccmd --project_attach <project URL> <authenticator key>
+
+  ## Check tasks using command line:
+    # docker exec -it boinc boinccmd --get_tasks
+
+  boinc:
+    container_name: boinc
+    image: boinc/client:arm32v7
+    restart: always
+    network_mode: host
+#    ports:
+#      - "31416:31416"
+    volumes:
+      - $USERDIR/docker/boinc/client:/var/lib/boinc
+    environment:
+      - TZ=$TZ
+      - BOINC_GUI_RPC_PASSWORD=$MY_PASSWORD
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc

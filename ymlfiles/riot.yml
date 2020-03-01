@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## Riot.io
+
+  ## Create default config:
+    # docker run --rm --entrypoint cat bubuntux/riot-web /etc/riot-web/config.json > $USERDIR/docker/riot/config.json
+
+  riot:
+    container_name: riot
+    image: bubuntux/riot-web:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    volumes:
+      - $USERDIR/docker/riot/config.json:/etc/riot-web/config.json:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.riot-rtr.entrypoints=https"
+      - "traefik.http.routers.riot-rtr.rule=Host(`riot.$DOMAINNAME`)"
+      - "traefik.http.routers.riot-rtr.tls=true"
+      - "traefik.http.routers.riot-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.riot-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.riot-rtr.service=riot-svc"
+      - "traefik.http.services.riot-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

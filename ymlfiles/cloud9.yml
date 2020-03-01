@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Cloud9 - Complete Web Based IDE with Terminal Access
+  cloud9:
+    container_name: cloud9
+    image: linuxserver/cloud9:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8000:8000"
+    volumes:
+      - $USERDIR/docker/traefik2/traefik/rules:/code/traefik_rules
+      - $USERDIR/docker/traefik2/ymlfiles:/code/ymlfiles
+#      - /var/run/docker.sock:/var/run/docker.sock # Needed if you plan to use Docker or compose commands
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#      - GITURL=https://github.com/linuxserver/docker-cloud9.git # Specify a git repo to checkout on first startup
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.cloud9-rtr.entrypoints=https"
+      - "traefik.http.routers.cloud9-rtr.rule=Host(`cloud9.$DOMAINNAME`)"
+      - "traefik.http.routers.cloud9-rtr.tls=true"
+      - "traefik.http.routers.cloud9-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.cloud9-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.cloud9-rtr.service=cloud9-svc"
+      - "traefik.http.services.cloud9-svc.loadbalancer.server.port=8000"
+
+networks:
+  traefik_proxy:
+    external: true

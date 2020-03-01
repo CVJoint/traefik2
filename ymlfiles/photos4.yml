@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## Photo/Image Server
+  photos:
+    container_name: photos
+    image: linuxserver/photoshow:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#    - "80:80"
+    volumes:
+      - ${USERDIR}/docker/photos/config2:/config
+      - ${USERDIR}/Pictures:/Pictures:ro
+      - ${USERDIR}/docker/photos/thumbs2:/Thumbs
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photos-rtr.entrypoints=https"
+      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      - "traefik.http.routers.photos-rtr.tls=true"
+      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.photos-rtr.service=photos-svc"
+      - "traefik.http.services.photos-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

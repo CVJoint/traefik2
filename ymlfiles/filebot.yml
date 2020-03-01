@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+
+## FileBot - Rename Movie and Tv Files
+  filebot:
+    container_name: filebot
+    image: jlesage/filebot:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+    volumes:
+      - $USERDIR/docker/filebot/config:/config
+      - $USERDIR/docker/filebot/output:/output
+      - /mnt/storage:/mnt/storage
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=768
+#      - VNC_PASSWORD=<a password> # Optional
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.filebot-rtr.entrypoints=https"
+      - "traefik.http.routers.filebot-rtr.rule=Host(`filebot.$DOMAINNAME`)"
+      - "traefik.http.routers.filebot-rtr.tls=true"
+      - "traefik.http.routers.filebot-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.filebot-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.filebot-rtr.service=filebot-svc"
+      - "traefik.http.services.filebot-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

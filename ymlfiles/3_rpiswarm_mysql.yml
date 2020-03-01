@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+
+## MySQL
+
+  mysql:
+    image: hypriot/rpi-mysql:latest
+    networks:
+      - overlay_net
+    ports:
+      - "3306:3306"
+    volumes:
+      - /opt/swarmdata/docker/mysql:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+#          - node.platform.arch == armv6l
+
+networks:
+  overlay_net:
+    external: true

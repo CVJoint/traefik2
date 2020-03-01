@@ -1,0 +1,23 @@
+version: "2.0"
+services:
+
+## Resilio - Data Sync
+
+  resilio:
+    container_name: resilio
+    image: kudaba/rpi-resilio:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+      - "8888:8888"
+      - "55555:55555"
+    volumes:
+      - ~/resilio:/drive
+      - ~/docker/resilio:/opt/rslsync/etc
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+networks:
+  traefik_proxy:
+    external: true

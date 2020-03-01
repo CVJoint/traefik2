@@ -1,0 +1,48 @@
+:latestversion: "3.7"
+services:
+
+## Lychee - Photo/Image Server
+
+  ## Suggested procedure to create your database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE lychee CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON lychee.* TO 'lychee'@'lychee.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  photos:
+    container_name: photos
+    image: lsiocommunity/pixapop:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#    - "80:80"
+    volumes:
+      - ${USERDIR}/pics:/photos
+#      - ${USERDIR}/Pictures:/photos
+      - ${USERDIR}/docker/photos/config6:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photos-rtr.entrypoints=https"
+      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      - "traefik.http.routers.photos-rtr.tls=true"
+      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.photos-rtr.middlewares=oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.photos-rtr.service=photos-svc"
+      - "traefik.http.services.photos-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

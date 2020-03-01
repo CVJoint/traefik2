@@ -1,0 +1,26 @@
+version: "2.0"
+services:
+
+## Syncthing - Data Sync
+
+  syncthing:
+    container_name: syncthing
+    image: dargmuesli/syncthing:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+      - "8384:8384"
+      - "22000:22000"
+      - "21027:21027/udp"
+    volumes:
+      - ~/syncthing:/var/syncthing/Sync
+      - ~/docker/syncthing:/var/syncthing/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+#      - TZ=$TZ
+
+networks:
+  traefik_proxy:
+    external: true

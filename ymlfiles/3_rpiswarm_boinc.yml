@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## BOINC Client - Berkeley Open Infrastructure for Network Computing
+  # https://boinc.berkeley.edu/projects.php
+
+  boinc:
+    image: boinc/client:arm32v7
+    networks:
+      - overlay_net
+    ports:
+      - "31416:31416"
+    volumes:
+      - "/home/pi/docker/boinc:/var/lib/boinc"
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+#          - node.role == manager
+          - node.platform.arch == armv7l
+    environment:
+      - TZ=$TZ
+      - BOINC_GUI_RPC_PASSWORD=$MY_PASSWORD
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+
+networks:
+  overlay_net:
+    external: true

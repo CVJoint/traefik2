@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+## Emby Media Server
+  emby:
+    container_name: emby
+    image: emby/embyserver:latest
+    restart: always
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.201
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+    volumes:
+      - /mnt/storage/movies:/MOVIES:ro
+      - /mnt/storage/tv:/TVSHOWS:ro
+      - /mnt/storage/concerts:/CONCERTS:ro
+      - /mnt/storage/music/music:/music:ro
+      - $USERDIR/docker/emby:/config
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - GIDLIST=44
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.emby-rtr.entrypoints=https"
+      - "traefik.http.routers.emby-rtr.rule=Host(`emby.$DOMAINNAME`)"
+      - "traefik.http.routers.emby-rtr.priority=4"
+      - "traefik.http.routers.emby-rtr.tls=true"
+      - "traefik.http.routers.emby-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.emby-rtr.middlewares=emby-headers"
+      - "traefik.http.middlewares.emby-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+#      - "traefik.http.middlewares.emby-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.emby-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.emby-headers.headers.addvaryheader=true"
+#      - "traefik.http.middlewares.emby-headers.headers.allowedhosts=emby.$DOMAINNAME"
+      - "traefik.http.middlewares.emby-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.emby-headers.headers.sslredirect=true"
+#      - "traefik.http.middlewares.emby-headers.headers.sslhost=emby.$DOMAINNAME"
+#      - "traefik.http.middlewares.emby-headers.headers.sslforcehost=true"
+#      - "traefik.http.middlewares.emby-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.emby-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.emby-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.emby-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.emby-headers.headers.forcestsheader=true"
+      - "traefik.http.middlewares.emby-headers.headers.framedeny=true"
+#      - "traefik.http.middlewares.emby-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.emby-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.emby-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.emby-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.emby-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.emby-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.emby-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.emby-rtr.service=emby-svc"
+      - "traefik.http.services.emby-svc.loadbalancer.server.port=8096"
+
+networks:
+  traefik_proxy:
+    external: true

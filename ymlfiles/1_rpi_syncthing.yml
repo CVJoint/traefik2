@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+
+## Syncthing – Continuous File Synchronization
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:arm32v7-latest
+    restart: always
+    networks:
+      - pi_net
+    ports:
+      - "8384:8384" # Application WebUI
+      - "22000:22000" # Listening port
+      - "21027:21027/udp" # Protocol discovery
+    volumes:
+      - $USERDIR/transfer_sync:/data/default
+      - $USERDIR/.scripts:/data/scripts
+      - $USERDIR/docker/ymlfiles_sync:/data/ymlfiles
+      - $USERDIR/docker/syncthing:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+
+networks:
+  pi_net:
+    external: true

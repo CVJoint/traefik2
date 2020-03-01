@@ -1,5 +1,7 @@
-rules.toml
-old_t.toml
-/dynamic
 traefik/acme/acme.json
-
+traefik/rules/
+ymlfiles/dbbackup*
+ymlfiles/airsonic2.yml
+backupppp/
+ymlswarm/
+ymlfiles/oauth-keycloak.yml

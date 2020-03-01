@@ -1,0 +1,72 @@
+version: "3.7"
+services:
+
+## Synapse - Matrix Server
+
+  # ... still a WIP ...
+
+
+  matrix:
+    container_name: matrix
+    image: matrixdotorg/synapse:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8008:8008"
+    volumes:
+      - $USERDIR/docker/matrix/data:/data
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.matrix-rtr.entrypoints=https"
+      - "traefik.http.routers.matrix-rtr.rule=Host(`matrix.$DOMAINNAME`)"
+      - "traefik.http.routers.matrix-rtr.tls=true"
+      - "traefik.http.routers.matrix-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.matrix-rtr.service=matrix-svc"
+      - "traefik.http.services.matrix-svc.loadbalancer.server.port=8008"
+
+## ma1sd - Federated Matrix Identity Server
+  ma1sd:
+    container_name: ma1sd
+    image: ma1uta/ma1sd:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8090:8090"
+    volumes:
+      - $USERDIR/docker/matrix/ma1sd/etc:/etc/ma1sd
+      - $USERDIR/docker/matrix/ma1sd/var:/var/ma1sd
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+    environment:
+#      - UID=$PUID
+#      - GID=$PGID
+#      - TZ=$TZ
+      - MATRIX_DOMAIN=matrix.$DOMAINNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.matrix-rtr.entrypoints=https"
+      - "traefik.http.routers.matrix-rtr.rule=Host(`matrix-ident.$DOMAINNAME`)"
+      - "traefik.http.routers.matrix-rtr.tls=true"
+      - "traefik.http.routers.matrix-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.matrix-rtr.service=matrix-svc"
+      - "traefik.http.services.matrix-svc.loadbalancer.server.port=8090"
+
+networks:
+  traefik_proxy:
+    external: true

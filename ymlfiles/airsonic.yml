@@ -1,0 +1,79 @@
+version: "3.7"
+services:
+
+## Airsonic - Music Server
+  # Login: admin / admin
+
+  ## With Mariadb (Optional, default HyperSQL works well)
+    # https://airsonic.github.io/docs/database/
+
+  ## Suggested procedure to create your database:
+  ## Change the <password>
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE airsonic CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+    # GRANT ALL PRIVILEGES ON airsonic.* TO 'airsonic'@'airsonic.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  airsonic:
+    container_name: airsonic
+    image: linuxserver/airsonic:latest
+    restart: always
+    networks:
+      - traefik_proxy
+      - mariadb
+#    ports:
+#      - "4040:4040"
+    volumes:
+      - /mnt/storage/music/music:/music:ro
+      - $USERDIR/docker/airsonic/podcasts:/podcasts
+      - $USERDIR/docker/airsonic/playlists:/playlists
+      - $USERDIR/docker/airsonic2/config:/config
+#      - $USERDIR/docker/airsonic/config:/app/airsonic/config #Used to change log level for debugging
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - JAVA_OPTS=-Dserver.use-forward-headers=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.airsonic-rtr.entrypoints=https"
+      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.tls=true"
+      - "traefik.http.routers.airsonic-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.airsonic-rtr.middlewares=airsonic-headers"
+      - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.airsonic-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.allowedhosts=airsonic.$DOMAINNAME"
+      - "traefik.http.middlewares.airsonic-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.airsonic-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.sslhost=airsonic.$DOMAINNAME"
+      - "traefik.http.middlewares.airsonic-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.airsonic-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.airsonic-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.airsonic-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
+      - "traefik.http.middlewares.airsonic-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.airsonic-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.airsonic-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
+#      - traefik.http.middlewares.airsonic-headers.headers.ContentSecurityPolicy="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' www.gstatic.com; img-src 'self' *.akamaized.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-src 'self'; object-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.airsonic-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.airsonic-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.airsonic-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
+      - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

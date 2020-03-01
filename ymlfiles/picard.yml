@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+
+## MusicBrainz Picard – Music Management
+  picard:
+    container_name: picard
+    image: mikenye/picard:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+    volumes:
+      - $USERDIR/docker/picard:/config
+      - $USERDIR/dwnloads/:/downloads
+      - /mnt/storage/music:/storage
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK=022
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=768
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.picard-rtr.entrypoints=https"
+      - "traefik.http.routers.picard-rtr.rule=Host(`picard.$DOMAINNAME`)"
+      - "traefik.http.routers.picard-rtr.tls=true"
+      - "traefik.http.routers.picard-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.picard-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.picard-rtr.service=picard-svc"
+      - "traefik.http.services.picard-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+
+## Gogs
+
+  gogs:
+    image: hypriot/rpi-gogs-alpine #raspbian
+    networks:
+      - overlay_net
+    ports:
+      - "8022:22"
+      - "3000:3000"
+    volumes:
+      - /opt/swarmdata/docker/gogs:/data 
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+#          - node.platform.arch == armv6l
+
+networks:
+  overlay_net:
+    external: true

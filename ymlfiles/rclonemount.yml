@@ -1,0 +1,30 @@
+version: "2"
+services:
+
+## RClone Mount
+
+  # When you force remove the container, you have to sudo fusermount -u -z /mnt/mediaefs on the hostsystem!
+
+  rclonemount:
+    container_name: rclonemount
+    image: mumiehub/rclone-mount:latest
+    restart: always
+    privileged: true
+    cap_add:
+    - SYS_ADMIN
+    devices:
+    - /dev/fuse
+    security_opt:
+      - apparmor:unconfined
+    stdin_open: true
+    tty: true
+    volumes:
+      - $USERDIR/.config/rclone:/config
+      - /mnt/gmedia:/mnt/gmedia:shared
+    environment:
+      - "ConfigDir=/config"
+      - "ConfigName=rclone.conf"
+      - "RemotePath=gmedia:"
+      - "MountPoint=/mnt/gmedia"
+      - "MountCommands=--uid 1000 --gid 1000 --umask 022 --default-permissions --allow-other --allow-non-empty --cache-db-purge --dir-cache-time 72h --poll-interval 5m --buffer-size 128M"
+      - "UnmountCommands=-u -z"

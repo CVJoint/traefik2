@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+
+# rsync -aP --inplace $USERNAME@192.168.1.50::volume/music /mnt/storage/
+
+## Rsync Server
+  rsync:
+    container_name: rsync
+    image: axiom/rsync-server:latest
+    restart: always
+    networks:
+      - traefik_proxy
+    ports:
+      - "873:873"
+#      - "22:22"
+    volumes:
+#      - $USERDIR/.ssh/authorized_keys:/root/.ssh/authorized_keys:ro
+      - /mnt/storage:/data:ro
+    environment:
+      - USERNAME=$USERNAME
+      - PASSWORD=$MY_PASSWORD
+      - VOLUME=/data
+      - ALLOW=192.168.1.0/24 172.16.0.0/12 127.0.0.1/32
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+
+## Organizr - Unified Server Web Interface
+
+  ## Still need to add allow from header...
+
+  organizr:
+    container_name: organizr
+    image: organizrtools/organizr-v2:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+    ports:
+      - "1180:80"
+    volumes:
+      - ${USERDIR}/docker/organizr:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.organizr-rtr.entrypoints=https"
+      - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
+      - "traefik.http.routers.organizr-rtr.tls=true"
+      - "traefik.http.routers.organizr-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.organizr-rtr.middlewares=organizr-headers"
+      - "traefik.http.middlewares.organizr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
+      - "traefik.http.middlewares.organizr-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.organizr-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.organizr-headers.headers.addvaryheader=true"
+      - "traefik.http.middlewares.organizr-headers.headers.allowedhosts=organizr.$DOMAINNAME"
+      - "traefik.http.middlewares.organizr-headers.headers.hostsproxyheaders=X-Forwarded-Host"
+      - "traefik.http.middlewares.organizr-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.organizr-headers.headers.sslhost=organizr.$DOMAINNAME"
+      - "traefik.http.middlewares.organizr-headers.headers.sslforcehost=true"
+      - "traefik.http.middlewares.organizr-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.organizr-headers.headers.stsseconds=63072000"
+      - "traefik.http.middlewares.organizr-headers.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.organizr-headers.headers.stspreload=true"
+      - "traefik.http.middlewares.organizr-headers.headers.forcestsheader=true"
+#      - "traefik.http.middlewares.organizr-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.organizr-headers.headers.customframeoptionsvalue=allow-from https:$DOMAINNAME" # This option overrides FrameDeny
+      - "traefik.http.middlewares.organizr-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.organizr-headers.headers.browserxssfilter=true"
+#      - "traefik.http.middlewares.organizr-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; script-src 'none'; base-uri 'none';"
+      - "traefik.http.middlewares.organizr-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.middlewares.organizr-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
+      - "traefik.http.middlewares.organizr-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
+      ## HTTP Services
+      - "traefik.http.routers.organizr-rtr.service=organizr-svc"
+      - "traefik.http.services.organizr-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true

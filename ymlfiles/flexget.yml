@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Flex-GET
+  flexget:
+    container_name: flexget
+    image: wiserain/flexget:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "3539:3539"
+    volumes:
+      - $USERDIR/docker/flexget/data:/data
+      - $USERDIR/docker/flexget/config:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - FG_WEBUI_PASSWD=$MY_PASSWORD
+      - FG_LOG_LEVEL=info
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.flexget-rtr.entrypoints=https"
+      - "traefik.http.routers.flexget-rtr.rule=Host(`flexget.$DOMAINNAME`)"
+      - "traefik.http.routers.flexget-rtr.tls=true"
+      - "traefik.http.routers.flexget-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.flexget-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.flexget-rtr.service=flexget-svc"
+      - "traefik.http.services.flexget-svc.loadbalancer.server.port=3539"
+
+networks:
+  traefik_proxy:
+    external: true

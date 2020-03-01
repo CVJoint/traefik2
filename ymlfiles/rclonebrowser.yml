@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+
+## RClone Browser with GUI interface
+  rclonebrowser:
+    container_name: rclonebrowser
+    image: romancin/rclonebrowser:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#     - "5800:5800" # Web Access
+#     - "5900:5900" # VNC port
+    volumes:
+      - $USERDIR/docker/rclonebrowser/config:/config
+      - $USERDIR/docker/rclonebrowser/media:/media # Location for downloading/uploading
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK=022
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=768
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.rclonebrowser-rtr.entrypoints=https"
+      - "traefik.http.routers.rclonebrowser-rtr.rule=Host(`rclone.$DOMAINNAME`)"
+      - "traefik.http.routers.rclonebrowser-rtr.tls=true"
+      - "traefik.http.routers.rclonebrowser-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.rclonebrowser-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.rclonebrowser-rtr.service=rclonebrowser-svc"
+      - "traefik.http.services.rclonebrowser-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+
+## JDownloader – Download Manager
+
+  ## Disable ads, banners, and other junk:
+    # https://www.ps2-home.com/forum/viewtopic.php?t=512
+    # Go to Advanced Settings and search for these keywords:
+      # premium alert
+      # special deals
+      # banner
+      # Donate (displays the Contribute tab)
+
+  ## Themes available
+    # Search Advanced Settings for "look and feel"
+
+  jdownloader:
+    container_name: jdownloader
+    image: jlesage/jdownloader-2:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "5800:5800"
+#      - "5900:5900"
+#      - "3129:3129"
+    volumes:
+      - $USERDIR/docker/jdownloader:/config
+      - $USERDIR/dwnloads/:/downloads # by default this folder is called ":/output"
+      - /mnt/storage:/mnt/storage
+    environment:
+      - USER_ID=$PUID
+      - GROUP_ID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=768
+      - KEEP_APP_RUNNING=1
+#      - VNC_PASSWORD=<a password> # Optional
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
+      - "traefik.http.routers.jdownloader-rtr.rule=Host(`jdownloader.$DOMAINNAME`)"
+      - "traefik.http.routers.jdownloader-rtr.tls=true"
+      - "traefik.http.routers.jdownloader-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.jdownloader-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
+      - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+
+## Nginx
+
+  nginx2:
+    image: drakerin/rpi-alpine-nginx
+    networks:
+      - overlay_net
+    ports:
+      - "3380:80"
+    volumes:
+#      - /opt/swarmdata/docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - /opt/swarmdata/docker/nginx2/index.html:/var/www/index.html
+    deploy:
+#      mode: global # service runs on every node
+      mode: replicated # a specified number of containers (default)
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+#          - node.platform.arch == armv6l
+
+networks:
+  overlay_net:
+    external: true
