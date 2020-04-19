@@ -43,43 +43,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik_proxy"
-      ## HTTP Routers
-      - "traefik.http.routers.nextcloud-rtr.entrypoints=https"
-      - "traefik.http.routers.nextcloud-rtr.rule=Host(`nextcloud.$DOMAINNAME`)"
-      - "traefik.http.routers.nextcloud-rtr.tls=true"
-      - "traefik.http.routers.nextcloud-rtr.tls.certresolver=dns-cloudflare"
-      ## Middlewares
-      - "traefik.http.routers.nextcloud-rtr.middlewares=nextcloud-redirect,nextcloud-headers"
-      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
-      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=https://$$1/remote.php/dav/"
-      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true"
-
-      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
-      - "traefik.http.middlewares.nextcloud-headers.headers.accesscontrolmaxage=100"
-      - "traefik.http.middlewares.nextcloud-headers.headers.addvaryheader=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.allowedhosts=nextcloud.$DOMAINNAME"
-      - "traefik.http.middlewares.nextcloud-headers.headers.hostsproxyheaders=X-Forwarded-Host"
-      - "traefik.http.middlewares.nextcloud-headers.headers.sslredirect=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.sslhost=nextcloud.$DOMAINNAME"
-      - "traefik.http.middlewares.nextcloud-headers.headers.sslforcehost=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.sslproxyheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.nextcloud-headers.headers.stsseconds=63072000"
-      - "traefik.http.middlewares.nextcloud-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.stspreload=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.forcestsheader=true"
-#      - "traefik.http.middlewares.nextcloud-headers.headers.framedeny=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.customframeoptionsvalue=SAMEORIGIN" # This option overrides FrameDeny
-      - "traefik.http.middlewares.nextcloud-headers.headers.contenttypenosniff=true"
-      - "traefik.http.middlewares.nextcloud-headers.headers.browserxssfilter=true"
-#      - "traefik.http.middlewares.nextcloud-headers.headers.contentsecuritypolicy=frame-ancestors 'none'; object-src 'none'; base-uri 'none';"
-      - "traefik.http.middlewares.nextcloud-headers.headers.referrerpolicy=same-origin"
-      - "traefik.http.middlewares.nextcloud-headers.headers.featurepolicy=camera 'none'; geolocation 'none'; microphone 'none'; payment 'none'; usb 'none'; vr 'none';"
-      - "traefik.http.middlewares.nextcloud-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
-      ## HTTP Services
-      - "traefik.http.routers.nextcloud-rtr.service=nextcloud-svc"
-      - "traefik.http.services.nextcloud-svc.loadbalancer.server.port=443"
-      - "traefik.http.services.nextcloud-svc.loadbalancer.passhostheader=true"
       ## TCP Routers
       - "traefik.tcp.routers.nextcloud-tcp.entrypoints=https"
       - "traefik.tcp.routers.nextcloud-tcp.rule=HostSNI(`nextcloud.$DOMAINNAME`)"
@@ -122,7 +85,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.onlyoffice-rtr.middlewares=onlyoffice-headers"
 #      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-#      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+#      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
 #      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolmaxage=100"
 #      - "traefik.http.middlewares.onlyoffice-headers.headers.addvaryheader=true"
 #      - "traefik.http.middlewares.onlyoffice-headers.headers.allowedhosts=onlyoffice.$DOMAINNAME"

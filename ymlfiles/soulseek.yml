@@ -12,14 +12,15 @@ services:
 #    ports:
 #      - "6080:6080"
     volumes:
-      - soulseek_data:/root/.SoulseekQt
-      - soulseek_logs:/root/Soulseek Chat Logs
-      - $USERDIR/dwnloads/completed:/root/Soulseek Downloads/complete
-      - $USERDIR/dwnloads/temp:/root/Soulseek Downloads/downloading
-      - /mnt/storage/music/music:/Music
+#      - $USERDIR/docker/soulseek/data:/data/.config
+      - $USERDIR/dwnloads/completed:/data/Soulseek Downloads/complete
+      - $USERDIR/dwnloads/temp:/data/Soulseek Downloads/downloading
+      - /mnt/storage/music/music:/Music:ro
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
+      - puid=$PUID
+      - pgid=$PGID
       - resolution=1600x720
     labels:
       - "traefik.enable=true"
@@ -31,7 +32,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.soulseek-rtr.middlewares=soulseek-headers,oauth@file"
       - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.soulseek-headers.headers.addvaryheader=true"
       - "traefik.http.middlewares.soulseek-headers.headers.allowedhosts=soulseek.$DOMAINNAME"
@@ -55,10 +56,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.soulseek-rtr.service=soulseek-svc"
       - "traefik.http.services.soulseek-svc.loadbalancer.server.port=6080"
-
-volumes:
-  soulseek_data:
-  soulseek_logs:
 
 networks:
   traefik_proxy:

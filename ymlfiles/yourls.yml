@@ -59,7 +59,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.yourls-rtr.middlewares=yourls-headers"
       - "traefik.http.middlewares.yourls-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.yourls-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.yourls-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.yourls-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.yourls-headers.headers.addvaryheader=true"
       - "traefik.http.middlewares.yourls-headers.headers.allowedhosts=$DOMAINNAME"

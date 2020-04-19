@@ -25,7 +25,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.logarr-rtr.middlewares=logarr-headers"
       - "traefik.http.middlewares.logarr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-#      - "traefik.http.middlewares.logarr-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+#      - "traefik.http.middlewares.logarr-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.logarr-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.logarr-headers.headers.addvaryheader=true"
 #      - "traefik.http.middlewares.logarr-headers.headers.allowedhosts=logarr.$DOMAINNAME"

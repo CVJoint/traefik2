@@ -29,7 +29,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=organizr-headers"
       - "traefik.http.middlewares.organizr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.organizr-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.organizr-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.organizr-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.organizr-headers.headers.addvaryheader=true"
       - "traefik.http.middlewares.organizr-headers.headers.allowedhosts=organizr.$DOMAINNAME"

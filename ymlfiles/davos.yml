@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## Davos - An FTP Automation Tool
+  davos:
+    container_name: davos
+    image: linuxserver/davos:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8989:8989"
+    volumes:
+      - $USERDIR/docker/davos:/config
+      - $USERDIR/dwnloads:/downloads
+      - /mnt/storage/tv:/tv
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.davos-rtr.entrypoints=https"
+      - "traefik.http.routers.davos-rtr.rule=Host(`davos.$DOMAINNAME`)"
+      - "traefik.http.routers.davos-rtr.tls=true"
+      - "traefik.http.routers.davos-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.davos-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.davos-rtr.service=davos-svc"
+      - "traefik.http.services.davos-svc.loadbalancer.server.port=8080"
+
+networks:
+  traefik_proxy:
+    external: true

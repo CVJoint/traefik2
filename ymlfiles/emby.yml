@@ -17,13 +17,12 @@ services:
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro
-      - /mnt/storage/concerts:/CONCERTS:ro
-      - /mnt/storage/music/music:/music:ro
+      - /mnt/storage/music/music:/MUSIC:ro
       - $USERDIR/docker/emby:/config
     environment:
       - UID=$PUID
       - GID=$PGID
-      - GIDLIST=44
+      - GIDLIST=44 # 'video' group
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -35,7 +34,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.emby-rtr.middlewares=emby-headers"
       - "traefik.http.middlewares.emby-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-#      - "traefik.http.middlewares.emby-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+#      - "traefik.http.middlewares.emby-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.emby-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.emby-headers.headers.addvaryheader=true"
 #      - "traefik.http.middlewares.emby-headers.headers.allowedhosts=emby.$DOMAINNAME"

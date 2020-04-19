@@ -16,7 +16,7 @@ services:
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro
-      - /mnt/storage/concerts:/CONCERTS:ro
+      - /mnt/storage/music/music:/MUSIC:ro
       - $USERDIR/docker/jellyfin:/config
     environment:
       - PUID=$PUID
@@ -33,7 +33,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.jellyfin-rtr.middlewares=jellyfin-headers"
       - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.jellyfin-headers.headers.addvaryheader=true"
 #      - "traefik.http.middlewares.jellyfin-headers.headers.allowedhosts=jellyfin.$DOMAINNAME"

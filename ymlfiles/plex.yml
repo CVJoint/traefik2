@@ -4,7 +4,7 @@ services:
 ## Plex Media Server
   plex:
     container_name: plex
-    image: linuxserver/plex:latest
+    image: linuxserver/plex:1.18.7.2457-77cb9455c-ls80
     restart: always
     devices:
       - /dev/dri:/dev/dri
@@ -23,14 +23,13 @@ services:
       - $USERDIR/docker/plex:/config
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TV:ro
-      - /mnt/storage/concerts:/CONCERTS:ro
       - /mnt/storage/music:/MUSIC:ro
-      - /mnt/storage/books:/BOOKS:ro
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
       - VERSION=docker
+#      - PLEX_CLAIM=claim-xxxxxxxx
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -41,7 +40,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.plex-rtr.middlewares=plex-headers"
       - "traefik.http.middlewares.plex-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.plex-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.plex-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.plex-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.plex-headers.headers.addvaryheader=true"
 #      - "traefik.http.middlewares.plex-headers.headers.allowedhosts=plex.$DOMAINNAME"

@@ -28,13 +28,12 @@ services:
       - /mnt/storage/music/music:/music:ro
       - $USERDIR/docker/airsonic/podcasts:/podcasts
       - $USERDIR/docker/airsonic/playlists:/playlists
-      - $USERDIR/docker/airsonic2/config:/config
+      - $USERDIR/docker/airsonic/config:/config
 #      - $USERDIR/docker/airsonic/config:/app/airsonic/config #Used to change log level for debugging
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     environment:
       - PUID=$PUID
       - PGID=$PGID
+      - TZ=$TZ
       - JAVA_OPTS=-Dserver.use-forward-headers=true
     labels:
       - "traefik.enable=true"
@@ -46,7 +45,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.airsonic-rtr.middlewares=airsonic-headers"
       - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.airsonic-headers.headers.addvaryheader=true"
       - "traefik.http.middlewares.airsonic-headers.headers.allowedhosts=airsonic.$DOMAINNAME"

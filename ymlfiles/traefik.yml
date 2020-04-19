@@ -8,7 +8,7 @@ services:
 ## Traefik - Reverse Proxy
   traefik:
     container_name: traefik
-    image: traefik:cantal # the cantal tag refers to v2.1.x
+    image: traefik:chevrotin # the chevrotin tag refers to v2.2.x
     restart: always
     command: # CLI arguments
       - --global.checkNewVersion=true
@@ -24,7 +24,7 @@ services:
       - --log=true
       - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=true
-      - --accessLog.filePath=/var/log/docker/traefik.log
+      - --accessLog.filePath=/traefik.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accessLog.filters.statusCodes=400-499
       - --providers.docker=true
@@ -43,6 +43,8 @@ services:
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.254
+    security_opt:
+      - no-new-privileges:true
     ports:
       - target: 80
         published: 80
@@ -56,7 +58,7 @@ services:
       - $TRAEFIK2DIR/traefik/rules:/rules # file provider directory
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $TRAEFIK2DIR/traefik/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
-      - /var/log/docker/traefik.log:/var/log/docker/traefik.log # for fail2ban - make sure to touch file before starting container
+      - /var/log/docker/traefik.log:/traefik.log # for fail2ban - make sure to touch file before starting container
     environment:
       - CF_API_EMAIL=$CLOUDFLARE_EMAIL
       - CF_API_KEY=$CLOUDFLARE_API_KEY
@@ -79,7 +81,7 @@ services:
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,oauth@file"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
-      - "traefik.http.middlewares.traefik-headers.headers.accesscontrolalloworigin=https://$DOMAINNAME"
+      - "traefik.http.middlewares.traefik-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.traefik-headers.headers.addvaryheader=true"
       - "traefik.http.middlewares.traefik-headers.headers.allowedhosts=traefik.$DOMAINNAME"
