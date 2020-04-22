@@ -1,6 +1,6 @@
 [tcp.routers]
   [tcp.routers.unifi-rtr]
-      entryPoints = ["http", "https"]
+      entryPoints = ["https"]
       rule = "HostSNI(`unifi.<your domain>`)"
       service = "unifi-svc"
       [tcp.routers.unifi-rtr.tls]
