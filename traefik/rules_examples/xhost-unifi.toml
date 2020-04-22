@@ -1,0 +1,18 @@
+[tcp.routers]
+  [tcp.routers.unifi-rtr]
+      entryPoints = ["http", "https"]
+      rule = "HostSNI(`unifi.<your domain>`)"
+      service = "unifi-svc"
+      [tcp.routers.unifi-rtr.tls]
+        certresolver = "dns-cloudflare"
+        passthrough = true
+        [[tcp.routers.unifi-rtr.tls.domains]]
+          main = "<your domain>"
+          sans = ["*.<your domain>"]
+
+[tcp.services]
+  [tcp.services.unifi-svc]
+    [tcp.services.unifi-svc.loadBalancer]
+      passHostHeader = true
+      [[tcp.services.unifi-svc.loadBalancer.servers]]
+        address = "192.168.1.3:8443" # or whatever your external host's IP:port is
