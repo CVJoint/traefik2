@@ -22,6 +22,8 @@ services:
       - UID=$PUID
       - GID=$PGID
       - TZ=$TZ
+      - SYNAPSE_SERVER_NAME=matrix.$DOMAINNAME
+      - SYNAPSE_REPORT_STATS=yes
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

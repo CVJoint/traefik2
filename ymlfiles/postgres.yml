@@ -11,7 +11,7 @@ services:
   ## Suggested procedure to create new databases:
   ## Replace <THESE VALUES>
     # docker exec -it postgres su postgres
-    # createuser <USER>
+    # createuser --pwprompt <USER>
     # createdb <DATABASE NAME> --owner=<USER> --encoding=UTF8
     # psql --u postgres
     # GRANT ALL PRIVILEGES ON DATABASE <database name> TO <user>;

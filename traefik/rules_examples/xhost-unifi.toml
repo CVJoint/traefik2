@@ -6,9 +6,6 @@
       [tcp.routers.unifi-rtr.tls]
         certresolver = "dns-cloudflare"
         passthrough = true
-        [[tcp.routers.unifi-rtr.tls.domains]]
-          main = "<your domain>"
-          sans = ["*.<your domain>"]
 
 [tcp.services]
   [tcp.services.unifi-svc]
