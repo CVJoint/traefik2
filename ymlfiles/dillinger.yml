@@ -36,7 +36,7 @@ services:
 #      - "traefik.http.routers.dillinger-rtr.tls.options=tls-opts@file"
       ## Middlewares
       - "traefik.http.routers.dillinger-rtr.middlewares=secure-headers@file,dillinger-auth" # Doesn't work with OAuth for some reason
-      - "traefik.http.middlewares.dillinger-auth.basicauth.users=$HTPASSWD" # htpasswd should have single $'s escaped w backslash: \$
+      - "traefik.http.middlewares.dillinger-auth.basicauth.users=$HTPASSWD"
       ## HTTP Services
       - "traefik.http.routers.dillinger-rtr.service=dillinger-svc"
       - "traefik.http.services.dillinger-svc.loadbalancer.server.port=8080"

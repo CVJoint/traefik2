@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+
+## SmartThings MQTT Bridge
+  mqtt-bridge:
+    container_name: mqtt-bridge
+    image: stjohnjohnson/smartthings-mqtt-bridge:latest
+    restart: always
+    networks:
+      - mqtt
+    ports:
+     - "8080:8080"
+    volumes:
+      - $USERDIR/docker/mqtt-bridge:/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+networks:
+  mqtt:
+    external: true

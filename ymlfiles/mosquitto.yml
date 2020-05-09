@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+
+## Mosquitto - MQTT Broker
+  mosquitto:
+    user: $PUID:$PGID
+    container_name: mosquitto
+    image: toke/mosquitto:latest
+    restart: always
+    networks:
+      - mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - $USERDIR/docker/mosquitto/config:/mqtt/config
+      - $USERDIR/docker/mosquitto/log:/mqtt/log
+      - $USERDIR/docker/mosquitto/data/:/mqtt/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+networks:
+  mqtt:
+    external: true

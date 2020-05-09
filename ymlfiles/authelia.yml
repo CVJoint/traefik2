@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+## Authelia - Self-Hosted Single Sign-On and Two-Factor Authentication
+  # Configuration files at: https://github.com/authelia/authelia/tree/master/compose/lite
+  # Create new hashed password: docker run authelia/authelia:latest authelia hash-password <new_password>
+
+  authelia:
+    container_name: authelia
+    image: authelia/authelia:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "9091:9091"
+    volumes:
+      - $USERDIR/docker/authelia/authelia:/var/lib/authelia
+      - $USERDIR/docker/authelia/configuration.yml:/etc/authelia/configuration.yml:ro
+      - $USERDIR/docker/authelia/users_database.yml:/etc/authelia/users_database.yml
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.authelia-rtr.entrypoints=https"
+      - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
+      - "traefik.http.routers.authelia-rtr.tls=true"
+      - "traefik.http.routers.authelia-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.authelia-rtr.middlewares=rate-limit@file,secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
+      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
+
+networks:
+  traefik_proxy:
+    external: true

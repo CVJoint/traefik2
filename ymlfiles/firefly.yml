@@ -1,0 +1,106 @@
+version: "3.7"
+services:
+
+## Firefly III - Finance Manager
+
+  ## Create a unique App Key which is a random 32 character string
+    # date +%s | sha256sum | base64 | head -c 32 ; echo
+
+  ## Suggested procedure to create new database:
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE firefly CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON firefly.* TO 'firefly'@'firefly.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
+
+  firefly:
+    container_name: firefly
+    image: jc5x/firefly-iii:latest
+    restart: always
+    networks:
+      traefik_proxy:
+        ipv4_address: 192.168.50.240
+      mariadb:
+        ipv4_address: 192.168.250.240
+#    ports:
+#      - "80:80"
+    volumes:
+      - $USERDIR/docker/firefly/export:/var/www/firefly-iii/storage/export
+      - $USERDIR/docker/firefly/upload:/var/www/firefly-iii/storage/upload
+    environment: # https://raw.githubusercontent.com/firefly-iii/firefly-iii/master/.env.example
+      - DB_CONNECTION=mysql
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_DATABASE=firefly
+      - DB_USERNAME=firefly
+      - DB_PASSWORD=$MYSQL_PASSWORD
+      - APP_KEY=$FIREFLY_APP_KEY
+      - APP_ENV=local
+      - APP_LOG_LEVEL=info # debug, info, notice, warning, error, critical, alert, emergency
+      - APP_URL=https://firefly.$DOMAINNAME
+      - TRUSTED_PROXIES=**
+      - SITE_OWNER=$MY_EMAIL
+      - TZ=$TZ
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - REDIS_DB="0"
+      - REDIS_CACHE_DB="1"
+      - MAIL_DRIVER=smtp
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=465
+      - MAIL_FROM=$MY_EMAIL
+      - MAIL_USERNAME=$SMTP_EMAIL
+      - MAIL_PASSWORD=$SMTP_PASS
+      - MAIL_ENCRYPTION=tls
+      - CER_PROVIDER=ratesapi
+      - SEND_TELEMETRY=false
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.firefly-rtr.entrypoints=https"
+      - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
+      - "traefik.http.routers.firefly-rtr.tls=true"
+      - "traefik.http.routers.firefly-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.firefly-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.firefly-rtr.service=firefly-svc"
+      - "traefik.http.services.firefly-svc.loadbalancer.server.port=80"
+
+## Firefly III CSV Importer
+  csvimporter:
+    container_name: csvimporter
+    image: fireflyiii/csv-importer:latest
+    restart: always
+    depends_on:
+      - firefly
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "80:80"
+    environment:
+      - FIREFLY_III_ACCESS_TOKEN=$FIREFLY_III_ACCESS_TOKEN
+      - FIREFLY_III_URI=http://firefly
+      - TRUSTED_PROXIES=**
+      - SEND_TELEMETRY=false
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.csvimporter-rtr.entrypoints=https"
+      - "traefik.http.routers.csvimporter-rtr.rule=Host(`csvimporter.$DOMAINNAME`)"
+      - "traefik.http.routers.csvimporter-rtr.tls=true"
+      - "traefik.http.routers.csvimporter-rtr.tls.certresolver=dns-cloudflare"
+      ## Middlewares
+      - "traefik.http.routers.csvimporter-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.csvimporter-rtr.service=csvimporter-svc"
+      - "traefik.http.services.csvimporter-svc.loadbalancer.server.port=80"
+
+networks:
+  traefik_proxy:
+    external: true
+  mariadb:
+    external: true

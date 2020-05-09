@@ -10,9 +10,10 @@ services:
     container_name: hass
     image: homeassistant/home-assistant:latest
     restart: always
-    privileged: true
+#    privileged: true
     networks:
       - traefik_proxy
+      - mqtt
 #    ports:
 #      - "8123:8123"
     volumes:
@@ -34,4 +35,6 @@ services:
 
 networks:
   traefik_proxy:
+    external: true
+  mqtt:
     external: true
