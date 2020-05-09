@@ -3,8 +3,6 @@ services:
 
 ## Postgres Database
 
-  ## Still testing this out..
-
   ## Create external postgres network:
     # docker network create --gateway 192.168.251.1 --subnet 192.168.251.0/24 postgres
 
@@ -23,10 +21,9 @@ services:
     image: postgres:12
     restart: always
     networks:
-#      traefik_proxy:
-#        ipv4_address: 192.168.50.250
-      postgres:
-        ipv4_address: 192.168.251.251
+      - traefik_proxy
+#      postgres:
+#        ipv4_address: 192.168.251.251
     ports:
       - "5432:5432"
     volumes:
@@ -45,7 +42,7 @@ services:
       - postgres
     networks:
       - traefik_proxy
-      - postgres
+#      - postgres
 #    ports:
 #      - "5050:5050"
     volumes:
@@ -68,5 +65,5 @@ services:
 networks:
   traefik_proxy:
     external: true
-  postgres:
-    external: true
+#  postgres:
+#    external: true

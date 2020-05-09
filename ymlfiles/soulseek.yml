@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.soulseek-rtr.tls=true"
       - "traefik.http.routers.soulseek-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
-      - "traefik.http.routers.soulseek-rtr.middlewares=soulseek-headers,oauth@file"
+      - "traefik.http.routers.soulseek-rtr.middlewares=soulseek-headers,authelia@file"
       - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
       - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.soulseek-headers.headers.accesscontrolmaxage=100"

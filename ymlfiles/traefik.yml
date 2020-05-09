@@ -87,7 +87,7 @@ services:
       - "traefik.http.routers.traefik-rtr.tls.domains[1].main=$DOMAIN" # Pulls main cert for second domain
       - "traefik.http.routers.traefik-rtr.tls.domains[1].sans=*.$DOMAIN" # Pulls wildcard cert for second domain
       ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,oauth@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolmaxage=100"

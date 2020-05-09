@@ -3,7 +3,15 @@ services:
 
 ## Authelia - Self-Hosted Single Sign-On and Two-Factor Authentication
   # Configuration files at: https://github.com/authelia/authelia/tree/master/compose/lite
+  # I used this to create my jwt_secret: https://www.grc.com/passwords.htm
   # Create new hashed password: docker run authelia/authelia:latest authelia hash-password <new_password>
+
+  ## Authelia works fine with the sqlite database. If you wish to create MariaDB database:
+    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # CREATE DATABASE authelia CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+    # GRANT ALL PRIVILEGES ON authelia.* TO 'authelia'@'authelia.mariadb' IDENTIFIED BY '<password>';
+    # FLUSH PRIVILEGES;
+    # exit
 
   authelia:
     container_name: authelia

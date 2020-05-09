@@ -10,7 +10,6 @@ services:
     restart: unless-stopped
     networks:
       - traefik_proxy
-      - postgres
 #    ports:
 #      - "4480:8080"
     volumes:
@@ -36,6 +35,4 @@ services:
 
 networks:
   traefik_proxy:
-    external: true
-  postgres:
     external: true
