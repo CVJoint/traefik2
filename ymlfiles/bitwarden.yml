@@ -12,6 +12,8 @@ services:
 #    ports:
 #      - "80:80"
 #      - "3012:3012"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/bitwarden:/data
       - /var/log/docker:/var/log/docker
@@ -35,9 +37,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.bitwarden-rtr.entrypoints=https"
       - "traefik.http.routers.bitwarden-rtr.rule=Host(`bitwarden.$DOMAINNAME`)"
-      - "traefik.http.routers.bitwarden-rtr.priority=1"
-      - "traefik.http.routers.bitwarden-rtr.tls=true"
-      - "traefik.http.routers.bitwarden-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.bitwarden-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.bitwarden-rtr.middlewares=secure-headers@file"
       ## HTTP Services
@@ -46,19 +46,15 @@ services:
       ## Bitwarden WebSocket
       - "traefik.http.routers.bitwardenHub-rtr.entrypoints=https"
       - "traefik.http.routers.bitwardenHub-rtr.rule=(Host(`bitwarden.$DOMAINNAME`) && Path(`/notifications/hub`))"
-      - "traefik.http.routers.bitwardenHub-rtr.priority=2"
-      - "traefik.http.routers.bitwardenHub-rtr.tls=true"
-      - "traefik.http.routers.bitwardenHub-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.bitwardenHub-rtr.priority=20"
       - "traefik.http.routers.bitwardenHub-rtr.service=bitwardenHub-svc"
       - "traefik.http.services.bitwardenHub-svc.loadbalancer.server.port=3012"
-#      ## Admin Page - Used when DISABLE_ADMIN_TOKEN=true above
-      - "traefik.http.routers.bitwardenAdmin-rtr.entrypoints=https"
-      - "traefik.http.routers.bitwardenAdmin-rtr.rule=(Host(`bitwarden.$DOMAINNAME`) && Path(`/admin`))"
-      - "traefik.http.routers.bitwardenAdmin-rtr.priority=3"
-      - "traefik.http.routers.bitwardenAdmin-rtr.tls=true"
-      - "traefik.http.routers.bitwardenAdmin-rtr.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.bitwardenAdmin-rtr.middlewares=secure-chain@file"
-      - "traefik.http.routers.bitwardenAdmin-rtr.service=bitwarden-svc"
+      ## API for Mobile Apps
+#      - "traefik.http.routers.bitwardenAPI-rtr.entrypoints=https"
+#      - "traefik.http.routers.bitwardenAPI-rtr.rule=HeadersRegexp(`User-Agent`, `Bitwarden_Mobile`)"
+#      - "traefik.http.routers.bitwardenAPI-rtr.priority=30"
+#      - "traefik.http.routers.bitwardenAPI-rtr.middlewares=secure-headers@file"
+#      - "traefik.http.routers.bitwardenAPI-rtr.service=bitwarden-svc"
 
 ## Bitwarden Backup
 
@@ -74,6 +70,8 @@ services:
     restart: on-failure
     networks:
       - bw-net
+    security_opt:
+      - no-new-privileges:true
     init: true
     depends_on:
       - bitwarden

@@ -12,6 +12,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "4480:8080"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/statping/config:/app
     environment:
@@ -25,8 +27,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.statping-rtr.entrypoints=https"
       - "traefik.http.routers.statping-rtr.rule=Host(`statping.$DOMAINNAME`)"
-      - "traefik.http.routers.statping-rtr.tls=true"
-      - "traefik.http.routers.statping-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.statping-rtr.middlewares=secure-chain@file"
       ## HTTP Services

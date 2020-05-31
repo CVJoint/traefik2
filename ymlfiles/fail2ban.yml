@@ -17,6 +17,8 @@ services:
     image: crazymax/fail2ban:latest
     restart: always
     network_mode: host
+    security_opt:
+      - no-new-privileges:true
     cap_add:
       - NET_ADMIN
       - NET_RAW

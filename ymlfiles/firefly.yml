@@ -24,6 +24,8 @@ services:
         ipv4_address: 192.168.250.240
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/firefly/export:/var/www/firefly-iii/storage/export
       - $USERDIR/docker/firefly/upload:/var/www/firefly-iii/storage/upload
@@ -62,8 +64,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.firefly-rtr.entrypoints=https"
       - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
-      - "traefik.http.routers.firefly-rtr.tls=true"
-      - "traefik.http.routers.firefly-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.firefly-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -91,8 +91,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.csvimporter-rtr.entrypoints=https"
       - "traefik.http.routers.csvimporter-rtr.rule=Host(`csvimporter.$DOMAINNAME`)"
-      - "traefik.http.routers.csvimporter-rtr.tls=true"
-      - "traefik.http.routers.csvimporter-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.csvimporter-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -1,38 +1,6 @@
 version: "3.7"
 services:
 
-## Forward Authentication for Traefik
-#  oauth:
-#    container_name: oauth
-##    image: thomseddon/traefik-forward-auth # thomseddeon's image doesnt support OIDC_ISSUER yet
-#    image: funkypenguin/traefik-forward-auth:latest
-#    restart: always
-#    networks:
-#      - traefik_proxy
-#    depends_on:
-#      - keycloak
-#    environment:
-#      - CLIENT_ID=$AUTH_CLIENT_ID
-#      - CLIENT_SECRET=$AUTH_CLIENT_SECRET
-#      - SECRET=$AUTH_SECRET
-#      - OIDC_ISSUER=https://keycloak.$DOMAINNAME/auth/realms/$KEYCLOAK_REALM
-#      - AUTH_HOST=oauth.$DOMAINNAME
-#      - COOKIE_DOMAIN=$DOMAINNAME
-#      - COOKIE_SECURE=true
-#      - LIFETIME=2592000 # 30 days
-#    labels:
-#      - "traefik.enable=true"
-#      ## HTTP Routers
-#      - "traefik.http.routers.oauth-rtr.entrypoints=https"
-#      - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAINNAME`)"
-#      - "traefik.http.routers.oauth-rtr.tls=true"
-#      - "traefik.http.routers.oauth-rtr.tls.certresolver=dns-cloudflare"
-#      ## Middlewares
-#      - "traefik.http.routers.oauth-rtr.middlewares=secure-chain@file,rate-limit@file"
-#      ## HTTP Services
-#      - "traefik.http.routers.oauth-rtr.service=oauth-svc"
-#      - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
-
 ## Keycloak - Private Authentication
 
   ## To fix net.core.*mem issues add these to the bottom of /etc/sysctl.conf
@@ -68,6 +36,8 @@ services:
       - mariadb
 #    ports:
 #      - "8080:8080"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -89,8 +59,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.keycloak-rtr.entrypoints=https"
       - "traefik.http.routers.keycloak-rtr.rule=Host(`keycloak.$DOMAINNAME`)"
-      - "traefik.http.routers.keycloak-rtr.tls=true"
-      - "traefik.http.routers.keycloak-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.keycloak-rtr.middlewares=secure-chain@file"
       ## HTTP Services

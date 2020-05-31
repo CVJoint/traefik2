@@ -24,6 +24,8 @@ services:
       - mariadb
 #    ports:
 #      - "3000:3000"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/codimd:/config
     environment:
@@ -56,8 +58,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.codimd-rtr.entrypoints=https"
       - "traefik.http.routers.codimd-rtr.rule=Host(`codimd.$DOMAINNAME`)"
-      - "traefik.http.routers.codimd-rtr.tls=true"
-      - "traefik.http.routers.codimd-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.codimd-rtr.middlewares=secure-headers@file"
       ## HTTP Services

@@ -56,6 +56,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "31416:31416"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/boinc/client:/var/lib/boinc
     environment:

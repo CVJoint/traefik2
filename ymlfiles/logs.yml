@@ -12,8 +12,10 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8080:8080"
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker socket proxy tcp://docker-socket-proxy:2375
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
@@ -27,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.dozzle-rtr.entrypoints=https"
       - "traefik.http.routers.dozzle-rtr.rule=Host(`logs.$DOMAINNAME`)"
-      - "traefik.http.routers.dozzle-rtr.tls=true"
-      - "traefik.http.routers.dozzle-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.dozzle-rtr.middlewares=secure-chain@file"
       ## HTTP Services

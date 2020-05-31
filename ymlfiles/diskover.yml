@@ -17,6 +17,8 @@ services:
 #      - "80:80"
 #      - "9181:9181"
 #      - "9999:9999"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/diskover/config:/config
       - /mnt/storage:/data:ro
@@ -38,8 +40,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.diskover-rtr.entrypoints=https"
       - "traefik.http.routers.diskover-rtr.rule=Host(`diskover.$DOMAINNAME`)"
-      - "traefik.http.routers.diskover-rtr.tls=true"
-      - "traefik.http.routers.diskover-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.diskover-rtr.middlewares=secure-chain@file"
       ## HTTP Services

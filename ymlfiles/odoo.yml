@@ -12,6 +12,8 @@ services:
       - traefik_proxy
     ports:
       - "8069:8069"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - odoo-web-data:/var/lib/odoo # folder needs correct folder perms to mount locally...
 #      - $USERDIR/docker/odoo/config:/etc/odoo # custom config
@@ -27,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.odoo-rtr.entrypoints=https"
       - "traefik.http.routers.odoo-rtr.rule=Host(`odoo.$DOMAINNAME`)"
-      - "traefik.http.routers.odoo-rtr.tls=true"
-      - "traefik.http.routers.odoo-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.odoo-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -1,6 +1,11 @@
 version: "3.7"
 services:
 
+# mosquitto_sub -h 192.168.1.50 -u username -P password -t "dev/test"
+# mosquitto_pub -d -h 192.168.1.50 -u username -P password -t dev/test -m "Hello World"
+
+# use -t "#" for "all" topics
+
 ## Mosquitto - MQTT Broker
   mosquitto:
     user: $PUID:$PGID
@@ -12,6 +17,8 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/mosquitto/config:/mqtt/config
       - $USERDIR/docker/mosquitto/log:/mqtt/log

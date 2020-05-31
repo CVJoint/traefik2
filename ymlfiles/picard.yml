@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "5800:5800"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/picard:/config
       - $USERDIR/dwnloads/:/downloads
@@ -26,8 +28,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.picard-rtr.entrypoints=https"
       - "traefik.http.routers.picard-rtr.rule=Host(`picard.$DOMAINNAME`)"
-      - "traefik.http.routers.picard-rtr.tls=true"
-      - "traefik.http.routers.picard-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.picard-rtr.middlewares=secure-chain@file"
       ## HTTP Services

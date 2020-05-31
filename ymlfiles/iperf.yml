@@ -12,6 +12,8 @@ services:
     ports:
       - "5201:5201/tcp"
       - "5201:5201/udp"
+    security_opt:
+      - no-new-privileges:true
 
 networks:
   traefik_proxy:

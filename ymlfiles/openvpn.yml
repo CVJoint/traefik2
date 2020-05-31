@@ -58,6 +58,8 @@ services:
 #      - "943:943"
 #      - "9443:9443"
       - "1194:1194/udp"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - $USERDIR/docker/openvpn:/etc/openvpn

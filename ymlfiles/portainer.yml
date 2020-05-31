@@ -6,13 +6,16 @@ services:
     container_name: portainer
     image: portainer/portainer:latest
     restart: always
-    command: -H unix:///var/run/docker.sock
+    command: -H tcp://docker-socket-proxy:2375
     networks:
       - traefik_proxy
+      - docker_socket
 #    ports:
 #      - "9000:9000"
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker socket proxy tcp://docker-socket-proxy:2375
       - portainer_data:/data # Change to local directory if you want to save/transfer config locally
     environment:
       - TZ=$TZ
@@ -21,8 +24,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.portainer-rtr.entrypoints=https"
       - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-      - "traefik.http.routers.portainer-rtr.tls=true"
-      - "traefik.http.routers.portainer-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.portainer-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -34,4 +35,6 @@ volumes:
 
 networks:
   traefik_proxy:
+    external: true
+  docker_socket:
     external: true

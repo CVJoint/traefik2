@@ -11,6 +11,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "7634:7634"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /dev:/dev:ro
     environment:

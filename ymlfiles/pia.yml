@@ -16,6 +16,8 @@ services:
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.238
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -30,8 +32,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.rutorrent-rtr.entrypoints=https"
       - "traefik.http.routers.rutorrent-rtr.rule=Host(`rutorrent.$DOMAINNAME`)"
-      - "traefik.http.routers.rutorrent-rtr.tls=true"
-      - "traefik.http.routers.rutorrent-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.rutorrent-rtr.middlewares=secure-chain@file"
       ## HTTP Services

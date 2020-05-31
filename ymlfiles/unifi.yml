@@ -2,6 +2,9 @@ version: "3.7"
 services:
 
 ## Unifi Controller Software
+
+  # Currently running on a raspberry pi so this is not used.
+
   ## Adopt new device
     # ssh ubnt@DEVICE_IP
     # login with ubnt/ubnt
@@ -24,6 +27,8 @@ services:
       - "8843:8843"
       - "8880:8880"
       - "6789:6789"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/unifi:/config
       - /etc/timezone:/etc/timezone:ro

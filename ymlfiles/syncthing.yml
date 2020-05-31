@@ -19,6 +19,8 @@ services:
 #      - "8384:8384" # Application WebUI
       - "22000:22000" # Listening port
       - "21027:21027/udp" # Protocol discovery
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/transfer_sync:/data/default
       - $USERDIR/.scripts:/data/scripts
@@ -34,8 +36,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.syncthing-rtr.entrypoints=https"
       - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
-      - "traefik.http.routers.syncthing-rtr.tls=true"
-      - "traefik.http.routers.syncthing-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.syncthing-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -35,6 +35,8 @@ services:
         ipv4_address: 192.168.250.248
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/yourls/config:/var/www/html # Create folder, then extract latest release from this link or any other theme: https://github.com/tomslominski/infinity-squared/releases/latest
 #      - $USERDIR/docker/yourls/page:/page
@@ -53,9 +55,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.yourls-rtr.entrypoints=https"
       - "traefik.http.routers.yourls-rtr.rule=Host(`$DOMAINNAME`)"
-      - "traefik.http.routers.yourls-rtr.priority=1"
-      - "traefik.http.routers.yourls-rtr.tls=true"
-      - "traefik.http.routers.yourls-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.yourls-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.yourls-rtr.middlewares=yourls-headers"
       - "traefik.http.middlewares.yourls-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -86,9 +86,7 @@ services:
       ## Admin Page
       - "traefik.http.routers.yourlsAdmin-rtr.entrypoints=https"
       - "traefik.http.routers.yourlsAdmin-rtr.rule=(Host(`$DOMAINNAME`) && Path(`/admin/`))"
-      - "traefik.http.routers.yourlsAdmin-rtr.priority=2"
-      - "traefik.http.routers.yourlsAdmin-rtr.tls=true"
-      - "traefik.http.routers.yourlsAdmin-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.yourlsAdmin-rtr.priority=20"
       - "traefik.http.routers.yourlsAdmin-rtr.middlewares=secure-chain@file"
       - "traefik.http.routers.yourlsAdmin-rtr.service=yourls-svc"
 

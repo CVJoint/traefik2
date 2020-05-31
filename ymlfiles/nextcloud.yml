@@ -32,7 +32,9 @@ services:
       - traefik_proxy
       - mariadb
 #    ports:
-#      - "7443:443"
+#      - "443:443"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/nextcloud:/config
       - /mnt/storage/files/nextcloud:/data
@@ -69,6 +71,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
 #      - onlyoffice_logs:/var/log/onlyoffice
 #      - onlyoffice_fonts:/usr/share/fonts/truetype/custom
@@ -80,8 +84,6 @@ services:
       ## HTTPS entrypoint
       - "traefik.http.routers.onlyoffice-rtr.entrypoints=https"
       - "traefik.http.routers.onlyoffice-rtr.rule=Host(`onlyoffice.$DOMAINNAME`)"
-      - "traefik.http.routers.onlyoffice-rtr.tls=true"
-      - "traefik.http.routers.onlyoffice-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.onlyoffice-rtr.middlewares=onlyoffice-headers"
 #      - "traefik.http.middlewares.onlyoffice-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -109,7 +111,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.onlyoffice-rtr.service=onlyoffice-svc"
       - "traefik.http.services.onlyoffice-svc.loadbalancer.server.port=80"
-      - "traefik.http.services.onlyoffice-svc.loadbalancer.passhostheader=true"
 
 #volumes:
 #  onlyoffice_logs:

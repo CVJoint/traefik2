@@ -6,8 +6,16 @@ services:
     container_name: ofelia
     image: mcuadros/ofelia:latest
     restart: always
+    networks:
+      - traefik_proxy
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $USERDIR/docker/ofelia/config.ini:/etc/ofelia/config.ini
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+
+networks:
+  traefik_proxy:
+    external: true

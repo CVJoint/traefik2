@@ -5,3 +5,4 @@ ymlfiles/airsonic2.yml
 backupppp/
 ymlswarm/
 ymlfiles/oauth-keycloak.yml
+traefik/certdumps/

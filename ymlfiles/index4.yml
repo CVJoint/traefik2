@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $TESTDIR:/usr/share/nginx/html:ro # Location you want to index
     environment:
@@ -20,8 +22,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.index-rtr.entrypoints=https"
       - "traefik.http.routers.index-rtr.rule=Host(`index.$DOMAINNAME`)"
-      - "traefik.http.routers.index-rtr.tls=true"
-      - "traefik.http.routers.index-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.index-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8989:8989"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/davos:/config
       - $USERDIR/dwnloads:/downloads
@@ -23,8 +25,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.davos-rtr.entrypoints=https"
       - "traefik.http.routers.davos-rtr.rule=Host(`davos.$DOMAINNAME`)"
-      - "traefik.http.routers.davos-rtr.tls=true"
-      - "traefik.http.routers.davos-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.davos-rtr.middlewares=secure-chain@file"
       ## HTTP Services

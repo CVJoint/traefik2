@@ -16,6 +16,7 @@ services:
       - CRON="0 5 * * *"
       - LOG_LEVEL=info
       - SELF_UPDATE=true
+#      - RUN_ONCE=true
 #      - IGNORE=unbound
 #      - NOTIFIERS=$DISCORD_NOTIFY # Discord Webhook URL
 

@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+# MotionEye - Video Surveillance
+  motioneye:
+    image: ccrisan/motioneye:master-amd64
+    container_name: motioneye
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+      - "8765:8765"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/motioneye/etc:/etc/motioneye
+      - $USERDIR/docker/motioneye/var:/var/lib/motioneye
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.motioneye-rtr.entrypoints=https"
+      - "traefik.http.routers.motioneye-rtr.rule=Host(`motioneye.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.motioneye-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.motioneye-rtr.service=motioneye-svc"
+      - "traefik.http.services.motioneye-svc.loadbalancer.server.port=8765"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -5,12 +5,14 @@ services:
 
   hydra:
     container_name: hydra
-    image: linuxserver/hydra2:latest
+    image: linuxserver/nzbhydra2:latest
     restart: unless-stopped
     networks:
       - traefik_proxy
 #    ports:
 #      - "5076:5076"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/hydra:/config
       - $USERDIR/dwnloads:/downloads
@@ -23,8 +25,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.hydra-rtr.entrypoints=https"
       - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
-      - "traefik.http.routers.hydra-rtr.tls=true"
-      - "traefik.http.routers.hydra-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.hydra-rtr.middlewares=secure-chain@file"
       ## HTTP Services

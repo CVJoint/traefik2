@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8000:8000"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/traefik2/traefik/rules:/code/traefik_rules
       - $USERDIR/docker/traefik2/ymlfiles:/code/ymlfiles
@@ -24,8 +26,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.cloud9-rtr.entrypoints=https"
       - "traefik.http.routers.cloud9-rtr.rule=Host(`cloud9.$DOMAINNAME`)"
-      - "traefik.http.routers.cloud9-rtr.tls=true"
-      - "traefik.http.routers.cloud9-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.cloud9-rtr.middlewares=secure-chain@file"
       ## HTTP Services

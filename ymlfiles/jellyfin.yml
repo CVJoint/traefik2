@@ -13,6 +13,8 @@ services:
     ports:
       - "8097:8096"
       - "8921:8920"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro
@@ -28,8 +30,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
       - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
-      - "traefik.http.routers.jellyfin-rtr.tls=true"
-      - "traefik.http.routers.jellyfin-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.jellyfin-rtr.middlewares=jellyfin-headers"
       - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

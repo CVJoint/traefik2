@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $TESTDIR:/var/lib/nginx/html:ro # Location you want to index
     labels:
@@ -17,8 +19,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.autoindex-rtr.entrypoints=https"
       - "traefik.http.routers.autoindex-rtr.rule=Host(`autoindex.$DOMAINNAME`)"
-      - "traefik.http.routers.autoindex-rtr.tls=true"
-      - "traefik.http.routers.autoindex-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.autoindex-rtr.middlewares=secure-chain@file"
       ## HTTP Services

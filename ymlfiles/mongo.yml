@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "27017:27017"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/mongo:/data/db
       - /etc/timezone:/etc/timezone:ro
@@ -26,6 +28,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8081:8081"
+    security_opt:
+      - no-new-privileges:true
 #    environment:
 #      - ME_CONFIG_BASICAUTH_USERNAME=$MY_USERNAME
 #      - ME_CONFIG_BASICAUTH_PASSWORD=$MY_PASSWORD
@@ -34,8 +38,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.mongoexpress-rtr.entrypoints=https"
       - "traefik.http.routers.mongoexpress-rtr.rule=Host(`mongoexpress.$DOMAINNAME`)"
-      - "traefik.http.routers.mongoexpress-rtr.tls=true"
-      - "traefik.http.routers.mongoexpress-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.mongoexpress-rtr.middlewares=secure-chain@file"
       ## HTTP Services

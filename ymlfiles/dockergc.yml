@@ -12,6 +12,8 @@ services:
     container_name: dockergc
     image: clockworksoul/docker-gc-cron:latest
     restart: always
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 #      - $USERDIR/docker/dockergc/docker-gc-exclude:/etc/docker-gc-exclude

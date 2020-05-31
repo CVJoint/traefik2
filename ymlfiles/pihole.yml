@@ -62,6 +62,8 @@ services:
 #      - '67:67/udp'
       - '1180:80/tcp'
       - '1443:443/tcp'
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/pihole/pihole:/etc/pihole
 #      ## Add dark skin to pihole: https://github.com/thomasbnt/Night_PiHole
@@ -84,8 +86,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.pihole-rtr.entrypoints=https"
       - "traefik.http.routers.pihole-rtr.rule=Host(`pihole.$DOMAINNAME`)"
-      - "traefik.http.routers.pihole-rtr.tls=true"
-      - "traefik.http.routers.pihole-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.pihole-rtr.middlewares=secure-chain@file,add-admin@file"
       ## HTTP Services

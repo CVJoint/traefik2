@@ -19,7 +19,9 @@ services:
       - traefik_proxy
       - mariadb
 #    ports:
-#      - "780:80"
+#      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/freshrss:/config
     environment:
@@ -31,8 +33,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.freshrss-rtr.entrypoints=https"
       - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
-      - "traefik.http.routers.freshrss-rtr.tls=true"
-      - "traefik.http.routers.freshrss-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=secure-headers@file"
       ## HTTP Services

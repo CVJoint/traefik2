@@ -1,7 +1,7 @@
 version: "3.7"
 services:
 
-  # ... still working on this one ... 
+  # ... still working on this one ...
 
 ## Nagios - System, Network, and Infrastructure Monitor
   # Login: nagiosadmin / nagios
@@ -35,6 +35,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/nagios/etc:/opt/nagios/etc
       - $USERDIR/docker/nagios/var:/opt/nagios/var
@@ -54,8 +56,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.nagios-rtr.entrypoints=https"
       - "traefik.http.routers.nagios-rtr.rule=Host(`nagios.$DOMAINNAME`)"
-      - "traefik.http.routers.nagios-rtr.tls=true"
-      - "traefik.http.routers.nagios-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.nagios-rtr.middlewares=secure-chain@file"
       ## HTTP Services

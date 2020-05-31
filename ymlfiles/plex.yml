@@ -19,6 +19,8 @@ services:
       - "32469:32469/udp"
       - "5353:5353/udp"
       - "1900:1900/udp"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/plex:/config
       - /mnt/storage/movies:/MOVIES:ro
@@ -35,8 +37,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.plex-rtr.entrypoints=https"
       - "traefik.http.routers.plex-rtr.rule=Host(`plex.$DOMAINNAME`)"
-      - "traefik.http.routers.plex-rtr.tls=true"
-      - "traefik.http.routers.plex-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.plex-rtr.middlewares=plex-headers"
       - "traefik.http.middlewares.plex-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

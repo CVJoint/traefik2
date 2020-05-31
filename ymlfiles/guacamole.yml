@@ -30,6 +30,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "4822:4822"
+    security_opt:
+      - no-new-privileges:true
 #    environment:
 #      - GUACD_LOG_LEVEL=info
     volumes:
@@ -48,6 +50,8 @@ services:
       - mariadb
 #    ports:
 #      - "8080:8080"
+    security_opt:
+      - no-new-privileges:true
     environment:
       - GUACD_HOSTNAME=guacd
       - GUACD_PORT=4822
@@ -64,8 +68,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.guacamole-rtr.entrypoints=https"
       - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
-      - "traefik.http.routers.guacamole-rtr.tls=true"
-      - "traefik.http.routers.guacamole-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.guacamole-rtr.middlewares=secure-chain@file,add-guacamole"
       - "traefik.http.middlewares.add-guacamole.addPrefix.prefix=/guacamole"
@@ -82,6 +84,8 @@ services:
 #        ipv4_address: 192.168.250.250
 #    ports:
 #      - "3306:3306"
+#    security_opt:
+#      - no-new-privileges:true
 #    volumes:
 #      - $USERDIR/docker/mariadb/data:/config
 #      - guacamole_db_init:/opt/guacamole/mysql/schema

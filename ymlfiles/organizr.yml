@@ -13,8 +13,10 @@ services:
       - traefik_proxy
     ports:
       - "1180:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - ${USERDIR}/docker/organizr:/config
+      - $USERDIR/docker/organizr:/config
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -24,8 +26,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.organizr-rtr.entrypoints=https"
       - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
-      - "traefik.http.routers.organizr-rtr.tls=true"
-      - "traefik.http.routers.organizr-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=organizr-headers"
       - "traefik.http.middlewares.organizr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

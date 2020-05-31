@@ -50,6 +50,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "6379:6379"
+    security_opt:
+      - no-new-privileges:true
     sysctls:
       net.core.somaxconn: '65535'
     volumes:
@@ -68,6 +70,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8081:8081"
+    security_opt:
+      - no-new-privileges:true
     environment:
       - REDIS_HOST=redis
     labels:
@@ -75,8 +79,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.rediscommander-rtr.entrypoints=https"
       - "traefik.http.routers.rediscommander-rtr.rule=Host(`rediscommander.$DOMAINNAME`)"
-      - "traefik.http.routers.rediscommander-rtr.tls=true"
-      - "traefik.http.routers.rediscommander-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.rediscommander-rtr.middlewares=secure-chain@file"
       ## HTTP Services

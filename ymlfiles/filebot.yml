@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "5800:5800"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/filebot/config:/config
       - $USERDIR/docker/filebot/output:/output
@@ -29,8 +31,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.filebot-rtr.entrypoints=https"
       - "traefik.http.routers.filebot-rtr.rule=Host(`filebot.$DOMAINNAME`)"
-      - "traefik.http.routers.filebot-rtr.tls=true"
-      - "traefik.http.routers.filebot-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.filebot-rtr.middlewares=secure-chain@file"
       ## HTTP Services

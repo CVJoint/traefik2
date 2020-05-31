@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "5800:5800"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/makemkv/config:/config:rw
       - $USERDIR/docker/makemkv/output:/output:rw # Output folder
@@ -27,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.makemkv-rtr.entrypoints=https"
       - "traefik.http.routers.makemkv-rtr.rule=Host(`makemkv.$DOMAINNAME`)"
-      - "traefik.http.routers.makemkv-rtr.tls=true"
-      - "traefik.http.routers.makemkv-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.makemkv-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+
+## SUI - A Startpage for your Server (with automatic Traefik integration!!)
+  sui:
+    container_name: sui
+    image: willfantom/sui:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+      - docker_socket
+#    ports:
+#      - "6999:6999"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/sui:/sui
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker socket proxy tcp://docker-socket-proxy:2375
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+#      - SUI_DEBUG=true
+      - DOMAIN=sui.$DOMAINNAME
+    labels:
+      - sui.enabled=true
+      - sui.name=dashboard
+      - sui.icon=home
+
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sui-rtr.entrypoints=https"
+      - "traefik.http.routers.sui-rtr.rule=Host(`sui.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sui-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.sui-rtr.service=sui-svc"
+      - "traefik.http.services.sui-svc.loadbalancer.server.port=6999"
+
+networks:
+  traefik_proxy:
+    external: true
+  docker_socket:
+    external: true

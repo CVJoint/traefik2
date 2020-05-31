@@ -17,6 +17,8 @@ services:
       - mariadb
 #    ports:
 #     - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/bin/data:/privatebin/data
       - $USERDIR/docker/bin/cfg:/privatebin/cfg
@@ -28,8 +30,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.bin-rtr.entrypoints=https"
       - "traefik.http.routers.bin-rtr.rule=Host(`bin.$DOMAINNAME`)"
-      - "traefik.http.routers.bin-rtr.tls=true"
-      - "traefik.http.routers.bin-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.bin-rtr.middlewares=secure-headers@file,rate-limit@file"
       ## HTTP Services

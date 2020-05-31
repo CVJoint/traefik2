@@ -11,7 +11,7 @@ services:
       - "8022:22"
       - "3000:3000"
     volumes:
-      - /opt/swarmdata/docker/gogs:/data 
+      - /opt/swarmdata/docker/gogs:/data
     deploy:
 #      mode: global # service runs on every node
       mode: replicated # a specified number of containers (default)

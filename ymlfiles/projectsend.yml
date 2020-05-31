@@ -23,6 +23,8 @@ services:
       - mariadb
 #    ports:
 #      - "9980:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/projectsend:/config
       - /mnt/storage/files/PROJECTSEND:/data
@@ -36,8 +38,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.projectsend-rtr.entrypoints=https"
       - "traefik.http.routers.projectsend-rtr.rule=Host(`send.$DOMAINNAME`)"
-      - "traefik.http.routers.projectsend-rtr.tls=true"
-      - "traefik.http.routers.projectsend-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.projectsend-rtr.middlewares=secure-headers@file,rate-limit@file"
       ## HTTP Services

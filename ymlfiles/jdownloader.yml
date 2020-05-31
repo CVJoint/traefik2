@@ -24,6 +24,8 @@ services:
 #      - "5800:5800"
 #      - "5900:5900"
 #      - "3129:3129"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/jdownloader:/config
       - $USERDIR/dwnloads/:/downloads # by default this folder is called ":/output"
@@ -42,8 +44,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
       - "traefik.http.routers.jdownloader-rtr.rule=Host(`jdownloader.$DOMAINNAME`)"
-      - "traefik.http.routers.jdownloader-rtr.tls=true"
-      - "traefik.http.routers.jdownloader-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.jdownloader-rtr.middlewares=secure-chain@file"
       ## HTTP Services

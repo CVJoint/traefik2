@@ -24,7 +24,6 @@ services:
       - --entrypoints.https.http.tls.domains[0].sans=*.$DOMAINNAME
       - --entrypoints.https.http.tls.domains[1].main=$DOMAIN # Pulls main cert for second domain
       - --entrypoints.https.http.tls.domains[1].sans=*.$DOMAIN # Pulls wildcard cert for second domain
-#      - --entrypoints.https.http.tls.options=tls-opts@file
       - --entryPoints.traefik.address=:8080
       - --api=true
 #      - --api.insecure=true
@@ -36,7 +35,7 @@ services:
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accessLog.filters.statusCodes=400-499
       - --providers.docker=true
-      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.endpoint=tcp://docker-socket-proxy:2375 # My docker-socket-proxy
       - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=traefik_proxy
@@ -51,8 +50,7 @@ services:
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.254
-    security_opt:
-      - no-new-privileges:true
+      docker_socket:
     ports:
       - target: 80
         published: 80
@@ -62,9 +60,11 @@ services:
         published: 443
         protocol: tcp
         mode: host
+    security_opt:
+      - no-new-privileges:true # https://docs.docker.com/engine/reference/run/#security-configuration
     volumes:
       - $TRAEFIK2DIR/traefik/rules:/rules # file provider directory
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker-socket-proxy tcp://docker-socket-proxy:2375
       - $TRAEFIK2DIR/traefik/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - /var/log/docker/traefik.log:/traefik.log # for fail2ban - make sure to touch file before starting container
     environment:
@@ -72,20 +72,10 @@ services:
       - CF_API_KEY=$CLOUDFLARE_API_KEY
     labels:
       - "traefik.enable=true"
-      # HTTP-to-HTTPS Redirect
-      - "traefik.http.routers.http-catchall.entrypoints=http"
-      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
-      - "traefik.http.routers.traefik-rtr.tls=true"
-      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.traefik-rtr.tls.domains[0].main=$DOMAINNAME"
-      - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
-      - "traefik.http.routers.traefik-rtr.tls.domains[1].main=$DOMAIN" # Pulls main cert for second domain
-      - "traefik.http.routers.traefik-rtr.tls.domains[1].sans=*.$DOMAIN" # Pulls wildcard cert for second domain
+      - "traefik.http.routers.traefik-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -112,7 +102,16 @@ services:
       - "traefik.http.middlewares.traefik-headers.headers.customresponseheaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex,"
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
+      ## API Forward Auth Bypass # Used for willfantom/SUI - automatic traefik dashboard
+      - "traefik.http.routers.traefik-bypass.entrypoints=https"
+      - "traefik.http.routers.traefik-bypass.rule=Host(`traefik.$DOMAINNAME`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.traefik-bypass.middlewares=traefik-headers,traefik-basicauth,rate-limit@file"
+      - "traefik.http.middlewares.traefik-basicauth.basicauth.users=$MY_USERNAME:$TRAEFIK_PASSWORD" # password must be htpasswd hash
+      - "traefik.http.routers.traefik-bypass.priority=20"
+      - "traefik.http.routers.traefik-bypass.service=api@internal"
 
 networks:
   traefik_proxy:
+    external: true
+  docker_socket:
     external: true

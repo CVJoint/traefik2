@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+
+## Requestrr - Make Ombi requests using Discord
+  requestrr:
+    container_name: requestrr
+    image: darkalfx/requestrr:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "4545:4545"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/requestrr:/root/config
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.requestrr-rtr.entrypoints=https"
+      - "traefik.http.routers.requestrr-rtr.rule=Host(`requestrr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.requestrr-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.requestrr-rtr.service=requestrr-svc"
+      - "traefik.http.services.requestrr-svc.loadbalancer.server.port=4545"
+
+networks:
+  traefik_proxy:
+    external: true

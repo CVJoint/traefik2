@@ -17,6 +17,8 @@ services:
 #      - "9080:9080" # WebUI
 #      - "9443:9443" # HTTPS WebUI
 #      - "8118:8118" # privoxy
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/rutorrent:/config
       - $USERDIR/dwnloads:/data
@@ -49,8 +51,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.rutorrent-rtr.entrypoints=https"
       - "traefik.http.routers.rutorrent-rtr.rule=Host(`rutorrent.$DOMAINNAME`)"
-      - "traefik.http.routers.rutorrent-rtr.tls=true"
-      - "traefik.http.routers.rutorrent-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.rutorrent-rtr.middlewares=secure-chain@file"
       ## HTTP Services

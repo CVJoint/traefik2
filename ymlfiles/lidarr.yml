@@ -11,6 +11,8 @@ services:
         ipv4_address: 192.168.50.244
 #    ports:
 #      - "8686:8686"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/lidarr:/config
       - $USERDIR/dwnloads:/downloads
@@ -24,13 +26,18 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.lidarr-rtr.entrypoints=https"
       - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
-      - "traefik.http.routers.lidarr-rtr.tls=true"
-      - "traefik.http.routers.lidarr-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.lidarr-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.lidarr-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
       - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
+      ## API Forward Auth Bypass
+      - "traefik.http.routers.lidarr-bypass.entrypoints=https"
+      - "traefik.http.routers.lidarr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
+#      - "traefik.http.routers.lidarr-bypass.rule=Headers(`X-Api-Key`, `$LIDARR_API_KEY`)"
+      - "traefik.http.routers.lidarr-bypass.priority=20"
+      - "traefik.http.routers.lidarr-bypass.service=lidarr-svc"
 
 networks:
   traefik_proxy:

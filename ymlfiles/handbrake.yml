@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "5800:5800"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/handbrake/config:/config:rw
       - $USERDIR/docker/handbrake/watch:/watch:rw # Watch folder
@@ -31,8 +33,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.handbrake-rtr.entrypoints=https"
       - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME`)"
-      - "traefik.http.routers.handbrake-rtr.tls=true"
-      - "traefik.http.routers.handbrake-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.handbrake-rtr.middlewares=secure-chain@file"
       ## HTTP Services

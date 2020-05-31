@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "3539:3539"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/flexget/data:/data
       - $USERDIR/docker/flexget/config:/config
@@ -24,8 +26,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.flexget-rtr.entrypoints=https"
       - "traefik.http.routers.flexget-rtr.rule=Host(`flexget.$DOMAINNAME`)"
-      - "traefik.http.routers.flexget-rtr.tls=true"
-      - "traefik.http.routers.flexget-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.flexget-rtr.middlewares=secure-chain@file"
       ## HTTP Services

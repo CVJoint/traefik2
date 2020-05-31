@@ -9,7 +9,9 @@ services:
     networks:
       - mqtt
     ports:
-     - "8080:8080"
+      - "8080:8080"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/mqtt-bridge:/config
       - /etc/timezone:/etc/timezone:ro

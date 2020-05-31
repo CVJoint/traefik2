@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+
+## Gossa - Simple Multimedia Fileserver
+  # Ctrl+h for list of hotkeys
+  gossa:
+    container_name: gossa
+    image: pldubouilh/gossa:latest
+    restart: always
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "8001:8001"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/dwnloads:/shared
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.gossa-rtr.entrypoints=https"
+      - "traefik.http.routers.gossa-rtr.rule=Host(`gossa.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.gossa-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.gossa-rtr.service=gossa-svc"
+      - "traefik.http.services.gossa-svc.loadbalancer.server.port=8001"
+
+networks:
+  traefik_proxy:
+    external: true

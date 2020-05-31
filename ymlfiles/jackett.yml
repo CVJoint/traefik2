@@ -11,6 +11,8 @@ services:
         ipv4_address: 192.168.50.249 # Use this IP to connect to sonarr/radarr/lidarr/ttrss: http://192.168.50.249:9117/...
 #    ports:
 #      - "9117:9117"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/jackett:/config
       - $USERDIR/dwnloads/temp:/downloads
@@ -23,8 +25,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.jackett-rtr.entrypoints=https"
       - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
-      - "traefik.http.routers.jackett-rtr.tls=true"
-      - "traefik.http.routers.jackett-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.jackett-rtr.middlewares=secure-chain@file"
       ## HTTP Services

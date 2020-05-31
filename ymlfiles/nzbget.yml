@@ -15,6 +15,8 @@ services:
         ipv4_address: 192.168.50.241
 #    ports:
 #      - "6789:6789"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/nzbget:/config
       - $USERDIR/dwnloads:/downloads
@@ -27,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.nzbget-rtr.entrypoints=https"
       - "traefik.http.routers.nzbget-rtr.rule=Host(`nzbget.$DOMAINNAME`)"
-      - "traefik.http.routers.nzbget-rtr.tls=true"
-      - "traefik.http.routers.nzbget-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.nzbget-rtr.middlewares=secure-chain@file"
       ## HTTP Services

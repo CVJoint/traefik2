@@ -11,6 +11,8 @@ services:
 #    ports:
 #     - "5800:5800" # Web Access
 #     - "5900:5900" # VNC port
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/rclonebrowser/config:/config
       - $USERDIR/docker/rclonebrowser/media:/media # Location for downloading/uploading
@@ -26,8 +28,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.rclonebrowser-rtr.entrypoints=https"
       - "traefik.http.routers.rclonebrowser-rtr.rule=Host(`rclone.$DOMAINNAME`)"
-      - "traefik.http.routers.rclonebrowser-rtr.tls=true"
-      - "traefik.http.routers.rclonebrowser-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.rclonebrowser-rtr.middlewares=secure-chain@file"
       ## HTTP Services

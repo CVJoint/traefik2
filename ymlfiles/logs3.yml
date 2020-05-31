@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #     - "28778:28778"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /opt/server
 #    environment:
@@ -20,8 +22,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.logio-rtr.entrypoints=https"
       - "traefik.http.routers.logio-rtr.rule=Host(`logs.$DOMAINNAME`)"
-      - "traefik.http.routers.logio-rtr.tls=true"
-      - "traefik.http.routers.logio-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.logio-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -39,6 +39,8 @@ services:
       - traefik_proxy
 #    ports:
 #     - "28777:28777"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /var/lib/docker:/var/lib/docker:ro
       - /var/log/docker:/var/log/docker:ro

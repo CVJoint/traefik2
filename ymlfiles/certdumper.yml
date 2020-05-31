@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+
+# Traefik Cert Dumper
+  certdumper:
+    container_name: certdumper
+    image: ldez/traefik-certs-dumper:latest
+    command: file \
+      --source /acme.json
+      --dest /dump
+      --version v2
+      --domain-subdir=true
+      --crt-ext=.pem
+      --key-ext=.pem
+      --watch
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/traefik2/traefik/acme/acme.json:/acme.json:ro
+      - $USERDIR/docker/traefik2/traefik/certdumps:/dump:rw

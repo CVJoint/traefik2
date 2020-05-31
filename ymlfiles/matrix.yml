@@ -14,6 +14,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8008:8008"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/matrix/data:/data
 #      - /etc/timezone:/etc/timezone:ro
@@ -29,8 +31,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.matrix-rtr.entrypoints=https"
       - "traefik.http.routers.matrix-rtr.rule=Host(`matrix.$DOMAINNAME`)"
-      - "traefik.http.routers.matrix-rtr.tls=true"
-      - "traefik.http.routers.matrix-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -46,6 +46,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "8090:8090"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/matrix/ma1sd/etc:/etc/ma1sd
       - $USERDIR/docker/matrix/ma1sd/var:/var/ma1sd
@@ -61,8 +63,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.matrix-rtr.entrypoints=https"
       - "traefik.http.routers.matrix-rtr.rule=Host(`matrix-ident.$DOMAINNAME`)"
-      - "traefik.http.routers.matrix-rtr.tls=true"
-      - "traefik.http.routers.matrix-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
       ## HTTP Services

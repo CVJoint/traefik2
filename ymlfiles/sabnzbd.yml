@@ -17,6 +17,8 @@ services:
 #    ports:
 #      - "8082:8080"
 #      - "9090:9090"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/sabnzbd:/config
       - $USERDIR/dwnloads/sabnzbd:/downloads
@@ -30,8 +32,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.sabnzbd-rtr.entrypoints=https"
       - "traefik.http.routers.sabnzbd-rtr.rule=Host(`sabnzbd.$DOMAINNAME`)"
-      - "traefik.http.routers.sabnzbd-rtr.tls=true"
-      - "traefik.http.routers.sabnzbd-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.sabnzbd-rtr.middlewares=secure-chain@file"
       ## HTTP Services

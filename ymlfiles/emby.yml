@@ -14,6 +14,8 @@ services:
     ports:
       - "8096:8096"
       - "8920:8920"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /mnt/storage/movies:/MOVIES:ro
       - /mnt/storage/tv:/TVSHOWS:ro
@@ -28,9 +30,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.emby-rtr.entrypoints=https"
       - "traefik.http.routers.emby-rtr.rule=Host(`emby.$DOMAINNAME`)"
-      - "traefik.http.routers.emby-rtr.priority=4"
-      - "traefik.http.routers.emby-rtr.tls=true"
-      - "traefik.http.routers.emby-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.emby-rtr.middlewares=emby-headers"
       - "traefik.http.middlewares.emby-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

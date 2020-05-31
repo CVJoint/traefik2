@@ -8,13 +8,13 @@ services:
     restart: unless-stopped
     networks:
       - traefik_proxy
+    security_opt:
+      - no-new-privileges:true
     labels:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.whoami-rtr.entrypoints=https"
       - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$DOMAINNAME`)"
-      - "traefik.http.routers.whoami-rtr.tls=true"
-      - "traefik.http.routers.whoami-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.whoami-rtr.middlewares=secure-chain@file"
       ## HTTP Services

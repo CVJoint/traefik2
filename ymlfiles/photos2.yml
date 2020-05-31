@@ -14,21 +14,21 @@ services:
       - traefik_proxy
 #    ports:
 #    - "8186:8186"
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - ${USERDIR}/Pictures:/pictures
-      - ${USERDIR}/docker/photos/config:/config
-      - ${USERDIR}/docker/photos/cache:/cache
+      - $USERDIR/Pictures:/pictures
+      - $USERDIR/docker/photos/config:/config
+      - $USERDIR/docker/photos/cache:/cache
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.photos-rtr.entrypoints=https"
       - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAIN`)"
-      - "traefik.http.routers.photos-rtr.tls=true"
-      - "traefik.http.routers.photos-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -26,8 +26,11 @@ services:
 #        ipv4_address: 192.168.251.251
     ports:
       - "5432:5432"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/postgres/postgres:/var/lib/postgresql/data
+      - $USERDIR/docker/postgres/dbbackup:/dbbackup
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
@@ -45,6 +48,8 @@ services:
 #      - postgres
 #    ports:
 #      - "5050:5050"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/postgres/pgadmin:/pgadmin
       - /etc/timezone:/etc/timezone:ro
@@ -54,8 +59,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.pgadmin-rtr.entrypoints=https"
       - "traefik.http.routers.pgadmin-rtr.rule=Host(`pgadmin.$DOMAINNAME`)"
-      - "traefik.http.routers.pgadmin-rtr.tls=true"
-      - "traefik.http.routers.pgadmin-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.pgadmin-rtr.middlewares=secure-chain@file"
       ## HTTP Services

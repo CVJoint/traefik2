@@ -14,8 +14,10 @@ services:
       - traefik_proxy
 #    ports:
 #      - "9091:9091"
+    security_opt:
+      - no-new-privileges:true
     volumes:
-      - $USERDIR/docker/authelia/authelia:/var/lib/authelia
+      - $USERDIR/docker/authelia/config:/var/lib/authelia
       - $USERDIR/docker/authelia/configuration.yml:/etc/authelia/configuration.yml:ro
       - $USERDIR/docker/authelia/users_database.yml:/etc/authelia/users_database.yml
     environment:
@@ -25,8 +27,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.authelia-rtr.entrypoints=https"
       - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
-      - "traefik.http.routers.authelia-rtr.tls=true"
-      - "traefik.http.routers.authelia-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.authelia-rtr.middlewares=rate-limit@file,secure-chain@file"
       ## HTTP Services

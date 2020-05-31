@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #     - "7777:7777"
+    security_opt:
+      - no-new-privileges:true
     environment:
       - STORAGE_TYPE=redis
       - STORAGE_HOST=redis
@@ -18,8 +20,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.bin-rtr.entrypoints=https"
       - "traefik.http.routers.bin-rtr.rule=Host(`bin.$DOMAINNAME`)"
-      - "traefik.http.routers.bin-rtr.tls=true"
-      - "traefik.http.routers.bin-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.bin-rtr.middlewares=secure-chain@file"
       ## HTTP Services

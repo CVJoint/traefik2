@@ -44,6 +44,8 @@ services:
         ipv4_address: 192.168.50.250
       mariadb:
         ipv4_address: 192.168.250.250
+    security_opt:
+      - no-new-privileges:true
     command: >
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
@@ -72,6 +74,8 @@ services:
       - mariadb
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     environment:
 #      - PMA_ARBITRARY=1 # Allows you to enter a database server hostname on login form
       - PMA_HOST=mariadb
@@ -83,8 +87,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
       - "traefik.http.routers.phpmyadmin-rtr.rule=Host(`phpmyadmin.$DOMAINNAME`)"
-#      - "traefik.http.routers.phpmyadmin-rtr.tls=true"
-      - "traefik.http.routers.phpmyadmin-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.phpmyadmin-rtr.middlewares=secure-chain@file"
       ## HTTP Services

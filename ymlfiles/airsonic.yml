@@ -4,32 +4,21 @@ services:
 ## Airsonic - Music Server
   # Login: admin / admin
 
-  ## With Mariadb (Optional, default HyperSQL works well)
-    # https://airsonic.github.io/docs/database/
-
-  ## Suggested procedure to create your database:
-  ## Change the <password>
-    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
-    # CREATE DATABASE airsonic CHARACTER SET = utf8 COLLATE = utf8_general_ci;
-    # GRANT ALL PRIVILEGES ON airsonic.* TO 'airsonic'@'airsonic.mariadb' IDENTIFIED BY '<password>';
-    # FLUSH PRIVILEGES;
-    # exit
-
   airsonic:
     container_name: airsonic
     image: linuxserver/airsonic:latest
     restart: always
     networks:
       - traefik_proxy
-      - mariadb
 #    ports:
 #      - "4040:4040"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /mnt/storage/music/music:/music:ro
       - $USERDIR/docker/airsonic/podcasts:/podcasts
       - $USERDIR/docker/airsonic/playlists:/playlists
       - $USERDIR/docker/airsonic/config:/config
-#      - $USERDIR/docker/airsonic/config:/app/airsonic/config #Used to change log level for debugging
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -40,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.airsonic-rtr.entrypoints=https"
       - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
-      - "traefik.http.routers.airsonic-rtr.tls=true"
-      - "traefik.http.routers.airsonic-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.airsonic-rtr.middlewares=airsonic-headers"
       - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -73,6 +60,4 @@ services:
 
 networks:
   traefik_proxy:
-    external: true
-  mariadb:
     external: true

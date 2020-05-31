@@ -10,8 +10,13 @@ services:
     restart: always
     networks:
       - traefik_proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - docker_socket
+#    ports:
+#      - "192.168.253.253:2375:2375"
+    security_opt:
+      - no-new-privileges:true
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker-socket-proxy tcp://docker-socket-proxy:2375
     environment:
       - TZ=$TZ
       - CLEANUP=true
@@ -20,9 +25,13 @@ services:
 #      - RUN_ONCE=true # Default false
       - LOG_LEVEL=info
       - SELF_UPDATE=true
+#      - RUN_ONCE=true
 #      - IGNORE=mongo influxdb postgres mariadb
       - NOTIFIERS=$SLACK_NOTIFY # Slack Webhook URL
+      - DOCKER_SOCKETS=tcp://docker-socket-proxy:2375
 
 networks:
   traefik_proxy:
+    external: true
+  docker_socket:
     external: true

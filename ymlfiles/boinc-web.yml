@@ -16,6 +16,8 @@ services:
       - traefik_proxy
 #    ports:
 #     - "3380:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/boinc/web:/app/BoincManager
     labels:
@@ -23,8 +25,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.boinc-rtr.entrypoints=https"
       - "traefik.http.routers.boinc-rtr.rule=Host(`boinc.$DOMAINNAME`)"
-      - "traefik.http.routers.boinc-rtr.tls=true"
-      - "traefik.http.routers.boinc-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.boinc-rtr.middlewares=secure-chain@file"
       ## HTTP Services

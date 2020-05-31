@@ -11,6 +11,8 @@ services:
         ipv4_address: 192.168.50.245
 #    ports:
 #      - "7878:7878"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/radarr:/config
       - $USERDIR/dwnloads:/downloads
@@ -24,13 +26,18 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.radarr-rtr.entrypoints=https"
       - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAINNAME`)"
-#      - "traefik.http.routers.radarr-rtr.tls=true"
-#      - "traefik.http.routers.radarr-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.radarr-rtr.priority=10"
       ## Middlewares
-#      - "traefik.http.routers.radarr-rtr.middlewares=secure-chain@file"
+      - "traefik.http.routers.radarr-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.radarr-rtr.service=radarr-svc"
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+      ## API Forward Auth Bypass
+      - "traefik.http.routers.radarr-bypass.entrypoints=https"
+      - "traefik.http.routers.radarr-bypass.rule=Host(`radarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
+#      - "traefik.http.routers.radarr-bypass.rule=Headers(`X-Api-Key`, `$RADARR_API_KEY`)"
+      - "traefik.http.routers.radarr-bypass.priority=20"
+      - "traefik.http.routers.radarr-bypass.service=radarr-svc"
 
 networks:
   traefik_proxy:

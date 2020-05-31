@@ -6,6 +6,8 @@ services:
     container_name: logrotate
     image: blacklabelops/logrotate:latest
     restart: always
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers
       - /var/log/docker:/var/log/docker

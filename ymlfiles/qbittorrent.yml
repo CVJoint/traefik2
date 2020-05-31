@@ -22,6 +22,8 @@ services:
 #      - "8022:8080"
 #      - "8999:8999"
 #      - "8999:8999/udp"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/qbittorrent:/config
       - $USERDIR/dwnloads:/downloads
@@ -42,8 +44,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
       - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qbittorrent.$DOMAINNAME`)"
-      - "traefik.http.routers.qbittorrent-rtr.tls=true"
-      - "traefik.http.routers.qbittorrent-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.qbittorrent-rtr.middlewares=secure-chain@file"
       ## HTTP Services

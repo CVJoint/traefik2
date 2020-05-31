@@ -10,6 +10,8 @@ services:
       - traefik_proxy
     ports:
       - "5800:5800"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ${USERDIR}/docker/firefox:/config
       - /dev/shm:/dev/shm
@@ -27,8 +29,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.firefox-rtr.entrypoints=https"
       - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
-      - "traefik.http.routers.firefox-rtr.tls=true"
-      - "traefik.http.routers.firefox-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.firefox-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -11,6 +11,8 @@ services:
         ipv4_address: 192.168.50.246
 #    ports:
 #      - "8989:8989"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/sonarr:/config
       - $USERDIR/dwnloads:/downloads
@@ -24,13 +26,18 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.sonarr-rtr.entrypoints=https"
       - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAINNAME`)"
-      - "traefik.http.routers.sonarr-rtr.tls=true"
-      - "traefik.http.routers.sonarr-rtr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.sonarr-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.sonarr-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
       - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+      ## API Forward Auth Bypass
+      - "traefik.http.routers.sonarr-bypass.entrypoints=https"
+      - "traefik.http.routers.sonarr-bypass.rule=Host(`sonarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
+#      - "traefik.http.routers.sonarr-bypass.rule=Headers(`X-Api-Key`, `$SONARR_API_KEY`)"
+      - "traefik.http.routers.sonarr-bypass.priority=20"
+      - "traefik.http.routers.sonarr-bypass.service=sonarr-svc"
 
 networks:
   traefik_proxy:

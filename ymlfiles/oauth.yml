@@ -15,6 +15,8 @@ services:
     restart: always
     networks:
       - traefik_proxy
+    security_opt:
+      - no-new-privileges:true
     environment:
       - CLIENT_ID=$GOOGLE_CLIENT_ID
       - CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
@@ -24,7 +26,7 @@ services:
       - AUTH_HOST=oauth.$DOMAINNAME
       - URL_PATH=/_oauth
       - WHITELIST=$MY_EMAIL
-      - LOG_LEVEL=info
+      - LOG_LEVEL=trace
       - LOG_FORMAT=text
       - LIFETIME=2592000 # 30 days
     labels:
@@ -32,8 +34,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.oauth-rtr.entrypoints=https"
       - "traefik.http.routers.oauth-rtr.rule=Host(`oauth.$DOMAINNAME`)"
-      - "traefik.http.routers.oauth-rtr.tls=true"
-      - "traefik.http.routers.oauth-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.oauth-rtr.middlewares=secure-chain@file,rate-limit@file"
       ## HTTP Services

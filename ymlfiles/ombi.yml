@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "3579:3579"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ${USERDIR}/docker/ombi:/config
     environment:
@@ -21,8 +23,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.ombi-rtr.entrypoints=https"
       - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
-      - "traefik.http.routers.ombi-rtr.tls=true"
-      - "traefik.http.routers.ombi-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.ombi-rtr.middlewares=secure-headers@file,rate-limit@file"
       ## HTTP Services

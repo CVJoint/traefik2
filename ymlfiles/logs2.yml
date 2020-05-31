@@ -10,6 +10,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "80:80"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - $USERDIR/docker/logarr:/config
       - /var/log/docker:/var/log/docker:ro
@@ -20,8 +22,6 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.logarr-rtr.entrypoints=https"
       - "traefik.http.routers.logarr-rtr.rule=Host(`logs.$DOMAINNAME`)"
-      - "traefik.http.routers.logarr-rtr.tls=true"
-      - "traefik.http.routers.logarr-rtr.tls.certresolver=dns-cloudflare"
       ## Middlewares
       - "traefik.http.routers.logarr-rtr.middlewares=logarr-headers"
       - "traefik.http.middlewares.logarr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

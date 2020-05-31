@@ -1,0 +1,90 @@
+version: "3.7"
+services:
+
+## Docker Socket Proxy - Security-enhanced proxy for the Docker Socket
+
+  ## Create external docker_socket nextwork (optional to specify gateway and subnet)
+    # docker network create --gateway 192.168.253.1 --subnet 192.168.253.0/24 docker_socket
+
+  ### Remember to add this network to containers or you'll waste a lot of time troubleshooting!!
+
+  ### Test it out:
+  ## Check current docker host (mine was empty):
+    # echo $DOCKER_HOST
+  ## Run to enable:
+    # export DOCKER_HOST=tcp://localhost
+  ## Now you cannot see running containers.
+    # Test with: docker ps
+    # The same will happen to any containers that use this proxy's 2375 port to access the Docker socket API.
+  ## To disable:
+    # export DOCKER_HOST=''
+    # Comment out the ports section below
+    # Connect with docker networking to: tcp://docker-socket-proxy:2375 or by IP tcp://192.168.253.253:2375
+
+  ## I granted access below based on these links:
+    # Traefik
+    # https://github.com/containous/traefik/issues/4174#issuecomment-634450865
+
+  ## Couldn't proxy these containers (no option to?)
+    # glances
+    # dockergc
+    # cf-companion
+    # ofelia
+    # logs/dozzle
+
+  ## Proxied these ones:
+    # traefik
+    # ouroboros
+    # sui
+    # portainer
+
+  docker-socket-proxy:
+    container_name: docker-socket-proxy
+    image: tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    privileged: true
+    networks:
+      docker_socket:
+        ipv4_address: 192.168.253.253
+#    ports:
+#      - "127.0.0.1:2375:2375"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
+      ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
+        # 0 to revoke access.
+        # 1 to grant access.
+      ## Granted by Default
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+      ## Revoked by Default
+        # Security critical
+      - AUTH=0
+      - SECRETS=0
+      - POST=0
+        # Not always needed
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - CONTAINERS=1      #
+      - DISTRIBUTION=0
+      - EXEC=0
+      - IMAGES=0
+      - INFO=0
+      - NETWORKS=1        #
+      - NODES=0
+      - PLUGINS=0
+      - SERVICES=1        #
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=1           #
+      - VOLUMES=0
+
+networks:
+  docker_socket:
+    external: true
