@@ -4,7 +4,7 @@ services:
 ## Errorpages - Serve custom error pages
   errorpages:
     container_name: errorpages
-    image: ebrianne/traefik-error-pages:latest
+    image: tprasadtp/traefik-error-pages:latest
     restart: unless-stopped
     networks:
       - traefik_proxy

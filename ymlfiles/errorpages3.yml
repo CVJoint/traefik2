@@ -4,12 +4,12 @@ services:
 ## Errorpages - Serve custom error pages
   errorpages:
     container_name: errorpages
-    image: ebrianne/traefik-error-pages:latest
+    image: tboerger/errors:latest
     restart: unless-stopped
     networks:
       - traefik_proxy
     ports:
-      - "3000:80"
+      - "3000:8080"
     security_opt:
       - no-new-privileges:true
     labels:
@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.errorpages-rtr.middlewares=secure-headers@file"
       ## HTTP Services
       - "traefik.http.routers.errorpages-rtr.service=errorpages-svc"
-      - "traefik.http.services.errorpages-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.errorpages-svc.loadbalancer.server.port=8080"
 
 networks:
   traefik_proxy:

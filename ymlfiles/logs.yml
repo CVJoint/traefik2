@@ -15,7 +15,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock:ro # Connect to docker socket proxy tcp://docker-socket-proxy:2375
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:

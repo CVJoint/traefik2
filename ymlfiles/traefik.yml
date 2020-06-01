@@ -77,7 +77,7 @@ services:
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.priority=10"
       ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file,errorpages@file"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolmaxage=100"
