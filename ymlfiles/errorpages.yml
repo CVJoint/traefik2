@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.errorpages-rtr.rule=PathPrefix(`/`)"
       - "traefik.http.routers.errorpages-rtr.priority=1"
       ## Middlewares
-      - "traefik.http.routers.errorpages-rtr.middlewares=secure-headers@file"
+      - "traefik.http.routers.errorpages-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.errorpages-rtr.service=errorpages-svc"
       - "traefik.http.services.errorpages-svc.loadbalancer.server.port=80"
