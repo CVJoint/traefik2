@@ -91,8 +91,6 @@ services:
       - mariadb
     networks:
       - mariadb
-    security_opt:
-      - no-new-privileges:true
     volumes:
       - /mnt/storage/misc/backup/backup_databases/mariadb:/var/dbdumps
       - $USERDIR/docker/mariadb/backup-all-mysql.sh:/backup-all-mysql.sh

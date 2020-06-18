@@ -7,7 +7,7 @@ services:
   ouroboros:
     container_name: ouroboros
     image: pyouroboros/ouroboros:latest
-    restart: always
+    restart: unless-stopped
     networks:
       - traefik_proxy
       - docker_socket
@@ -25,7 +25,6 @@ services:
 #      - RUN_ONCE=true # Default false
       - LOG_LEVEL=info
       - SELF_UPDATE=true
-#      - RUN_ONCE=true
 #      - IGNORE=mongo influxdb postgres mariadb
       - NOTIFIERS=$SLACK_NOTIFY # Slack Webhook URL
       - DOCKER_SOCKETS=tcp://docker-socket-proxy:2375

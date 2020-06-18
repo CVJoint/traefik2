@@ -65,7 +65,7 @@ services:
         # Security critical
       - AUTH=0
       - SECRETS=0
-      - POST=0
+      - POST=1 # Needed for Ouroboros
         # Not always needed
       - BUILD=0
       - COMMIT=0
@@ -73,7 +73,7 @@ services:
       - CONTAINERS=1      #
       - DISTRIBUTION=0
       - EXEC=0
-      - IMAGES=0
+      - IMAGES=1
       - INFO=0
       - NETWORKS=1        #
       - NODES=0

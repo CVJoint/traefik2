@@ -6,8 +6,10 @@ services:
     container_name: mqtt-bridge
     image: stjohnjohnson/smartthings-mqtt-bridge:latest
     restart: always
+    mac_address: $BRIDGE_MAC
     networks:
-      - mqtt
+      mqtt:
+        ipv4_address: 192.168.252.50
     ports:
       - "8080:8080"
     security_opt:

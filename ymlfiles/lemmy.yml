@@ -1,0 +1,67 @@
+version: "3.7"
+services:
+
+## Lemmy - Reddit alternative
+
+
+  ## Can't get it to connect to other servers...
+
+
+  lemmy:
+    container_name: lemmy
+    image: dessalines/lemmy:v0.6.65
+    restart: unless-stopped
+    depends_on:
+      - pictshare
+      - iframely
+    networks:
+      - traefik_proxy
+      - lemmy
+#    ports:
+#      - "127.0.0.1:8536:8536"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/lemmy/lemmy/lemmy.hjson:/config/config.hjson
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - RUST_LOG=error
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.lemmy-rtr.entrypoints=https"
+      - "traefik.http.routers.lemmy-rtr.rule=Host(`lemmy.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.lemmy-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.lemmy-rtr.service=lemmy-svc"
+      - "traefik.http.services.lemmy-svc.loadbalancer.server.port=8536"
+
+  pictshare:
+    container_name: pictshare
+    image: shtripok/pictshare:latest
+    restart: unless-stopped
+    networks:
+      - lemmy
+#    ports:
+#      - "127.0.0.1:8537:80"
+    volumes:
+      - $USERDIR/docker/lemmy/pictshare:/usr/share/nginx/html/data
+
+  iframely:
+    container_name: iframely
+    image: dogbin/iframely:latest
+    restart: unless-stopped
+    networks:
+      - lemmy
+#    ports:
+#      - "127.0.0.1:8061:80"
+    volumes:
+      - $USERDIR/docker/lemmy/iframely/iframely.config.local.js:/iframely/config.local.js:ro
+
+networks:
+  traefik_proxy:
+    external: true
+  lemmy:
+    external: false

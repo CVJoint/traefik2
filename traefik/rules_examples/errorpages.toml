@@ -1,5 +1,5 @@
 [http.middlewares]
   [http.middlewares.errorpages.errors]
-    status = ["400-499", "500-599"]
+    status = ["404-499", "500-599"]
     service = "errorpages-svc@docker"
     query = "/{status}"

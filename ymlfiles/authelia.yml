@@ -17,9 +17,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $USERDIR/docker/authelia/config:/var/lib/authelia
-      - $USERDIR/docker/authelia/configuration.yml:/etc/authelia/configuration.yml:ro
-      - $USERDIR/docker/authelia/users_database.yml:/etc/authelia/users_database.yml
+      - $USERDIR/docker/authelia:/config
     environment:
       - TZ=$TZ
     labels:

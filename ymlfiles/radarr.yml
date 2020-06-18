@@ -34,8 +34,7 @@ services:
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
       ## API Forward Auth Bypass
       - "traefik.http.routers.radarr-bypass.entrypoints=https"
-      - "traefik.http.routers.radarr-bypass.rule=Host(`radarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
-#      - "traefik.http.routers.radarr-bypass.rule=Headers(`X-Api-Key`, `$RADARR_API_KEY`)"
+      - "traefik.http.routers.radarr-bypass.rule=Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`)"
       - "traefik.http.routers.radarr-bypass.priority=20"
       - "traefik.http.routers.radarr-bypass.service=radarr-svc"
 

@@ -2,14 +2,13 @@ version: "3.7"
 services:
 
 # MotionEye - Video Surveillance
+  # Login: admin / *no password*
   motioneye:
     image: ccrisan/motioneye:master-amd64
     container_name: motioneye
     restart: unless-stopped
     networks:
       - traefik_proxy
-    security_opt:
-      - no-new-privileges:true
     ports:
       - "8081:8081"
       - "8082:8082"
@@ -34,7 +33,7 @@ services:
       - "traefik.http.routers.motioneye-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.motioneye-rtr.service=motioneye-svc"
-      - "traefik.http.services.motioneye-svc.loadbalancer.server.port=8765"
+      - "traefik.http.services.motioneye-svc.loadbalancer.server.port=8081"
 
 networks:
   traefik_proxy:

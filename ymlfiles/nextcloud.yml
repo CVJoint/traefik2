@@ -24,6 +24,9 @@ services:
     #     'port' => 6379,
     # ),
 
+  ## An example to run occ commands:
+    # docker exec -it nextcloud sudo --user abc php7 /config/www/nextcloud/occ db:add-missing-indices
+
   nextcloud:
     container_name: nextcloud
     image: linuxserver/nextcloud:latest

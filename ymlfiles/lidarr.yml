@@ -34,8 +34,7 @@ services:
       - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
       ## API Forward Auth Bypass
       - "traefik.http.routers.lidarr-bypass.entrypoints=https"
-      - "traefik.http.routers.lidarr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
-#      - "traefik.http.routers.lidarr-bypass.rule=Headers(`X-Api-Key`, `$LIDARR_API_KEY`)"
+      - "traefik.http.routers.lidarr-bypass.rule=Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`)"
       - "traefik.http.routers.lidarr-bypass.priority=20"
       - "traefik.http.routers.lidarr-bypass.service=lidarr-svc"
 

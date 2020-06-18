@@ -34,8 +34,7 @@ services:
       - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
       ## API Forward Auth Bypass
       - "traefik.http.routers.sonarr-bypass.entrypoints=https"
-      - "traefik.http.routers.sonarr-bypass.rule=Host(`sonarr.$DOMAINNAME`) && PathPrefix(`/api/`)"
-#      - "traefik.http.routers.sonarr-bypass.rule=Headers(`X-Api-Key`, `$SONARR_API_KEY`)"
+      - "traefik.http.routers.sonarr-bypass.rule=Headers(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`)"
       - "traefik.http.routers.sonarr-bypass.priority=20"
       - "traefik.http.routers.sonarr-bypass.service=sonarr-svc"
 

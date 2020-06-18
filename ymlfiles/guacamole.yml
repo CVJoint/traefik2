@@ -21,6 +21,11 @@ services:
     # Login: guacadmin / guacadmin
     # Recommended to create a new user and disable/delete guacadmin
 
+  ## The SSH private key needs to be formatted as a PEM key, beginning with:
+    # -----BEGIN RSA PRIVATE KEY-----
+  ## Make a backup of your key, then use the command:
+    # ssh-keygen -p -N "<your_passphrase>" -m pem -f ~/.ssh/id_rsa
+
 ## Guacd
   guacd:
     container_name: guacd
@@ -30,10 +35,8 @@ services:
       - traefik_proxy
 #    ports:
 #      - "4822:4822"
-    security_opt:
-      - no-new-privileges:true
-#    environment:
-#      - GUACD_LOG_LEVEL=info
+    environment:
+      - GUACD_LOG_LEVEL=debug
     volumes:
 #      - /var/lib/guacamole/drive:/drive:rw
 #      - /var/lib/guacamole/record:/record:rw
@@ -50,8 +53,6 @@ services:
       - mariadb
 #    ports:
 #      - "8080:8080"
-    security_opt:
-      - no-new-privileges:true
     environment:
       - GUACD_HOSTNAME=guacd
       - GUACD_PORT=4822
@@ -59,8 +60,13 @@ services:
       - MYSQL_DATABASE=guacamole
       - MYSQL_USER=guacamole
       - MYSQL_PASSWORD=$MYSQL_PASSWORD
+#      - POSTGRES_HOSTNAME=postgres
+#      - POSTGRES_DATABASE=guacamole
+#      - POSTGRES_USER=guacamole
+#      - POSTGRES_PASSWORD=$PG_PASSWORD
     volumes:
 #      - guacamole_db_init:/opt/guacamole/mysql/schema # Uncomment to initialize MariaDB. Need to use container below in the same compose file
+#      - guacamole_db_init:/opt/guacamole/postgresql/schema # Uncomment to initialize MariaDB. Need to use container below in the same compose file
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     labels:
@@ -95,6 +101,27 @@ services:
 #      - PUID=$PUID
 #      - PGID=$PGID
 #      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
+#  postgres:
+#    container_name: postgres
+#    image: postgres:12
+#    restart: always
+#    networks:
+#      - traefik_proxy
+##      postgres:
+##        ipv4_address: 192.168.251.251
+#    ports:
+#      - "5432:5432"
+#    security_opt:
+#      - no-new-privileges:true
+#    volumes:
+#      - $USERDIR/docker/postgres/postgres:/var/lib/postgresql/data
+#      - guacamole_db_init:/schema
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+#    environment:
+#      - POSTGRES_PASSWORD=$PG_ROOT_PASSWORD
+
 
 volumes:
   guacamole_db_init:
