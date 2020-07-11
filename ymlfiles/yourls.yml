@@ -54,7 +54,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.yourls-rtr.entrypoints=https"
-      - "traefik.http.routers.yourls-rtr.rule=Host(`$DOMAINNAME`,`www.$DOMAINNAME`)"
+      - "traefik.http.routers.yourls-rtr.rule=HostHeader(`$DOMAINNAME`,`www.$DOMAINNAME`)"
       - "traefik.http.routers.yourls-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.yourls-rtr.middlewares=yourls-headers,www-redirect"

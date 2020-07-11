@@ -20,7 +20,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.requestrr-rtr.entrypoints=https"
-      - "traefik.http.routers.requestrr-rtr.rule=Host(`requestrr.$DOMAINNAME`)"
+      - "traefik.http.routers.requestrr-rtr.rule=HostHeader(`requestrr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.requestrr-rtr.middlewares=secure-chain@file"
       ## HTTP Services

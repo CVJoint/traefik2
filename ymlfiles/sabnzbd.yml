@@ -31,7 +31,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.sabnzbd-rtr.entrypoints=https"
-      - "traefik.http.routers.sabnzbd-rtr.rule=Host(`sabnzbd.$DOMAINNAME`)"
+      - "traefik.http.routers.sabnzbd-rtr.rule=HostHeader(`sabnzbd.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.sabnzbd-rtr.middlewares=secure-chain@file"
       ## HTTP Services

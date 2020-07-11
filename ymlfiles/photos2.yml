@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.photos-rtr.entrypoints=https"
-      - "traefik.http.routers.photos-rtr.rule=Host(`photos.$DOMAIN`)"
+      - "traefik.http.routers.photos-rtr.rule=HostHeader(`photos.$DOMAIN`)"
       ## Middlewares
       - "traefik.http.routers.photos-rtr.middlewares=secure-chain@file"
       ## HTTP Services

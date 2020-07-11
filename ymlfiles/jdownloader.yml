@@ -43,7 +43,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
-      - "traefik.http.routers.jdownloader-rtr.rule=Host(`jdownloader.$DOMAINNAME`)"
+      - "traefik.http.routers.jdownloader-rtr.rule=HostHeader(`jdownloader.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jdownloader-rtr.middlewares=secure-chain@file"
       ## HTTP Services

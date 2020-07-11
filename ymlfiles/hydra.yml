@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.hydra-rtr.entrypoints=https"
-      - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
+      - "traefik.http.routers.hydra-rtr.rule=HostHeader(`hydra.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.hydra-rtr.middlewares=secure-chain@file"
       ## HTTP Services

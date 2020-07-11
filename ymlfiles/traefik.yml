@@ -13,6 +13,7 @@ services:
     command: # CLI arguments
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=true
+      - --global.insecureSNI # Enables domain fronting (v2.2.2+)
       - --entryPoints.http.address=:80
       - --entrypoints.http.http.redirections.entryPoint.to=https # entrypoints.<your_entrypoint_name>.http.redirections...
       - --entryPoints.https.address=:443
@@ -36,7 +37,7 @@ services:
       - --accessLog.filters.statusCodes=400-499
       - --providers.docker=true
       - --providers.docker.endpoint=tcp://docker-socket-proxy:2375 # My docker-socket-proxy
-      - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
+      - --providers.docker.defaultrule=HostHeader(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=traefik_proxy
       - --providers.docker.swarmMode=false
@@ -74,7 +75,7 @@ services:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
-      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      - "traefik.http.routers.traefik-rtr.rule=HostHeader(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file,errorpages@file"
@@ -104,7 +105,7 @@ services:
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## API Forward Auth Bypass # Used for willfantom/SUI - automatic traefik dashboard
       - "traefik.http.routers.traefik-bypass.entrypoints=https"
-      - "traefik.http.routers.traefik-bypass.rule=Host(`traefik.$DOMAINNAME`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.traefik-bypass.rule=HostHeader(`traefik.$DOMAINNAME`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.traefik-bypass.middlewares=traefik-headers,traefik-basicauth,rate-limit@file"
       - "traefik.http.middlewares.traefik-basicauth.basicauth.users=$MY_USERNAME:$TRAEFIK_PASSWORD" # password must be htpasswd hash
       - "traefik.http.routers.traefik-bypass.priority=20"

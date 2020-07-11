@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.whoami-rtr.entrypoints=https"
-      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$DOMAINNAME`)"
+      - "traefik.http.routers.whoami-rtr.rule=HostHeader(`whoami.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.whoami-rtr.middlewares=secure-chain@file"
       ## HTTP Services

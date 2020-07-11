@@ -6,7 +6,7 @@ services:
 
   statping:
     container_name: statping
-    image: hunterlong/statping:latest
+    image: statping/statping:latest
     restart: unless-stopped
     networks:
       - traefik_proxy
@@ -26,7 +26,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.statping-rtr.entrypoints=https"
-      - "traefik.http.routers.statping-rtr.rule=Host(`statping.$DOMAINNAME`)"
+      - "traefik.http.routers.statping-rtr.rule=HostHeader(`statping.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.statping-rtr.middlewares=secure-chain@file"
       ## HTTP Services

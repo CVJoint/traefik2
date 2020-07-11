@@ -14,8 +14,8 @@ services:
     networks:
       - traefik_proxy
       - mqtt
-#    ports:
-#      - "8123:8123"
+    ports:
+      - "8123:8123"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -26,20 +26,19 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.hass-rtr.entrypoints=https"
-      - "traefik.http.routers.hass-rtr.rule=Host(`hass.$DOMAINNAME`)"
-#      - "traefik.http.routers.hass-rtr.priority=10"
+      - "traefik.http.routers.hass-rtr.rule=HostHeader(`hass.$DOMAINNAME`)"
+      - "traefik.http.routers.hass-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.hass-rtr.middlewares=secure-headers@file"
       ## HTTP Services
       - "traefik.http.routers.hass-rtr.service=hass-svc"
       - "traefik.http.services.hass-svc.loadbalancer.server.port=8123"
-      ## API
-#      - "traefik.http.routers.hassAPI-rtr.entrypoints=https"
-#      - "traefik.http.routers.hassAPI-rtr.rule=HeadersRegexp(`User-Agent`, `Tautulli`)"
-##      - "traefik.http.routers.hassAPI-rtr.rule=HeadersRegexp(`X-Forwarded-Uri`, `$REGEXPRRR`)"
-#      - "traefik.http.routers.hassAPI-rtr.priority=20"
-#      - "traefik.http.routers.hassAPI-rtr.middlewares=secure-headers@file"
-#      - "traefik.http.routers.hassAPI-rtr.service=tautulli-svc"
+      ## API Forward Auth Bypass
+      - "traefik.http.routers.hass-bypass.entrypoints=https"
+      - "traefik.http.routers.hass-bypass.rule=(Host(`hass.$DOMAINNAME`) && PathPrefix(`/api/`))"
+      - "traefik.http.routers.hass-bypass.priority=20"
+      - "traefik.http.routers.hass-bypass.middlewares=secure-headers@file"
+      - "traefik.http.routers.hass-bypass.service=hass-svc"
 
 
 networks:

@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.firefox-rtr.entrypoints=https"
-      - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
+      - "traefik.http.routers.firefox-rtr.rule=HostHeader(`firefox.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.firefox-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -37,7 +37,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.gotify-rtr.entrypoints=https"
-      - "traefik.http.routers.gotify-rtr.rule=Host(`gotify.$DOMAINNAME`)"
+      - "traefik.http.routers.gotify-rtr.rule=HostHeader(`gotify.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.gotify-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.emby-rtr.entrypoints=https"
-      - "traefik.http.routers.emby-rtr.rule=Host(`emby.$DOMAINNAME`)"
+      - "traefik.http.routers.emby-rtr.rule=HostHeader(`emby.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.emby-rtr.middlewares=emby-headers"
       - "traefik.http.middlewares.emby-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

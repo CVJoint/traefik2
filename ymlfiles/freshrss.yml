@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.freshrss-rtr.entrypoints=https"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.rule=HostHeader(`freshrss.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=secure-headers@file"
       ## HTTP Services

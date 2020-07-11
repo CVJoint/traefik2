@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.boinc-rtr.entrypoints=https"
-      - "traefik.http.routers.boinc-rtr.rule=Host(`boinc.$DOMAINNAME`)"
+      - "traefik.http.routers.boinc-rtr.rule=HostHeader(`boinc.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.boinc-rtr.middlewares=secure-chain@file"
       ## HTTP Services

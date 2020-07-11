@@ -25,7 +25,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.flexget-rtr.entrypoints=https"
-      - "traefik.http.routers.flexget-rtr.rule=Host(`flexget.$DOMAINNAME`)"
+      - "traefik.http.routers.flexget-rtr.rule=HostHeader(`flexget.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.flexget-rtr.middlewares=secure-chain@file"
       ## HTTP Services

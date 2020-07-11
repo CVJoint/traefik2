@@ -35,7 +35,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.syncthing-rtr.entrypoints=https"
-      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
+      - "traefik.http.routers.syncthing-rtr.rule=HostHeader(`syncthing.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.syncthing-rtr.middlewares=secure-chain@file"
       ## HTTP Services

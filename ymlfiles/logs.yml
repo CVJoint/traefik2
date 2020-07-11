@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.dozzle-rtr.entrypoints=https"
-      - "traefik.http.routers.dozzle-rtr.rule=Host(`logs.$DOMAINNAME`)"
+      - "traefik.http.routers.dozzle-rtr.rule=HostHeader(`logs.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.dozzle-rtr.middlewares=secure-chain@file"
       ## HTTP Services

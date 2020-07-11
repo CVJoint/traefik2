@@ -14,12 +14,16 @@
   ## To store logs use:
     # touch $USERDIR/docker/pihole/pihole.log
 
-  ## I've added the following blocklist in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
+  ## I've added the following blocklists in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
     # https://dbl.oisd.nl/
-    ## More info here: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
-  ## These regex's:
-    # https://github.com/mmotti/pihole-regex
-  ## And I've added the following whitelist entry:
+      ## More info: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
+    # https://raw.githubusercontent.com/llacb47/mischosts/master/social/tiktok-block
+      ## More info: https://www.reddit.com/r/pihole/comments/hi4g08/tiktok_list/fwegcwi/?context=1
+  ## These regex's: https://github.com/mmotti/pihole-regex
+    # docker exec -it pihole bash
+    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.sh | bash
+    # exit
+  ## And I've added the following whitelist entries (copy domains and paste all at once)
     # https://github.com/anudeepND/whitelist/blob/master/domains/whitelist.txt
 
 version: "3.7"

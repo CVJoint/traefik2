@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.openvpnAS-rtr.entrypoints=https"
-      - "traefik.http.routers.openvpnAS-rtr.rule=Host(`openvpn.$DOMAINNAME`)"
+      - "traefik.http.routers.openvpnAS-rtr.rule=HostHeader(`openvpn.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.openvpnAS-rtr.middlewares=secure-chain@file"
       ## HTTP Services

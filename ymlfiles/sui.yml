@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.sui-rtr.entrypoints=https"
-      - "traefik.http.routers.sui-rtr.rule=Host(`sui.$DOMAINNAME`)"
+      - "traefik.http.routers.sui-rtr.rule=HostHeader(`sui.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.sui-rtr.middlewares=secure-chain@file"
       ## HTTP Services

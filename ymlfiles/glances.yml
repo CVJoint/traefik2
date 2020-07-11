@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.glances-rtr.entrypoints=https"
-      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      - "traefik.http.routers.glances-rtr.rule=HostHeader(`glances.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.glances-rtr.middlewares=secure-chain@file"
       ## HTTP Services

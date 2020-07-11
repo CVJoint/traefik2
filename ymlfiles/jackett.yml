@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.jackett-rtr.entrypoints=https"
-      - "traefik.http.routers.jackett-rtr.rule=Host(`jackett.$DOMAINNAME`)"
+      - "traefik.http.routers.jackett-rtr.rule=HostHeader(`jackett.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jackett-rtr.middlewares=secure-chain@file"
       ## HTTP Services

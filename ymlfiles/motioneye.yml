@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.motioneye-rtr.entrypoints=https"
-      - "traefik.http.routers.motioneye-rtr.rule=Host(`motioneye.$DOMAINNAME`)"
+      - "traefik.http.routers.motioneye-rtr.rule=HostHeader(`motioneye.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.motioneye-rtr.middlewares=secure-chain@file"
       ## HTTP Services

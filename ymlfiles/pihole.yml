@@ -29,9 +29,11 @@
   ## To store logs use:
     # touch $USERDIR/docker/pihole/pihole.log
 
-  ## I've added the following blocklist in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
+  ## I've added the following blocklists in addition to the standard ones under Settings>Blocklists (copy the link, paste and update)
     # https://dbl.oisd.nl/
-    ## More info here: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
+      ## More info: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
+    # https://raw.githubusercontent.com/llacb47/mischosts/master/social/tiktok-block
+      ## More info: https://www.reddit.com/r/pihole/comments/hi4g08/tiktok_list/fwegcwi/?context=1
   ## These regex's: https://github.com/mmotti/pihole-regex
     # docker exec -it pihole bash
     # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.sh | bash
@@ -85,7 +87,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.pihole-rtr.entrypoints=https"
-      - "traefik.http.routers.pihole-rtr.rule=Host(`pihole.$DOMAINNAME`)"
+      - "traefik.http.routers.pihole-rtr.rule=HostHeader(`pihole.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.pihole-rtr.middlewares=secure-chain@file,add-admin@file"
       ## HTTP Services

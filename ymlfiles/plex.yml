@@ -36,7 +36,8 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.plex-rtr.entrypoints=https"
-      - "traefik.http.routers.plex-rtr.rule=Host(`plex.$DOMAINNAME`)"
+      - "traefik.http.routers.plex-rtr.rule=HostHeader(`plex.$DOMAINNAME`)"
+      - "traefik.http.routers.plex-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.plex-rtr.middlewares=plex-headers"
       - "traefik.http.middlewares.plex-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -64,6 +65,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.plex-rtr.service=plex-svc"
       - "traefik.http.services.plex-svc.loadbalancer.server.port=32400"
+      ## Forward Auth for Web
+      - "traefik.http.routers.plexWeb-rtr.entrypoints=https"
+      - "traefik.http.routers.plexWeb-rtr.rule=(Host(`plex.$DOMAINNAME`) && PathPrefix(`/web/`))"
+      - "traefik.http.routers.plexWeb-rtr.priority=20"
+      - "traefik.http.routers.plexWeb-rtr.middlewares=secure-chain@file"
+      - "traefik.http.routers.plexWeb-rtr.service=plex-svc"
 
 networks:
   traefik_proxy:

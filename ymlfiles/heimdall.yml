@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.heimdall-rtr.entrypoints=https"
-      - "traefik.http.routers.heimdall-rtr.rule=Host(`heimdall.$DOMAINNAME`)"
+      - "traefik.http.routers.heimdall-rtr.rule=HostHeader(`heimdall.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.heimdall-rtr.middlewares=secure-chain@file"
       ## HTTP Services

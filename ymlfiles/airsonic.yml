@@ -28,7 +28,8 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.airsonic-rtr.entrypoints=https"
-      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.rule=HostHeader(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.airsonic-rtr.middlewares=airsonic-headers"
       - "traefik.http.middlewares.airsonic-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
@@ -57,6 +58,13 @@ services:
       ## HTTP Services
       - "traefik.http.routers.airsonic-rtr.service=airsonic-svc"
       - "traefik.http.services.airsonic-svc.loadbalancer.server.port=4040"
+      ## Web Login - Forward Auth
+      - "traefik.http.routers.airsonicLogin-rtr.entrypoints=https"
+      - "traefik.http.routers.airsonicLogin-rtr.rule=(Host(`airsonic.$DOMAINNAME`) && Path(`/login`))"
+      - "traefik.http.routers.airsonicLogin-rtr.priority=20"
+      - "traefik.http.routers.airsonicLogin-rtr.middlewares=authelia@file"
+      - "traefik.http.routers.airsonicLogin-rtr.service=airsonic-svc"
+
 
 networks:
   traefik_proxy:

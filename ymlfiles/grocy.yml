@@ -25,7 +25,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.grocy-rtr.entrypoints=https"
-      - "traefik.http.routers.grocy-rtr.rule=Host(`grocy.$DOMAINNAME`)"
+      - "traefik.http.routers.grocy-rtr.rule=HostHeader(`grocy.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.grocy-rtr.middlewares=secure-chain@file"
       ## HTTP Services

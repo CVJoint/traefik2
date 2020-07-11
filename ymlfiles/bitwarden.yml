@@ -36,10 +36,10 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.bitwarden-rtr.entrypoints=https"
-      - "traefik.http.routers.bitwarden-rtr.rule=Host(`bitwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.bitwarden-rtr.rule=HostHeader(`bitwarden.$DOMAINNAME`)"
       - "traefik.http.routers.bitwarden-rtr.priority=10"
       ## Middlewares
-      - "traefik.http.routers.bitwarden-rtr.middlewares=secure-headers@file"
+      - "traefik.http.routers.bitwarden-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.bitwarden-rtr.service=bitwarden-svc"
       - "traefik.http.services.bitwarden-svc.loadbalancer.server.port=80"
@@ -49,12 +49,6 @@ services:
       - "traefik.http.routers.bitwardenHub-rtr.priority=20"
       - "traefik.http.routers.bitwardenHub-rtr.service=bitwardenHub-svc"
       - "traefik.http.services.bitwardenHub-svc.loadbalancer.server.port=3012"
-      ## API for Mobile Apps
-#      - "traefik.http.routers.bitwardenAPI-rtr.entrypoints=https"
-#      - "traefik.http.routers.bitwardenAPI-rtr.rule=HeadersRegexp(`User-Agent`, `Bitwarden_Mobile`)"
-#      - "traefik.http.routers.bitwardenAPI-rtr.priority=30"
-#      - "traefik.http.routers.bitwardenAPI-rtr.middlewares=secure-headers@file"
-#      - "traefik.http.routers.bitwardenAPI-rtr.service=bitwarden-svc"
 
 ## Bitwarden Backup
 
