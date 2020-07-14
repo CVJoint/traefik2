@@ -13,7 +13,6 @@ services:
     command: # CLI arguments
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=true
-      - --global.insecureSNI # Enables domain fronting (v2.2.2+)
       - --entryPoints.http.address=:80
       - --entrypoints.http.http.redirections.entryPoint.to=https # entrypoints.<your_entrypoint_name>.http.redirections...
       - --entryPoints.https.address=:443
