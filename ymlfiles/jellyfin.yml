@@ -16,15 +16,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - /mnt/storage/movies:/MOVIES:ro
-      - /mnt/storage/tv:/TVSHOWS:ro
-      - /mnt/storage/music/music:/MUSIC:ro
+      - /mnt/storage:/MEDIA:ro
       - $USERDIR/docker/jellyfin:/config
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
       - UMASK_SET=022
+      - JELLYFIN_FFmpeg__probesize=10G
+      - JELLYFIN_FFmpeg__analyzeduration=500M
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

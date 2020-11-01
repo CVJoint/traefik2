@@ -22,6 +22,6 @@ services:
       - DOMAIN2=$DOMAIN
       - DOMAIN2_ZONE_ID=$ZONE_ID_2 # Copy from Cloudflare Overview page
       - DOMAIN2_PROXIED=TRUE
-    labels:
+#    labels:
 #      # Container creates routes based on the docker labels "rule=HostHeader". This is a work-around to manually create CNAME records
-      - "traefik.http.routers.cf-companion-rtr.rule=HostHeader(`oneshot.$DOMAINNAME`)"
+#      - "traefik.http.routers.cf-companion-rtr.rule=HostHeader(`oneshot.$DOMAINNAME`)"

@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+
+## countdown - SSH over the web
+  countdown:
+    container_name: countdown
+    image: yooooomi/easy-countdown:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+    ports:
+      - "3111:3000"
+    security_opt:
+      - no-new-privileges:true
+    stdin_open: true # So that the serving is not exited with code 0
+#    volumes:
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+    environment:
+      TIMER_BACKGROUND: https://wallpaperplay.com/walls/full/0/7/6/29912.jpg
+      TIMER_TARGET: "Wed Oct 10 2020 00:00:00 GMT-0500" # Get help with https://esqsoft.com/javascript_examples/date-to-epoch.htm
+      TIMER_TITLE: "Time until Oct 10:"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.countdown-rtr.entrypoints=https"
+      - "traefik.http.routers.countdown-rtr.rule=HostHeader(`countdown.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.countdown-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.countdown-rtr.service=countdown-svc"
+      - "traefik.http.services.countdown-svc.loadbalancer.server.port=3000"
+
+networks:
+  traefik_proxy:
+    external: true

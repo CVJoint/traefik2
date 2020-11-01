@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $TESTDIR:/opt/www/files/:ro # Location you want to index
+      - $USERDIR/tmpfldr:/opt/www/files/:ro # Location you want to index
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

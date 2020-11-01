@@ -1,0 +1,23 @@
+version: "3"
+services:
+
+  xteve:
+    user: "$PUID:$PGID"
+    container_name: xteve
+    image: tnwhitwell/xteve:latest
+    restart: unless-stopped
+    network_mode: "service:wireguard"
+#    networks:
+#      pi_net:
+#        ipv4_address: 192.168.40.253
+    ports:
+      - "34400:34400"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ~/docker/xteve:/config
+      - /tmp/xteve:/tmp/xteve
+
+networks:
+  pi_net:
+    external: true

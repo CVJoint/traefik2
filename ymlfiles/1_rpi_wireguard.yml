@@ -1,0 +1,38 @@
+# Need to start the external network before running:
+  # docker network create --gateway 192.168.40.1 --subnet 192.168.40.0/24 pi_net
+
+version: "2.1"
+services:
+
+  wireguard:
+    container_name: wireguard
+    image: linuxserver/wireguard:latest
+    restart: unless-stopped
+    networks:
+      pi_net:
+        ipv4_address: 192.168.40.254
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    ports:
+      - 51820:51820/udp
+#    security_opt:
+#      - no-new-privileges:true
+    volumes:
+      - ~/docker/wireguard:/config
+      - /lib/modules:/lib/modules
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+#      - SERVERURL=wireguard.domain.com #optional
+#      - SERVERPORT=51820 #optional
+#      - PEERS=1 #optional
+#      - PEERDNS=auto #optional
+#      - INTERNAL_SUBNET=10.13.13.0 #optional
+
+networks:
+  pi_net:
+    external: true

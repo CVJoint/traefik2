@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+
+## Prometheus
+  prometheus:
+    user: "$PUID:$PGID"
+    container_name: prometheus
+    image: prom/prometheus:latest
+    depends_on:
+      - coinmarketcap-exporter
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "9090:9090"
+#    security_opt:
+#      - no-new-privileges:true
+    ulimits:
+      nofile:
+        soft: 200000
+        hard: 200000
+    command:
+      --config.file=/data/prometheus_config.yml
+      --storage.tsdb.path=/data
+      --storage.tsdb.retention.time=180d
+      --web.enable-admin-api
+      --web.external-url=https://prometheus.$DOMAINNAME
+    volumes:
+#      - $USERDIR/docker/prometheus/config/prometheus_config.yml:/data/prometheus_config.yml
+#      - $USERDIR/docker/prometheus/data:/prometheus
+      - $USERDIR/docker/prometheus:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.prometheus-rtr.entrypoints=https"
+      - "traefik.http.routers.prometheus-rtr.rule=HostHeader(`prometheus.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.prometheus-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.prometheus-rtr.service=prometheus-svc"
+      - "traefik.http.services.prometheus-svc.loadbalancer.server.port=9090"
+
+## coinmarketcap
+  coinmarketcap-exporter:
+    container_name: coinmarketcap-exporter
+    image: bcawthra/coinmarketcap-exporter:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+#    ports:
+#      - "9101:9101"
+#    security_opt:
+#      - no-new-privileges:true
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY
+
+networks:
+  traefik_proxy:
+    external: true

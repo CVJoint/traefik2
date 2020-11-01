@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri #optional
+      - /dev/vcsm:/dev/vcsm #optional
+      - /dev/vchiq:/dev/vchiq #optional
+      - /dev/video10:/dev/video10 #optional
+      - /dev/video11:/dev/video11 #optional
+      - /dev/video12:/dev/video12 #optional
+    networks:
+      pi_net:
+        ipv4_address: 192.168.40.250
+    ports:
+      - "8096:8096"
+      - "8920:8920" #optional
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/jellyfin:/config
+      - /opt/storage:/MEDIA:ro
+      - /opt/vc/lib:/opt/vc/lib #optional
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022 #optional
+
+networks:
+  pi_net:
+    external: true

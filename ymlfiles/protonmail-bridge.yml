@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+
+## Protonmail Bridge
+  protonmail-bridge:
+    container_name: protonmail-bridge
+    image: shenxn/protonmail-bridge:latest
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
+    ports:
+      - "1025:25/tcp"
+      - "1143:143/tcp"
+#    security_opt:
+#      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/protonmail:/root
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+networks:
+  traefik_proxy:
+    external: true

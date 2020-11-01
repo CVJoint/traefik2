@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+
+
+# https://hub.docker.com/r/tellytv/telly
+# https://github.com/tellytv/telly/wiki/Docker-Walkthrough%3A-Linux-with-config-file
+# https://github.com/tellytv/telly/wiki/Running-Telly:-Filtering
+# https://github.com/tellytv/telly/wiki/Adding-Telly-to-Plex
+# Telly uses port 6077
+# In plex, the DVR IP will be http://HostIP:6077
+# EPG data will be at http://HostIP:6077/epg.xml
+# when plex sees the list of channels and offers to rescan, DONT.
+# it'll double the channel count and you'll have to restart plex
+
+
+## TellyTV - IPTV
+  # XMLTV: http://beastiptv.tv:8080/xmltv.php?username=YOURUSERNAME&password=YOURPASSWORD
+  tellytv:
+    container_name: tellytv
+    image: tellytv/telly:dev-ffmpeg
+    restart: unless-stopped
+    network_mode: "container:qbittorrent"
+#    networks:
+#      - traefik_proxy
+#    ports:
+#      - "6077:6077"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/tellytv/telly.config.toml:/etc/telly/telly.config.toml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=$TZ
+
+networks:
+  traefik_proxy:
+    external: true

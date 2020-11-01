@@ -32,8 +32,8 @@ services:
       - F2B_LOG_LEVEL=INFO
 #      - F2B_DB_PURGE_AGE=1d # Age at which bans should be purged from the database
       - F2B_IPTABLES_CHAIN=DOCKER-USER # Specifies the iptables chain to which the Fail2Ban rules should be added
-      - SSMTP_HOST=smtp.gmail.com
-      - SSMTP_PORT=465
-      - SSMTP_USER=$SMTP_EMAIL
-      - SSMTP_PASSWORD=$SMTP_PASS # Create an "app password" if you use 2FA
-      - SSMTP_TLS=YES
+      - SSMTP_HOST=protonmail-bridge
+      - SSMTP_PORT=25
+      - SSMTP_USER=$PROTONMAIL_USER
+      - SSMTP_PASSWORD=$PROTONMAIL_PASS # Create an "app password" if you use 2FA
+      - SSMTP_TLS=NO

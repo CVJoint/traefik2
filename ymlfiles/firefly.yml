@@ -51,12 +51,12 @@ services:
       - REDIS_DB="0"
       - REDIS_CACHE_DB="1"
       - MAIL_DRIVER=smtp
-      - MAIL_HOST=smtp.gmail.com
-      - MAIL_PORT=465
-      - MAIL_FROM=$MY_EMAIL
-      - MAIL_USERNAME=$SMTP_EMAIL
-      - MAIL_PASSWORD=$SMTP_PASS
-      - MAIL_ENCRYPTION=tls
+      - MAIL_HOST=protonmail-bridge
+      - MAIL_PORT=25
+      - MAIL_FROM=$PROTONMAIL_USER
+      - MAIL_USERNAME=$PROTONMAIL_USER
+      - MAIL_PASSWORD=$PROTONMAIL_PASS
+      - MAIL_ENCRYPTION=null
       - CER_PROVIDER=ratesapi
       - SEND_TELEMETRY=false
     labels:

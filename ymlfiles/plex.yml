@@ -4,7 +4,7 @@ services:
 ## Plex Media Server
   plex:
     container_name: plex
-    image: linuxserver/plex:1.18.7.2457-77cb9455c-ls80
+    image: linuxserver/plex:latest
     restart: always
     devices:
       - /dev/dri:/dev/dri

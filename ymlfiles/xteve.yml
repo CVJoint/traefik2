@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+
+## xteve - IPTV
+  # XMLTV: http://beastiptv.tv:8080/xmltv.php?username=YOURUSERNAME&password=YOURPASSWORD
+  xteve:
+    container_name: xteve
+    image: alturismo/xteve:latest
+    restart: unless-stopped
+    network_mode: "container:qbittorrent"
+#    networks:
+#      - traefik_proxy
+#    ports:
+#      - "34400:34400"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/docker/xteve/config/dot:/root/.xteve
+      - $USERDIR/docker/xteve/config/config:/config
+      - $USERDIR/docker/xteve/beast:/beast
+      - /tmp/xteve/:/tmp/xteve
+#      - /mnt/user/appdata/tvheadend/data/:/TVH
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=$TZ
+#    labels:
+#      - "traefik.enable=true"
+#      ## HTTP Routers
+#      - "traefik.http.routers.xteve-rtr.entrypoints=https"
+#      - "traefik.http.routers.xteve-rtr.rule=HostHeader(`xteve.$DOMAINNAME`)"
+#      ## Middlewares
+#      - "traefik.http.routers.xteve-rtr.middlewares=secure-chain@file"
+#      ## HTTP Services
+#      - "traefik.http.routers.xteve-rtr.service=xteve-svc"
+#      - "traefik.http.services.xteve-svc.loadbalancer.server.port=34400"
+
+#networks:
+#  traefik_proxy:
+#    external: true

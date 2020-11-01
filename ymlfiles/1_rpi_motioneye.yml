@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+
+## MotionEye
+  motioneye:
+    container_name: motioneye
+    image: ccrisan/motioneye:master-armhf
+    restart: always
+#    networks:
+#      pi_net:
+#        ipv4_address: 172.20.200.101
+    devices:
+      - /dev/video0:/dev/video0
+    ports:
+      - "8765:8765"
+      - "8081:8081"
+    volumes:
+      - ~/docker/motioneye/etc:/etc/motioneye
+      - ~/docker/motioneye/var:/var/lib/motioneye
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

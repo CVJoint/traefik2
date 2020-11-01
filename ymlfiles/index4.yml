@@ -4,19 +4,16 @@ services:
 ## Simple Directory Index / File Browser
   index:
     container_name: index
-    image: kitpages/nginx-explorer:latest
+    image: puteulanus/tinyfilemanager:latest
     restart: always
     networks:
       - traefik_proxy
 #    ports:
-#      - "80:80"
-    security_opt:
-      - no-new-privileges:true
+#      - "8080:8080"
+#    security_opt:
+#      - no-new-privileges:true
     volumes:
-      - $TESTDIR:/usr/share/nginx/html:ro # Location you want to index
-    environment:
-      - HTTP_USER=test
-      - HTTP_PASSWORD=test
+      - $USERDIR/tmpfldr://web/file/test:ro # Location you want to index
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -26,7 +23,7 @@ services:
       - "traefik.http.routers.index-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.index-rtr.service=index-svc"
-      - "traefik.http.services.index-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.index-svc.loadbalancer.server.port=8080"
 
 networks:
   traefik_proxy:

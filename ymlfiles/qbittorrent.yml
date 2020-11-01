@@ -18,10 +18,13 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0 # Needed with Mullvad
 #    ports:
 #      - "8022:8080"
 #      - "8999:8999"
 #      - "8999:8999/udp"
+#      - "34400:34400" #xteve
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -32,23 +35,35 @@ services:
       - PUID=$PUID
       - PGID=$PGID
       - VPN_ENABLED=yes
-      - VPN_USERNAME=$PIA_USER
-      - VPN_PASSWORD=$PIA_PASS
       - LAN_NETWORK=192.168.1.0/24
       - NAME_SERVERS=1.1.1.1,1.0.0.1
       - UMASK=002
-      ## Add these to your .ovpn file:
-#      - VPN_OPTIONS=--inactive 3600 --ping 10 --ping-exit 60 --auth-nocache
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
       - "traefik.http.routers.qbittorrent-rtr.rule=HostHeader(`qbittorrent.$DOMAINNAME`)"
+      - "traefik.http.routers.qbittorrent-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.qbittorrent-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
       - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+      ## API Forward Auth Bypass
+      - "traefik.http.routers.qbittorrent-bypass.entrypoints=https"
+      - "traefik.http.routers.qbittorrent-bypass.rule=HostHeader(`qbittorrent.$DOMAINNAME`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.qbittorrent-bypass.priority=20"
+      - "traefik.http.routers.qbittorrent-bypass.service=qbittorrent-svc"
+
+      #Xteve
+      ## HTTP Routers
+      - "traefik.http.routers.xteve-rtr.entrypoints=https"
+      - "traefik.http.routers.xteve-rtr.rule=HostHeader(`xteve.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.xteve-rtr.middlewares=secure-chain@file"
+      ## HTTP Services
+      - "traefik.http.routers.xteve-rtr.service=xteve-svc"
+      - "traefik.http.services.xteve-svc.loadbalancer.server.port=34400"
 
 networks:
   traefik_proxy:

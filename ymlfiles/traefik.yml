@@ -68,8 +68,13 @@ services:
       - $TRAEFIK2DIR/traefik/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - /var/log/docker/traefik.log:/traefik.log # for fail2ban - make sure to touch file before starting container
     environment:
-      - CF_API_EMAIL=$CLOUDFLARE_EMAIL
-      - CF_API_KEY=$CLOUDFLARE_API_KEY
+#      - CF_API_EMAIL=$CLOUDFLARE_EMAIL
+#      - CF_API_KEY=$CLOUDFLARE_API_KEY
+      - CF_API_EMAIL_FILE=/run/secrets/cf-api-email
+      - CF_API_KEY_FILE=/run/secrets/cf-api-key
+    secrets:
+      - "cf-api-email"
+      - "cf-api-key"
     labels:
       - "traefik.enable=true"
       # HTTP Routers
@@ -109,6 +114,12 @@ services:
       - "traefik.http.middlewares.traefik-basicauth.basicauth.users=$MY_USERNAME:$TRAEFIK_PASSWORD" # password must be htpasswd hash
       - "traefik.http.routers.traefik-bypass.priority=20"
       - "traefik.http.routers.traefik-bypass.service=api@internal"
+
+secrets:
+   cf-api-email:
+     file: "./secrets/cf-api-email"
+   cf-api-key:
+     file: "./secrets/cf-api-key"
 
 networks:
   traefik_proxy:

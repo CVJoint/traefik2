@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.motioneye-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.motioneye-rtr.service=motioneye-svc"
-      - "traefik.http.services.motioneye-svc.loadbalancer.server.port=8081"
+      - "traefik.http.services.motioneye-svc.loadbalancer.server.port=8765"
 
 networks:
   traefik_proxy:

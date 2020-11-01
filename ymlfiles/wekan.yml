@@ -4,6 +4,7 @@ services:
 # Need to run with MongoDB
 
 ## Wekan - Open Source Kanban Board
+  # https://wekan.$DOMAINNAME/sign-up to register users
   wekan:
     container_name: wekan
     image: wekanteam/wekan:latest
@@ -20,8 +21,9 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo/wekan # //<mongo container name>:<mongo port>/<database name>
       - ROOT_URL=https://wekan.$DOMAINNAME
-      - MAIL_URL=smtp://$SMTP_USER:$SMTP_PASS@$SMTP_EMAIL:465 # smtp://user:pass@mailserver.example.com:25/
-      - MAIL_FROM=Wekan Notifications <$SMTP_EMAIL>
+      - MAIL_URL=smtp://$SMTP_USER:$SMTP_PASS@$SMTP_EMAIL:465
+#      - MAIL_URL=smtp://$PROTONMAIL_USER:$PROTONMAIL_PASS@protonmail-bridge:25 # smtp://user:pass@mailserver.example.com:25/
+      - MAIL_FROM=$PROTONMAIL_USER
       - WITH_API=false
       - BROWSER_POLICY_ENABLED=true
       - TRUSTED_URL=https://wekan.$DOMAINNAME

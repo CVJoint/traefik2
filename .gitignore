@@ -1,8 +1,7 @@
+backupppp/
 traefik/acme/acme.json
+traefik/certdumps/
 traefik/rules/
 ymlfiles/dbbackup*
-ymlfiles/airsonic2.yml
-backupppp/
+ymlfiles/secrets/
 ymlswarm/
-ymlfiles/oauth-keycloak.yml
-traefik/certdumps/
