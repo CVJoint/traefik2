@@ -67,7 +67,7 @@ services:
 
   ## Modify script to add subdirs by date
     ## Create the script file
-      # docker run --rm --entrypoint cat dsteinkopf script/backup-all-mysql /backup-all-mysql.sh  > $USERDIR/docker/mariadb/backup-all-mysql.sh
+      # docker run --rm --entrypoint cat dsteinkopf/backup-all-mysql /backup-all-mysql.sh  > $USERDIR/docker/mariadb/backup-all-mysql.sh
       # chmod 755 $USERDIR/docker/mariadb/backup-all-mysql.sh
     ## Edit the file:
       ## Add subdirs by date and time:
