@@ -8,7 +8,7 @@ services:
 
   ## Suggested procedure to create new databases:
   ## Replace <these values>
-    # docker exec -it mariadb mysql -uroot -p$MYSQL_ROOT_PASSWORD
+    # docker exec -it mariadb mysql -uroot -p $MYSQL_ROOT_PASSWORD
     # CREATE DATABASE <database name> CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
     # GRANT ALL PRIVILEGES ON <database name>.* TO '<user>'@'<container>.mariadb' IDENTIFIED BY '<password>';
     # FLUSH PRIVILEGES;
