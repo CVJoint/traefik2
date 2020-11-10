@@ -134,7 +134,7 @@ Now I have a line saved in my notes of all my "standard" services so that I can 
 
 ---
 
-#Support the maintainer
+## Support the maintainer
 
 This software is provided under MIT license and therefore freely usable without restrictions. Dontations are always welcome:
 
