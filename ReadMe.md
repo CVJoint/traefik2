@@ -133,3 +133,11 @@ do
 Now I have a line saved in my notes of all my "standard" services so that I can start/stop them easily. I have two lines saved: One starts the database containers first, the other lists the databases at the end so that they're stopped last.
 
 ---
+
+#Support the maintainer
+
+This software is provided under MIT license and therefore freely usable without restrictions. Dontations are always welcome:
+
+ETH - 0x05aC8e6C1cb8A7a4624F550c62a41Be96dD5d2E3
+
+BTC - 35UcjMWh39wvbugg2HRDt49a9LV25FT6d8
