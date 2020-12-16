@@ -5,7 +5,7 @@ services:
     user: "$PUID:$PGID"
     container_name: xteve
     image: tnwhitwell/xteve:latest
-    restart: unless-stopped
+    restart: always
     network_mode: "service:wireguard"
 #    networks:
 #      pi_net:

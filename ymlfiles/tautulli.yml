@@ -5,7 +5,7 @@ services:
   tautulli:
     container_name: tautulli
     image: linuxserver/tautulli:latest
-    restart: unless-stopped
+    restart: always
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.243
@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.tautulli-rtr.entrypoints=https"
-      - "traefik.http.routers.tautulli-rtr.rule=HostHeader(`tautulli.$DOMAINNAME`)"
+      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME`)"
       - "traefik.http.routers.tautulli-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.tautulli-rtr.middlewares=secure-chain@file"
@@ -33,7 +33,7 @@ services:
       - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"
       ## API
       - "traefik.http.routers.tautulliAPI-rtr.entrypoints=https"
-      - "traefik.http.routers.tautulliAPI-rtr.rule=Headers(`X-Api-Key`, `$TAUTULLI_DEVICE_KEY`) || Query(`apikey`, `$TAUTULLI_DEVICE_KEY`)"
+      - "traefik.http.routers.tautulliAPI-rtr.rule=Host(`tautulli.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$TAUTULLI_DEVICE_KEY`) || Query(`apikey`, `$TAUTULLI_DEVICE_KEY`))"
       - "traefik.http.routers.tautulliAPI-rtr.priority=20"
       - "traefik.http.routers.tautulliAPI-rtr.middlewares=basic-chain@file"
       - "traefik.http.routers.tautulliAPI-rtr.service=tautulli-svc"

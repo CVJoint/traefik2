@@ -86,7 +86,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.code-rtr.entrypoints=https"
-      - "traefik.http.routers.code-rtr.rule=HostHeader(`code.$DOMAINNAME`)"
+      - "traefik.http.routers.code-rtr.rule=Host(`code.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.code-rtr.middlewares=secure-headers@file"
       ## HTTP Services

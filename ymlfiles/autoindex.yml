@@ -18,7 +18,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.autoindex-rtr.entrypoints=https"
-      - "traefik.http.routers.autoindex-rtr.rule=HostHeader(`autoindex.$DOMAINNAME`)"
+      - "traefik.http.routers.autoindex-rtr.rule=Host(`autoindex.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.autoindex-rtr.middlewares=secure-chain@file"
       ## HTTP Services

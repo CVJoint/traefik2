@@ -6,7 +6,7 @@ services:
   hydra:
     container_name: hydra
     image: linuxserver/nzbhydra2:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.hydra-rtr.entrypoints=https"
-      - "traefik.http.routers.hydra-rtr.rule=HostHeader(`hydra.$DOMAINNAME`)"
+      - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.hydra-rtr.middlewares=secure-chain@file"
       ## HTTP Services

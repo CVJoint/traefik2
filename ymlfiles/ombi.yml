@@ -5,7 +5,7 @@ services:
   ombi:
     container_name: ombi
     image: linuxserver/ombi:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.ombi-rtr.entrypoints=https"
-      - "traefik.http.routers.ombi-rtr.rule=HostHeader(`ombi.$DOMAINNAME`)"
+      - "traefik.http.routers.ombi-rtr.rule=Host(`ombi.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.ombi-rtr.middlewares=secure-headers@file,rate-limit@file"
       ## HTTP Services

@@ -6,7 +6,7 @@ services:
   motioneye:
     image: ccrisan/motioneye:master-amd64
     container_name: motioneye
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     ports:
@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.motioneye-rtr.entrypoints=https"
-      - "traefik.http.routers.motioneye-rtr.rule=HostHeader(`motioneye.$DOMAINNAME`)"
+      - "traefik.http.routers.motioneye-rtr.rule=Host(`motioneye.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.motioneye-rtr.middlewares=secure-chain@file"
       ## HTTP Services

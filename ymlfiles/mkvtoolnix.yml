@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.mkvtoolnix-rtr.entrypoints=https"
-      - "traefik.http.routers.mkvtoolnix-rtr.rule=HostHeader(`mkvtoolnix.$DOMAINNAME`)"
+      - "traefik.http.routers.mkvtoolnix-rtr.rule=Host(`mkvtoolnix.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.mkvtoolnix-rtr.middlewares=secure-chain@file"
       ## HTTP Services

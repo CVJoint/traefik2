@@ -8,7 +8,7 @@ services:
   organizr:
     container_name: organizr
     image: organizrtools/organizr-v2:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     ports:
@@ -25,7 +25,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.organizr-rtr.entrypoints=https"
-      - "traefik.http.routers.organizr-rtr.rule=HostHeader(`organizr.$DOMAINNAME`)"
+      - "traefik.http.routers.organizr-rtr.rule=Host(`organizr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.organizr-rtr.middlewares=organizr-headers"
       - "traefik.http.middlewares.organizr-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

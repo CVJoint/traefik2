@@ -39,7 +39,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.diskover-rtr.entrypoints=https"
-      - "traefik.http.routers.diskover-rtr.rule=HostHeader(`diskover.$DOMAINNAME`)"
+      - "traefik.http.routers.diskover-rtr.rule=Host(`diskover.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.diskover-rtr.middlewares=secure-chain@file"
       ## HTTP Services

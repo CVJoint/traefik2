@@ -11,7 +11,7 @@ services:
   unifi:
     container_name: unifi
     image: linuxserver/unifi-controller:arm32v7-latest
-    restart: unless-stopped
+    restart: always
     network_mode: host
 #    networks:
 #      - pi_net

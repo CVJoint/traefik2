@@ -26,7 +26,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.hass-rtr.entrypoints=https"
-      - "traefik.http.routers.hass-rtr.rule=HostHeader(`hass.$DOMAINNAME`)"
+      - "traefik.http.routers.hass-rtr.rule=Host(`hass.$DOMAINNAME`)"
       - "traefik.http.routers.hass-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.hass-rtr.middlewares=secure-headers@file"

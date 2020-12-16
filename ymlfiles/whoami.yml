@@ -5,7 +5,7 @@ services:
   whoami:
     container_name: whoami
     image: containous/whoami:v1.3.0
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     security_opt:
@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.whoami-rtr.entrypoints=https"
-      - "traefik.http.routers.whoami-rtr.rule=HostHeader(`whoami.$DOMAINNAME`)"
+      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.whoami-rtr.middlewares=secure-chain@file"
       ## HTTP Services

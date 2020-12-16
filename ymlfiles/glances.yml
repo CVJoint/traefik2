@@ -6,7 +6,7 @@ services:
     container_name: glances
     image: nicolargo/glances:latest
     pid: host
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.glances-rtr.entrypoints=https"
-      - "traefik.http.routers.glances-rtr.rule=HostHeader(`glances.$DOMAINNAME`)"
+      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.glances-rtr.middlewares=secure-chain@file"
       ## HTTP Services

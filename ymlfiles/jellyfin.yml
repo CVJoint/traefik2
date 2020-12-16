@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
-      - "traefik.http.routers.jellyfin-rtr.rule=HostHeader(`jellyfin.$DOMAINNAME`)"
+      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jellyfin-rtr.middlewares=jellyfin-headers"
       - "traefik.http.middlewares.jellyfin-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"

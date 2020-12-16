@@ -37,7 +37,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.projectsend-rtr.entrypoints=https"
-      - "traefik.http.routers.projectsend-rtr.rule=HostHeader(`send.$DOMAINNAME`)"
+      - "traefik.http.routers.projectsend-rtr.rule=Host(`send.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.projectsend-rtr.middlewares=secure-headers@file,rate-limit@file"
       ## HTTP Services

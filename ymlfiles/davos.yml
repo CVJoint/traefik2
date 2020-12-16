@@ -5,7 +5,7 @@ services:
   davos:
     container_name: davos
     image: linuxserver/davos:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.davos-rtr.entrypoints=https"
-      - "traefik.http.routers.davos-rtr.rule=HostHeader(`davos.$DOMAINNAME`)"
+      - "traefik.http.routers.davos-rtr.rule=Host(`davos.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.davos-rtr.middlewares=secure-chain@file"
       ## HTTP Services

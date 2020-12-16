@@ -5,7 +5,7 @@ services:
   soulseek:
     container_name: soulseek
     image: realies/soulseek:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    network_mode: "container:qbittorrent"
@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.soulseek-rtr.entrypoints=https"
-      - "traefik.http.routers.soulseek-rtr.rule=HostHeader(`soulseek.$DOMAINNAME`)"
+      - "traefik.http.routers.soulseek-rtr.rule=Host(`soulseek.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.soulseek-rtr.middlewares=secure-chain@file"
       ## HTTP Services

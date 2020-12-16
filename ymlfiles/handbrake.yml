@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.handbrake-rtr.entrypoints=https"
-      - "traefik.http.routers.handbrake-rtr.rule=HostHeader(`handbrake.$DOMAINNAME`)"
+      - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.handbrake-rtr.middlewares=secure-chain@file"
       ## HTTP Services

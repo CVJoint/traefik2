@@ -58,7 +58,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.keycloak-rtr.entrypoints=https"
-      - "traefik.http.routers.keycloak-rtr.rule=HostHeader(`keycloak.$DOMAINNAME`)"
+      - "traefik.http.routers.keycloak-rtr.rule=Host(`keycloak.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.keycloak-rtr.middlewares=secure-chain@file"
       ## HTTP Services

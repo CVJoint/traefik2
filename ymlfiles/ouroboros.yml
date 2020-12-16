@@ -7,7 +7,7 @@ services:
   ouroboros:
     container_name: ouroboros
     image: pyouroboros/ouroboros:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
       - docker_socket

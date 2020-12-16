@@ -57,7 +57,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.codimd-rtr.entrypoints=https"
-      - "traefik.http.routers.codimd-rtr.rule=HostHeader(`codimd.$DOMAINNAME`)"
+      - "traefik.http.routers.codimd-rtr.rule=Host(`codimd.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.codimd-rtr.middlewares=secure-headers@file"
       ## HTTP Services

@@ -5,7 +5,7 @@ services:
   requestrr:
     container_name: requestrr
     image: darkalfx/requestrr:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -20,7 +20,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.requestrr-rtr.entrypoints=https"
-      - "traefik.http.routers.requestrr-rtr.rule=HostHeader(`requestrr.$DOMAINNAME`)"
+      - "traefik.http.routers.requestrr-rtr.rule=Host(`requestrr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.requestrr-rtr.middlewares=secure-chain@file"
       ## HTTP Services

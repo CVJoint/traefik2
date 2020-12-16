@@ -10,7 +10,7 @@ services:
   lemmy:
     container_name: lemmy
     image: dessalines/lemmy:v0.6.65
-    restart: unless-stopped
+    restart: always
     depends_on:
       - pictshare
       - iframely
@@ -31,7 +31,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.lemmy-rtr.entrypoints=https"
-      - "traefik.http.routers.lemmy-rtr.rule=HostHeader(`lemmy.$DOMAINNAME`)"
+      - "traefik.http.routers.lemmy-rtr.rule=Host(`lemmy.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.lemmy-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -41,7 +41,7 @@ services:
   pictshare:
     container_name: pictshare
     image: shtripok/pictshare:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - lemmy
 #    ports:
@@ -52,7 +52,7 @@ services:
   iframely:
     container_name: iframely
     image: dogbin/iframely:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - lemmy
 #    ports:

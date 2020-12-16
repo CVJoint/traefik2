@@ -5,7 +5,7 @@ services:
   cryptpad:
     container_name: cryptpad
     image: "promasu/cryptpad:latest"
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -29,7 +29,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.cryptpad-rtr.entrypoints=https"
-      - "traefik.http.routers.cryptpad-rtr.rule=HostHeader(`cryptpad.$DOMAINNAME`)"
+      - "traefik.http.routers.cryptpad-rtr.rule=Host(`cryptpad.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.cryptpad-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -37,7 +37,7 @@ services:
       - "traefik.http.services.cryptpad-svc.loadbalancer.server.port=3000"
       ## Sandbox
       - "traefik.http.routers.cryptpad-sandbox-rtr.entrypoints=https"
-      - "traefik.http.routers.cryptpad-sandbox-rtr.rule=HostHeader(`cryptpad-sandbox.$DOMAINNAME`)"
+      - "traefik.http.routers.cryptpad-sandbox-rtr.rule=Host(`cryptpad-sandbox.$DOMAINNAME`)"
       - "traefik.http.routers.cryptpad-sandbox-rtr.middlewares=secure-chain@file"
       - "traefik.http.routers.cryptpad-sandbox-rtr.service=cryptpad-sandbox-svc"
       - "traefik.http.services.cryptpad-sandbox-svc.loadbalancer.server.port=3001"

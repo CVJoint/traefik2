@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.riot-rtr.entrypoints=https"
-      - "traefik.http.routers.riot-rtr.rule=HostHeader(`riot.$DOMAINNAME`)"
+      - "traefik.http.routers.riot-rtr.rule=Host(`riot.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.riot-rtr.middlewares=secure-chain@file"
       ## HTTP Services

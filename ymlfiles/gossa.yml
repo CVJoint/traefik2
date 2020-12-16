@@ -21,7 +21,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.gossa-rtr.entrypoints=https"
-      - "traefik.http.routers.gossa-rtr.rule=HostHeader(`gossa.$DOMAINNAME`)"
+      - "traefik.http.routers.gossa-rtr.rule=Host(`gossa.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.gossa-rtr.middlewares=secure-chain@file"
       ## HTTP Services

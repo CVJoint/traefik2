@@ -6,7 +6,7 @@ services:
 #    user: $PUID:$PGID
     image: codercom/code-server:latest
     container_name: vscode
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -20,7 +20,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.vscode-rtr.entrypoints=https"
-      - "traefik.http.routers.vscode-rtr.rule=HostHeader(`vscode.$DOMAINNAME`)"
+      - "traefik.http.routers.vscode-rtr.rule=Host(`vscode.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.vscode-rtr.middlewares=secure-chain@file"
       ## HTTP Services

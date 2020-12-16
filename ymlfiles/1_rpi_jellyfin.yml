@@ -4,7 +4,7 @@ services:
   jellyfin:
     container_name: jellyfin
     image: linuxserver/jellyfin:latest
-    restart: unless-stopped
+    restart: always
     devices:
       - /dev/dri:/dev/dri #optional
       - /dev/vcsm:/dev/vcsm #optional

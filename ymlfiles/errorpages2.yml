@@ -4,8 +4,8 @@ services:
 ## Errorpages - Serve custom error pages
   errorpages:
     container_name: errorpages
-    image: billimek/custom-error-pages:0.4.4
-    restart: unless-stopped
+    image: tboerger/errors:latest
+    restart: always
     networks:
       - traefik_proxy
     ports:

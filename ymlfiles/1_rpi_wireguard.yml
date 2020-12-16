@@ -7,7 +7,7 @@ services:
   wireguard:
     container_name: wireguard
     image: linuxserver/wireguard:latest
-    restart: unless-stopped
+    restart: always
     networks:
       pi_net:
         ipv4_address: 192.168.40.254

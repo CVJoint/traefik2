@@ -6,7 +6,7 @@ services:
   xteve:
     container_name: xteve
     image: alturismo/xteve:latest
-    restart: unless-stopped
+    restart: always
     network_mode: "container:qbittorrent"
 #    networks:
 #      - traefik_proxy
@@ -28,7 +28,7 @@ services:
 #      - "traefik.enable=true"
 #      ## HTTP Routers
 #      - "traefik.http.routers.xteve-rtr.entrypoints=https"
-#      - "traefik.http.routers.xteve-rtr.rule=HostHeader(`xteve.$DOMAINNAME`)"
+#      - "traefik.http.routers.xteve-rtr.rule=Host(`xteve.$DOMAINNAME`)"
 #      ## Middlewares
 #      - "traefik.http.routers.xteve-rtr.middlewares=secure-chain@file"
 #      ## HTTP Services

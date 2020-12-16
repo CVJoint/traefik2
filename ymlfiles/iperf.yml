@@ -5,7 +5,7 @@ services:
   iperf:
     container_name: iperf
     image: mlabbe/iperf3:latest
-    restart: unless-stopped
+    restart: always
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.199

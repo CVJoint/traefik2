@@ -5,7 +5,7 @@ services:
   openbazaar:
     container_name: openbazaar
     image: openbazaar/server:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     ports:
@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.openbazaar-rtr.entrypoints=https"
-      - "traefik.http.routers.openbazaar-rtr.rule=HostHeader(`openbazaar.$DOMAINNAME`)"
+      - "traefik.http.routers.openbazaar-rtr.rule=Host(`openbazaar.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.openbazaar-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -14,7 +14,7 @@ services:
   bin:
     container_name: bin
     image: claudehohl/stikked:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
       - mariadb
@@ -41,7 +41,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.bin-rtr.entrypoints=https"
-      - "traefik.http.routers.bin-rtr.rule=HostHeader(`bin.$DOMAINNAME`)"
+      - "traefik.http.routers.bin-rtr.rule=Host(`bin.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.bin-rtr.middlewares=secure-headers@file"
       ## HTTP Services

@@ -5,7 +5,7 @@ services:
   wetty:
     container_name: wetty
     image: svenihoney/wetty:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -25,7 +25,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.wetty-rtr.entrypoints=https"
-      - "traefik.http.routers.wetty-rtr.rule=HostHeader(`wetty.$DOMAINNAME`)"
+      - "traefik.http.routers.wetty-rtr.rule=Host(`wetty.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.wetty-rtr.middlewares=secure-chain@file"
       ## HTTP Services

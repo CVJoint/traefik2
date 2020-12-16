@@ -8,7 +8,7 @@ services:
     image: prom/prometheus:latest
     depends_on:
       - coinmarketcap-exporter
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -35,7 +35,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.prometheus-rtr.entrypoints=https"
-      - "traefik.http.routers.prometheus-rtr.rule=HostHeader(`prometheus.$DOMAINNAME`)"
+      - "traefik.http.routers.prometheus-rtr.rule=Host(`prometheus.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.prometheus-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -46,7 +46,7 @@ services:
   coinmarketcap-exporter:
     container_name: coinmarketcap-exporter
     image: bcawthra/coinmarketcap-exporter:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:

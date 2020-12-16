@@ -30,7 +30,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.matrix-rtr.entrypoints=https"
-      - "traefik.http.routers.matrix-rtr.rule=HostHeader(`matrix.$DOMAINNAME`)"
+      - "traefik.http.routers.matrix-rtr.rule=Host(`matrix.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -62,7 +62,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.matrix-rtr.entrypoints=https"
-      - "traefik.http.routers.matrix-rtr.rule=HostHeader(`matrix-ident.$DOMAINNAME`)"
+      - "traefik.http.routers.matrix-rtr.rule=Host(`matrix-ident.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.matrix-rtr.middlewares=secure-chain@file"
       ## HTTP Services

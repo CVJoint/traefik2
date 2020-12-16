@@ -30,7 +30,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.filebot-rtr.entrypoints=https"
-      - "traefik.http.routers.filebot-rtr.rule=HostHeader(`filebot.$DOMAINNAME`)"
+      - "traefik.http.routers.filebot-rtr.rule=Host(`filebot.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.filebot-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -5,7 +5,7 @@ services:
   cloud9:
     container_name: cloud9
     image: linuxserver/cloud9:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -25,7 +25,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.cloud9-rtr.entrypoints=https"
-      - "traefik.http.routers.cloud9-rtr.rule=HostHeader(`cloud9.$DOMAINNAME`)"
+      - "traefik.http.routers.cloud9-rtr.rule=Host(`cloud9.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.cloud9-rtr.middlewares=secure-chain@file"
       ## HTTP Services

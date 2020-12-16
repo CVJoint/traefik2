@@ -25,6 +25,7 @@ services:
       - --entrypoints.https.http.tls.domains[1].main=$DOMAIN # Pulls main cert for second domain
       - --entrypoints.https.http.tls.domains[1].sans=*.$DOMAIN # Pulls wildcard cert for second domain
       - --entryPoints.traefik.address=:8080
+      - --entryPoints.wireguard.address=:51820/udp
       - --api=true
 #      - --api.insecure=true
 #      - --serversTransport.insecureSkipVerify=true
@@ -36,7 +37,7 @@ services:
       - --accessLog.filters.statusCodes=400-499
       - --providers.docker=true
       - --providers.docker.endpoint=tcp://docker-socket-proxy:2375 # My docker-socket-proxy
-      - --providers.docker.defaultrule=HostHeader(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
+      - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=traefik_proxy
       - --providers.docker.swarmMode=false
@@ -61,6 +62,10 @@ services:
         published: 443
         protocol: tcp
         mode: host
+      - target: 51820 # wireguard
+        published: 51820
+        protocol: udp
+        mode: host
     security_opt:
       - no-new-privileges:true # https://docs.docker.com/engine/reference/run/#security-configuration
     volumes:
@@ -80,10 +85,10 @@ services:
       - "traefik.enable=true"
       # HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
-      - "traefik.http.routers.traefik-rtr.rule=HostHeader(`traefik.$DOMAINNAME`)"
+      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.priority=10"
       ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file,errorpages@file"
+      - "traefik.http.routers.traefik-rtr.middlewares=traefik-headers,rate-limit@file,authelia@file,errorpages@docker"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolallowmethods=GET, OPTIONS, PUT"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolalloworiginlist=https://$DOMAINNAME"
       - "traefik.http.middlewares.traefik-headers.headers.accesscontrolmaxage=100"
@@ -110,7 +115,7 @@ services:
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## API Forward Auth Bypass # Used for willfantom/SUI - automatic traefik dashboard
       - "traefik.http.routers.traefik-bypass.entrypoints=https"
-      - "traefik.http.routers.traefik-bypass.rule=HostHeader(`traefik.$DOMAINNAME`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.traefik-bypass.rule=Host(`traefik.$DOMAINNAME`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.traefik-bypass.middlewares=traefik-headers,traefik-basicauth,rate-limit@file"
       - "traefik.http.middlewares.traefik-basicauth.basicauth.users=$MY_USERNAME:$TRAEFIK_PASSWORD" # password must be htpasswd hash
       - "traefik.http.routers.traefik-bypass.priority=20"

@@ -21,7 +21,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.logio-rtr.entrypoints=https"
-      - "traefik.http.routers.logio-rtr.rule=HostHeader(`logs.$DOMAINNAME`)"
+      - "traefik.http.routers.logio-rtr.rule=Host(`logs.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.logio-rtr.middlewares=secure-chain@file"
       ## HTTP Services

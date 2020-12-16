@@ -37,7 +37,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.mongoexpress-rtr.entrypoints=https"
-      - "traefik.http.routers.mongoexpress-rtr.rule=HostHeader(`mongoexpress.$DOMAINNAME`)"
+      - "traefik.http.routers.mongoexpress-rtr.rule=Host(`mongoexpress.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.mongoexpress-rtr.middlewares=secure-chain@file"
       ## HTTP Services

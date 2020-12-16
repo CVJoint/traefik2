@@ -6,7 +6,7 @@ services:
     user: "$PUID"
     container_name: grafana
     image: grafana/grafana:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
 #    ports:
@@ -21,7 +21,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.grafana-rtr.entrypoints=https"
-      - "traefik.http.routers.grafana-rtr.rule=HostHeader(`grafana.$DOMAINNAME`)"
+      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.grafana-rtr.middlewares=secure-chain@file"
       ## HTTP Services

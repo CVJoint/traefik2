@@ -9,7 +9,7 @@ services:
   nzbget:
     container_name: nzbget
     image: linuxserver/nzbget:latest
-    restart: unless-stopped
+    restart: always
     networks:
       traefik_proxy:
         ipv4_address: 192.168.50.241
@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.nzbget-rtr.entrypoints=https"
-      - "traefik.http.routers.nzbget-rtr.rule=HostHeader(`nzbget.$DOMAINNAME`)"
+      - "traefik.http.routers.nzbget-rtr.rule=Host(`nzbget.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.nzbget-rtr.middlewares=secure-chain@file"
       ## HTTP Services

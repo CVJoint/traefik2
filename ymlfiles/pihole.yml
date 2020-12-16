@@ -37,7 +37,7 @@
     # Lots of good lists here: https://www.github.developerdan.com/hosts/
   ## These regex's: https://github.com/mmotti/pihole-regex
     # docker exec -it pihole bash
-    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.sh | bash
+    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.py | sudo python3 ## doesn't work for me, had to enter manually. (maybe it wants /etc/pihole to be on the host?)
     # exit
   ## And I've added the following whitelist entries (copy domains and paste all at once)
     # https://github.com/anudeepND/whitelist/blob/master/domains/whitelist.txt
@@ -69,14 +69,10 @@ services:
       - no-new-privileges:true
     volumes:
       - $USERDIR/docker/pihole/pihole:/etc/pihole
-#      ## Add dark skin to pihole: https://github.com/thomasbnt/Night_PiHole
-      - $USERDIR/docker/pihole/theme/skin-blue.min.css:/var/www/html/admin/style/vendor/skin-blue.min.css
-      - $USERDIR/docker/pihole/theme/AdminLTE.min.css:/var/www/html/admin/style/vendor/AdminLTE.min.css
       - $USERDIR/docker/pihole/resolv.conf/resolv.conf:/etc/resolv.conf:ro
       - $USERDIR/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
       ## Run `touch ~/docker/pihole/pihole.log` before starting pihole
       - $USERDIR/docker/pihole/pihole.log:/var/log/pihole.log
-      - ${USERDIR}/docker/pihole/scripts/whitelist/scripts/whitelist.sh:/usr/local/bin/whitelist.sh
     environment:
       - TZ=$TZ
       - ServerIP=192.168.1.50 # (My Docker Host IP)
@@ -88,7 +84,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.pihole-rtr.entrypoints=https"
-      - "traefik.http.routers.pihole-rtr.rule=HostHeader(`pihole.$DOMAINNAME`)"
+      - "traefik.http.routers.pihole-rtr.rule=Host(`pihole.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.pihole-rtr.middlewares=secure-chain@file,add-admin@file"
       ## HTTP Services

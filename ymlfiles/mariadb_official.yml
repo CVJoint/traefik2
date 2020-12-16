@@ -86,7 +86,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
-      - "traefik.http.routers.phpmyadmin-rtr.rule=HostHeader(`phpmyadmin.$DOMAINNAME`)"
+      - "traefik.http.routers.phpmyadmin-rtr.rule=Host(`phpmyadmin.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.phpmyadmin-rtr.middlewares=secure-chain@file"
       ## HTTP Services

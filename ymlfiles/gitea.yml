@@ -50,7 +50,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.gitea-rtr.entrypoints=https"
-      - "traefik.http.routers.gitea-rtr.rule=HostHeader(`gitea.$DOMAINNAME`)"
+      - "traefik.http.routers.gitea-rtr.rule=Host(`gitea.$DOMAINNAME`)"
       - "traefik.http.routers.gitea-API-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.gitea-rtr.middlewares=secure-chain@file"

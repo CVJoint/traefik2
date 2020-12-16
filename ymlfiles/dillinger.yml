@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.dillinger-rtr.entrypoints=https"
-      - "traefik.http.routers.dillinger-rtr.rule=HostHeader(`dillinger.$DOMAINNAME`)"
+      - "traefik.http.routers.dillinger-rtr.rule=Host(`dillinger.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.dillinger-rtr.middlewares=secure-headers@file,dillinger-auth" # Doesn't work with OAuth for some reason
       - "traefik.http.middlewares.dillinger-auth.basicauth.users=$HTPASSWD"

@@ -19,9 +19,10 @@
       ## More info: https://www.reddit.com/r/pihole/comments/bppug1/introducing_the/
     # https://raw.githubusercontent.com/llacb47/mischosts/master/social/tiktok-block
       ## More info: https://www.reddit.com/r/pihole/comments/hi4g08/tiktok_list/fwegcwi/?context=1
+    # Lots of good lists here: https://www.github.developerdan.com/hosts/
   ## These regex's: https://github.com/mmotti/pihole-regex
     # docker exec -it pihole bash
-    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.sh | bash
+    # curl -sSl https://raw.githubusercontent.com/mmotti/pihole-regex/master/install.py | sudo python3 ## doesn't work for me, had to enter manually. (maybe it wants /etc/pihole to be on the host?)
     # exit
   ## And I've added the following whitelist entries (copy domains and paste all at once)
     # https://github.com/anudeepND/whitelist/blob/master/domains/whitelist.txt
@@ -33,7 +34,7 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
-    restart: unless-stopped
+    restart: always
     depends_on:
       - unbound
     cap_add:
@@ -52,9 +53,6 @@ services:
 #      - '443:443/tcp'
     volumes:
       - ~/docker/pihole/pihole:/etc/pihole
-#      ## Add dark skin to pihole: https://github.com/thomasbnt/Night_PiHole
-#      - ~/docker/pihole/theme/skin-blue.min.css:/var/www/html/admin/style/vendor/skin-blue.min.css
-#      - ~/docker/pihole/theme/AdminLTE.min.css:/var/www/html/admin/style/vendor/AdminLTE.min.css
       - ~/docker/pihole/resolv.conf/resolv.conf:/etc/resolv.conf:ro
       - ~/docker/pihole/dnsmasq.d:/etc/dnsmasq.d
       ## Run `touch ~/docker/pihole/pihole.log` before starting pihole

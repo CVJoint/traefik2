@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.makemkv-rtr.entrypoints=https"
-      - "traefik.http.routers.makemkv-rtr.rule=HostHeader(`makemkv.$DOMAINNAME`)"
+      - "traefik.http.routers.makemkv-rtr.rule=Host(`makemkv.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.makemkv-rtr.middlewares=secure-chain@file"
       ## HTTP Services

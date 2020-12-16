@@ -63,7 +63,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.firefly-rtr.entrypoints=https"
-      - "traefik.http.routers.firefly-rtr.rule=HostHeader(`firefly.$DOMAINNAME`)"
+      - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.firefly-rtr.middlewares=secure-chain@file"
       ## HTTP Services
@@ -90,7 +90,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.csvimporter-rtr.entrypoints=https"
-      - "traefik.http.routers.csvimporter-rtr.rule=HostHeader(`csvimporter.$DOMAINNAME`)"
+      - "traefik.http.routers.csvimporter-rtr.rule=Host(`csvimporter.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.csvimporter-rtr.middlewares=secure-chain@file"
       ## HTTP Services

@@ -134,10 +134,10 @@ Now I have a line saved in my notes of all my "standard" services so that I can 
 
 ---
 
-## Support the maintainer
+## Tip the maintainer
 
 This software is provided under MIT license and therefore freely usable without restrictions. Dontations are always welcome:
 
-ETH - 0x05aC8e6C1cb8A7a4624F550c62a41Be96dD5d2E3
+ETH - cvjoint.eth
 
 BTC - 35UcjMWh39wvbugg2HRDt49a9LV25FT6d8

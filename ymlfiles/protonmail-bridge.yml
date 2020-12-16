@@ -5,7 +5,7 @@ services:
   protonmail-bridge:
     container_name: protonmail-bridge
     image: shenxn/protonmail-bridge:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     ports:

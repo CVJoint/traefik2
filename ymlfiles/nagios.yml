@@ -55,7 +55,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.nagios-rtr.entrypoints=https"
-      - "traefik.http.routers.nagios-rtr.rule=HostHeader(`nagios.$DOMAINNAME`)"
+      - "traefik.http.routers.nagios-rtr.rule=Host(`nagios.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.nagios-rtr.middlewares=secure-chain@file"
       ## HTTP Services

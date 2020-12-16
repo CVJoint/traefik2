@@ -5,7 +5,7 @@ services:
   countdown:
     container_name: countdown
     image: yooooomi/easy-countdown:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
     ports:
@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.countdown-rtr.entrypoints=https"
-      - "traefik.http.routers.countdown-rtr.rule=HostHeader(`countdown.$DOMAINNAME`)"
+      - "traefik.http.routers.countdown-rtr.rule=Host(`countdown.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.countdown-rtr.middlewares=secure-chain@file"
       ## HTTP Services

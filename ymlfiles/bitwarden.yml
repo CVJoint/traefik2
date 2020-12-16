@@ -36,7 +36,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.bitwarden-rtr.entrypoints=https"
-      - "traefik.http.routers.bitwarden-rtr.rule=HostHeader(`bitwarden.$DOMAINNAME`)"
+      - "traefik.http.routers.bitwarden-rtr.rule=Host(`bitwarden.$DOMAINNAME`)"
       - "traefik.http.routers.bitwarden-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.bitwarden-rtr.middlewares=secure-headers@file"
@@ -51,7 +51,7 @@ services:
       - "traefik.http.services.bitwardenHub-svc.loadbalancer.server.port=3012"
       ## Admin Page
       - "traefik.http.routers.bitwardenAdmin-rtr.entrypoints=https"
-      - "traefik.http.routers.bitwardenAdmin-rtr.rule=(HostHeader(`bitwarden.$DOMAINNAME`) && Path(`/admin/`))"
+      - "traefik.http.routers.bitwardenAdmin-rtr.rule=(Host(`bitwarden.$DOMAINNAME`) && Path(`/admin/`))"
       - "traefik.http.routers.bitwardenAdmin-rtr.priority=20"
       - "traefik.http.routers.bitwardenAdmin-rtr.middlewares=secure-chain@file"
       - "traefik.http.routers.bitwardenAdmin-rtr.service=bitwarden-svc"

@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.airsonic-rtr.entrypoints=https"
-      - "traefik.http.routers.airsonic-rtr.rule=HostHeader(`airsonic.$DOMAINNAME`)"
+      - "traefik.http.routers.airsonic-rtr.rule=Host(`airsonic.$DOMAINNAME`)"
       - "traefik.http.routers.airsonic-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.airsonic-rtr.middlewares=airsonic-headers"

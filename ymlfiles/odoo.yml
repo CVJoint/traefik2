@@ -28,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.odoo-rtr.entrypoints=https"
-      - "traefik.http.routers.odoo-rtr.rule=HostHeader(`odoo.$DOMAINNAME`)"
+      - "traefik.http.routers.odoo-rtr.rule=Host(`odoo.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.odoo-rtr.middlewares=secure-chain@file"
       ## HTTP Services

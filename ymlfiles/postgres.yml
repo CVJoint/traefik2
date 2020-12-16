@@ -58,7 +58,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.pgadmin-rtr.entrypoints=https"
-      - "traefik.http.routers.pgadmin-rtr.rule=HostHeader(`pgadmin.$DOMAINNAME`)"
+      - "traefik.http.routers.pgadmin-rtr.rule=Host(`pgadmin.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.pgadmin-rtr.middlewares=secure-chain@file"
       ## HTTP Services

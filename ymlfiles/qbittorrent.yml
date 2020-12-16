@@ -42,28 +42,23 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
-      - "traefik.http.routers.qbittorrent-rtr.rule=HostHeader(`qbittorrent.$DOMAINNAME`)"
+      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qbittorrent.$DOMAINNAME`)"
       - "traefik.http.routers.qbittorrent-rtr.priority=10"
       ## Middlewares
       - "traefik.http.routers.qbittorrent-rtr.middlewares=secure-chain@file"
       ## HTTP Services
       - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
       - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
-      ## API Forward Auth Bypass
-      - "traefik.http.routers.qbittorrent-bypass.entrypoints=https"
-      - "traefik.http.routers.qbittorrent-bypass.rule=HostHeader(`qbittorrent.$DOMAINNAME`) && PathPrefix(`/api/`)"
-      - "traefik.http.routers.qbittorrent-bypass.priority=20"
-      - "traefik.http.routers.qbittorrent-bypass.service=qbittorrent-svc"
 
-      #Xteve
-      ## HTTP Routers
-      - "traefik.http.routers.xteve-rtr.entrypoints=https"
-      - "traefik.http.routers.xteve-rtr.rule=HostHeader(`xteve.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.xteve-rtr.middlewares=secure-chain@file"
-      ## HTTP Services
-      - "traefik.http.routers.xteve-rtr.service=xteve-svc"
-      - "traefik.http.services.xteve-svc.loadbalancer.server.port=34400"
+#      #Xteve
+#      ## HTTP Routers
+#      - "traefik.http.routers.xteve-rtr.entrypoints=https"
+#      - "traefik.http.routers.xteve-rtr.rule=Host(`xteve.$DOMAINNAME`)"
+#      ## Middlewares
+#      - "traefik.http.routers.xteve-rtr.middlewares=secure-chain@file"
+#      ## HTTP Services
+#      - "traefik.http.routers.xteve-rtr.service=xteve-svc"
+#      - "traefik.http.services.xteve-svc.loadbalancer.server.port=34400"
 
 networks:
   traefik_proxy:

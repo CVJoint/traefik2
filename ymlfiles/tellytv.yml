@@ -18,7 +18,7 @@ services:
   tellytv:
     container_name: tellytv
     image: tellytv/telly:dev-ffmpeg
-    restart: unless-stopped
+    restart: always
     network_mode: "container:qbittorrent"
 #    networks:
 #      - traefik_proxy

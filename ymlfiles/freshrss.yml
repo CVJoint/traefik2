@@ -14,7 +14,7 @@ services:
   freshrss:
     container_name: freshrss
     image: linuxserver/freshrss:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - traefik_proxy
       - mariadb
@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.freshrss-rtr.entrypoints=https"
-      - "traefik.http.routers.freshrss-rtr.rule=HostHeader(`freshrss.$DOMAINNAME`)"
+      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.freshrss-rtr.middlewares=secure-headers@file"
       ## HTTP Services
